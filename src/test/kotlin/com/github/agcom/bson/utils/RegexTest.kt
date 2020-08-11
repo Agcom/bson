@@ -1,9 +1,5 @@
 package com.github.agcom.bson.utils
 
-import com.github.agom.bson.utils.asEmbedded
-import com.github.agom.bson.utils.toBsonRegularExpression
-import com.github.agom.bson.utils.toRegex
-import com.github.agom.bson.utils.toRegexOptions
 import io.kotest.core.spec.style.FreeSpec
 import io.kotest.matchers.shouldBe
 import org.bson.BsonRegularExpression

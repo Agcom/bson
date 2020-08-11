@@ -1,7 +1,6 @@
-package com.github.agcom.bson.encoders
+package com.github.agcom.bson.decoders
 
-import com.github.agcom.bson.Bson
-import com.github.agcom.bson.BsonConfiguration
+import com.github.agcom.bson.*
 import com.github.agcom.bson.serializers.BsonValueSerializer
 import io.kotest.core.spec.style.FreeSpec
 import io.kotest.matchers.shouldBe
@@ -17,65 +16,74 @@ class BsonValuePrimitiveTest : FreeSpec({
 
     "bson binary" {
         val binary = BsonBinary(Random.nextBytes(100))
-        bson.toBson(BsonValueSerializer, binary) shouldBe binary
+        bson.fromBson(BsonValueSerializer, binary) shouldBe binary
     }
+
     "bson boolean" {
         val bool = BsonBoolean(Random.nextBoolean())
-        bson.toBson(BsonValueSerializer, bool) shouldBe bool
+        bson.fromBson(BsonValueSerializer, bool) shouldBe bool
     }
-    "bson date-time" {
+
+    "bson date time" {
         val t = BsonDateTime(Clock.systemUTC().millis())
-        bson.toBson(BsonValueSerializer, t) shouldBe t
+        bson.fromBson(BsonValueSerializer, t) shouldBe t
     }
-    "bson decimal-128" {
+
+    "bson decimal 128" {
         val decimal = BsonDecimal128(Decimal128(Random.nextLong()))
-        bson.toBson(BsonValueSerializer, decimal) shouldBe decimal
+        bson.fromBson(BsonValueSerializer, decimal) shouldBe decimal
     }
+
     "bson double" {
         val d = BsonDouble(Random.nextDouble())
-        bson.toBson(BsonValueSerializer, d) shouldBe d
+        bson.fromBson(BsonValueSerializer, d) shouldBe d
     }
-    "bson int-32" {
-        val i = BsonInt32(Random.nextInt())
-        bson.toBson(BsonValueSerializer, i) shouldBe i
 
+    "bson int 32" {
+        val i = BsonInt32(Random.nextInt())
+        bson.fromBson(BsonValueSerializer, i) shouldBe i
     }
-    "bson int-64" {
+
+    "bson int 64" {
         val l = BsonInt64(Random.nextLong())
-        bson.toBson(BsonValueSerializer, l) shouldBe l
+        bson.fromBson(BsonValueSerializer, l) shouldBe l
     }
-    "bson java-script" {
+
+    "bson java script" {
         val js = BsonJavaScript("main() {}")
-        bson.toBson(BsonValueSerializer, js) shouldBe js
+        bson.fromBson(BsonValueSerializer, js) shouldBe js
     }
+
     "bson null" {
-        bson.toBson(BsonValueSerializer, BsonNull.VALUE) shouldBe BsonNull.VALUE
+        bson.fromBson(BsonValueSerializer, BsonNull.VALUE) shouldBe BsonNull.VALUE
     }
-    "bson object-id" {
+
+    "bson object id" {
         val id = BsonObjectId(ObjectId())
-        bson.toBson(BsonValueSerializer, id) shouldBe id
+        bson.fromBson(BsonValueSerializer, id) shouldBe id
     }
-    "bson regular expression" - {
+
+    "bson regular expresion" - {
 
         "without options" {
             val regex = BsonRegularExpression("acme.*corp")
-            bson.toBson(BsonValueSerializer, regex) shouldBe regex
+            bson.fromBson(BsonValueSerializer, regex) shouldBe regex
         }
 
         "with options" {
             val regex = BsonRegularExpression("acme.*corp", "imdxs")
-            bson.toBson(BsonValueSerializer, regex) shouldBe regex
+            bson.fromBson(BsonValueSerializer, regex) shouldBe regex
         }
 
         "a hard one" {
             val regex = BsonRegularExpression("[+-]?(\\d+(\\.\\d+)?|\\.\\d+)([eE][+-]?\\d+)?", "imdxs")
-            bson.toBson(BsonValueSerializer, regex) shouldBe regex
+            bson.fromBson(BsonValueSerializer, regex) shouldBe regex
         }
-
     }
+
     "bson string" {
         val str = BsonString("hello")
-        bson.toBson(BsonValueSerializer, str) shouldBe str
+        bson.fromBson(BsonValueSerializer, str) shouldBe str
     }
 
 })

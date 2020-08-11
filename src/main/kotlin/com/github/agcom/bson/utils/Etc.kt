@@ -1,3 +1,3 @@
-package com.github.agom.bson.utils
+package com.github.agcom.bson.utils
 
 internal const val PRIMITIVE_TAG = "primitive"

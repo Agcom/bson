@@ -1,6 +1,6 @@
-package com.github.agom.bson.decoders
+package com.github.agcom.bson.decoders
 
-import com.github.agom.bson.Bson
+import com.github.agcom.bson.Bson
 import kotlinx.serialization.CompositeDecoder
 import kotlinx.serialization.Decoder
 import org.bson.BsonValue

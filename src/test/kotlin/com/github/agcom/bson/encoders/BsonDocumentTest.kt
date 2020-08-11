@@ -1,7 +1,7 @@
 package com.github.agcom.bson.encoders
 
 import com.github.agcom.bson.models.*
-import com.github.agom.bson.*
+import com.github.agcom.bson.*
 import io.kotest.core.spec.style.FreeSpec
 import io.kotest.matchers.shouldBe
 import kotlinx.serialization.PolymorphicSerializer

@@ -1,4 +1,4 @@
-package com.github.agom.bson.utils
+package com.github.agcom.bson.utils
 
 import org.bson.BsonBinary
 import org.bson.types.Binary

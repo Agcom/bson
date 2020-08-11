@@ -1,7 +1,7 @@
-package com.github.agom.bson.serializers
+package com.github.agcom.bson.serializers
 
-import com.github.agom.bson.decoders.BsonInput
-import com.github.agom.bson.encoders.BsonOutput
+import com.github.agcom.bson.decoders.BsonInput
+import com.github.agcom.bson.encoders.BsonOutput
 import kotlinx.serialization.*
 import kotlinx.serialization.builtins.serializer
 import org.bson.types.Binary
@@ -12,7 +12,7 @@ import java.util.regex.Pattern
 @Serializer(Binary::class)
 object BinarySerializer : KSerializer<Binary> {
 
-    override val descriptor: SerialDescriptor = PrimitiveDescriptor("org.bson.types.Binary", PrimitiveKind.STRING)
+    override val descriptor: SerialDescriptor = PrimitiveDescriptor(Binary::class.qualifiedName!!, PrimitiveKind.STRING)
 
     override fun serialize(encoder: Encoder, value: Binary) {
         encoder.verify(); encoder as BsonOutput
@@ -29,7 +29,7 @@ object BinarySerializer : KSerializer<Binary> {
 @Serializer(ObjectId::class)
 object ObjectIdSerializer : KSerializer<ObjectId> {
 
-    override val descriptor: SerialDescriptor = PrimitiveDescriptor("org.bson.types.ObjectId", PrimitiveKind.STRING)
+    override val descriptor: SerialDescriptor = PrimitiveDescriptor(ObjectId::class.qualifiedName!!, PrimitiveKind.STRING)
 
     override fun serialize(encoder: Encoder, value: ObjectId) {
         encoder.verify(); encoder as BsonOutput
@@ -80,7 +80,7 @@ object JavaScriptSerializer : KSerializer<String> {
 @Serializer(Decimal128::class)
 object Decimal128Serializer : KSerializer<Decimal128> {
 
-    override val descriptor: SerialDescriptor = PrimitiveDescriptor("org.bson.types.Decimal128", PrimitiveKind.STRING)
+    override val descriptor: SerialDescriptor = PrimitiveDescriptor(Decimal128::class.qualifiedName!!, PrimitiveKind.STRING)
 
     override fun serialize(encoder: Encoder, value: Decimal128) {
         encoder.verify(); encoder as BsonOutput
@@ -97,7 +97,7 @@ object Decimal128Serializer : KSerializer<Decimal128> {
 @Serializer(Regex::class)
 object RegexSerializer : KSerializer<Regex> {
 
-    override val descriptor: SerialDescriptor = PrimitiveDescriptor("kotlin.text.Regex", PrimitiveKind.STRING)
+    override val descriptor: SerialDescriptor = PrimitiveDescriptor(Regex::class.qualifiedName!!, PrimitiveKind.STRING)
 
     override fun serialize(encoder: Encoder, value: Regex) {
         encoder.verify(); encoder as BsonOutput
@@ -117,7 +117,7 @@ object RegexSerializer : KSerializer<Regex> {
 @Serializer(Pattern::class)
 object PatternSerializer : KSerializer<Pattern> {
 
-    override val descriptor: SerialDescriptor = PrimitiveDescriptor("java.util.regex.Pattern", PrimitiveKind.STRING)
+    override val descriptor: SerialDescriptor = PrimitiveDescriptor(Pattern::class.qualifiedName!!, PrimitiveKind.STRING)
 
     override fun serialize(encoder: Encoder, value: Pattern) = encoder.encode(RegexSerializer, value.toRegex())
 

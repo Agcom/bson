@@ -1,4 +1,4 @@
-package com.github.agom.bson
+package com.github.agcom.bson
 
 data class BsonConfiguration(
         val encodeDefaults: Boolean = false,
