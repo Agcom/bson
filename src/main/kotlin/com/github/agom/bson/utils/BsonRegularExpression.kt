@@ -3,8 +3,8 @@ package com.github.agom.bson.utils
 import org.bson.BsonRegularExpression
 import kotlin.text.RegexOption.*
 
-fun Regex.toBsonRegularExpression() = BsonRegularExpression(pattern, options.asEmbedded())
-fun BsonRegularExpression.toRegex() = Regex(pattern, options.toRegexOptions())
+fun Regex.toBsonRegularExpression(): BsonRegularExpression = BsonRegularExpression(pattern, options.asEmbedded())
+fun BsonRegularExpression.toRegex(): Regex = Regex(pattern, options.toRegexOptions())
 
 /**
  * Ignores [LITERAL] and [CANON_EQ].

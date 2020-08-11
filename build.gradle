@@ -26,6 +26,8 @@ dependencies {
 compileKotlin.kotlinOptions { jvmTarget = '11' }
 compileTestKotlin.kotlinOptions { jvmTarget = '11' }
 
+test { useJUnitPlatform() }
+
 compileKotlin {
     kotlinOptions.freeCompilerArgs = ['-Xopt-in=kotlin.RequiresOptIn']
 }

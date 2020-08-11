@@ -3,6 +3,7 @@ package com.github.agcom.bson.encoders
 import com.github.agom.bson.Bson
 import com.github.agom.bson.BsonConfiguration
 import com.github.agom.bson.serializers.BsonValueSerializer
+import com.github.agom.bson.serializers.RegexSerializer
 import io.kotest.core.spec.style.FreeSpec
 import io.kotest.matchers.shouldBe
 import org.bson.*
@@ -12,9 +13,9 @@ import java.time.Clock
 import kotlin.random.Random
 
 class BsonValuePrimitiveTest : FreeSpec({
-    
+
     val bson = Bson(BsonConfiguration.DEFAULT)
-    
+
     "bson binary" {
         val binary = BsonBinary(Random.nextBytes(100))
         bson.toBson(BsonValueSerializer, binary) shouldBe binary
@@ -55,9 +56,23 @@ class BsonValuePrimitiveTest : FreeSpec({
         val id = BsonObjectId(ObjectId())
         bson.toBson(BsonValueSerializer, id) shouldBe id
     }
-    "bson regular expression" {
-        val regex = BsonRegularExpression("foo")
-        bson.toBson(BsonValueSerializer, regex) shouldBe regex
+    "bson regular expression" - {
+
+        "without options" {
+            val regex = BsonRegularExpression("acme.*corp")
+            bson.toBson(BsonValueSerializer, regex) shouldBe regex
+        }
+
+        "with options" {
+            val regex = BsonRegularExpression("acme.*corp", "imdxs")
+            bson.toBson(BsonValueSerializer, regex) shouldBe regex
+        }
+
+        "a hard one" {
+            val regex = BsonRegularExpression("[+-]?(\\d+(\\.\\d+)?|\\.\\d+)([eE][+-]?\\d+)?", "imdxs")
+            bson.toBson(BsonValueSerializer, regex) shouldBe regex
+        }
+
     }
     "bson string" {
         val str = BsonString("hello")

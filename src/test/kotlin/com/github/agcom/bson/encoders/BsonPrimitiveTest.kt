@@ -64,18 +64,42 @@ class BsonPrimitiveTest : FreeSpec({
         val decimal = Decimal128(Random.nextLong())
         bson.toBson(Decimal128Serializer, decimal) shouldBe BsonDecimal128(decimal)
     }
-    "regular expresion" {
-        bson.toBson(
-            RegexSerializer, Regex(
-                "[+-]?(\\d+(\\.\\d+)?|\\.\\d+)([eE][+-]?\\d+)?", setOf(
-                    RegexOption.IGNORE_CASE,
-                    RegexOption.MULTILINE,
-                    RegexOption.UNIX_LINES,
-                    RegexOption.COMMENTS,
-                    RegexOption.DOT_MATCHES_ALL
+    "regular expresion" - {
+
+        "without options" {
+            val regex = Regex("acme.*corp")
+            bson.toBson(RegexSerializer, regex) shouldBe BsonRegularExpression(regex.pattern)
+        }
+
+        "with options" {
+            val regex =
+                Regex(
+                    "acme.*corp", setOf(
+                        RegexOption.IGNORE_CASE,
+                        RegexOption.MULTILINE,
+                        RegexOption.LITERAL,
+                        RegexOption.UNIX_LINES,
+                        RegexOption.COMMENTS,
+                        RegexOption.DOT_MATCHES_ALL,
+                        RegexOption.CANON_EQ
+                    )
                 )
-            )
-        ) shouldBe BsonRegularExpression("[+-]?(\\d+(\\.\\d+)?|\\.\\d+)([eE][+-]?\\d+)?", "imdxs")
+            bson.toBson(RegexSerializer, regex) shouldBe BsonRegularExpression(regex.pattern, "imdxs")
+        }
+
+        "a hard one" {
+            bson.toBson(
+                RegexSerializer, Regex(
+                    "[+-]?(\\d+(\\.\\d+)?|\\.\\d+)([eE][+-]?\\d+)?", setOf(
+                        RegexOption.IGNORE_CASE,
+                        RegexOption.MULTILINE,
+                        RegexOption.UNIX_LINES,
+                        RegexOption.COMMENTS,
+                        RegexOption.DOT_MATCHES_ALL
+                    )
+                )
+            ) shouldBe BsonRegularExpression("[+-]?(\\d+(\\.\\d+)?|\\.\\d+)([eE][+-]?\\d+)?", "imdxs")
+        }
     }
     "enum kind" {
         val notFound = HttpError.NOT_FOUND
