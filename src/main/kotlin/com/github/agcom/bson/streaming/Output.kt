@@ -9,8 +9,8 @@ internal fun BsonOutput.writeBson(bson: BsonValue) {
     when (bson.bsonType) {
         DOUBLE, STRING, BINARY, OBJECT_ID, BOOLEAN, DATE_TIME, NULL, REGULAR_EXPRESSION, JAVASCRIPT, INT32, INT64, DECIMAL128 ->
             writePrimitive(bson)
-        DOCUMENT -> TODO()
-        ARRAY -> TODO()
+        DOCUMENT -> writeDocument(bson.asDocument())
+        ARRAY -> writeArray(bson.asArray())
         else -> throw BsonEncodingException("Unexpected bson type '${bson.bsonType}'")
     }
 }
@@ -48,4 +48,29 @@ private fun BsonOutput.writePrimitive(bson: BsonValue) {
         }
         else -> throw BsonEncodingException("Unexpected bson type '${bson.bsonType}'")
     }
+}
+
+private fun BsonOutput.writeDocument(doc: BsonDocument) {
+
+    writeInt32(0) // reserve space for size
+    val startPosition = position
+    for ((key, value) in doc) {
+        writeCString(key)
+        writeBson(value)
+    }
+    writeByte(END_OF_DOCUMENT.value)
+
+    val size: Int = position - startPosition
+    writeInt32(startPosition, size)
+}
+
+private fun BsonOutput.writeArray(array: BsonArray) {
+    writeByte(ARRAY.value)
+    val startPosition = position
+    writeInt32(0) // reserve space for size
+    array.forEach(::writeBson)
+    writeByte(END_OF_DOCUMENT.value)
+
+    val size = position - startPosition
+    writeInt32(startPosition, size)
 }
