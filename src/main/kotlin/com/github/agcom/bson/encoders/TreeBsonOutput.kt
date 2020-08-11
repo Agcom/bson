@@ -16,8 +16,8 @@ import org.bson.types.ObjectId
 
 @OptIn(InternalSerializationApi::class)
 private sealed class AbstractBsonTreeOutput(
-        final override val bson: Bson,
-        val nodeConsumer: (BsonValue) -> Unit
+    final override val bson: Bson,
+    val nodeConsumer: (BsonValue) -> Unit
 ) : NamedValueEncoder(), BsonOutput {
 
     final override val context: SerialModule
@@ -27,7 +27,8 @@ private sealed class AbstractBsonTreeOutput(
 
     override fun encodeBson(element: BsonValue) = encodeSerializableValue(BsonValueSerializer, element)
 
-    override fun shouldEncodeElementDefault(descriptor: SerialDescriptor, index: Int): Boolean = bson.configuration.encodeDefaults
+    override fun shouldEncodeElementDefault(descriptor: SerialDescriptor, index: Int): Boolean =
+        bson.configuration.encodeDefaults
 
     override fun composeName(parentName: String, childName: String): String = childName
 
@@ -41,7 +42,8 @@ private sealed class AbstractBsonTreeOutput(
     override fun encodeTaggedBoolean(tag: String, value: Boolean) = putElement(tag, BsonBoolean(value))
     override fun encodeTaggedString(tag: String, value: String) = putElement(tag, BsonString(value))
     override fun encodeTaggedChar(tag: String, value: Char) = encodeTaggedString(tag, value.toString())
-    override fun encodeTaggedEnum(tag: String, enumDescription: SerialDescriptor, ordinal: Int) = encodeTaggedString(tag, enumDescription.getElementName(ordinal))
+    override fun encodeTaggedEnum(tag: String, enumDescription: SerialDescriptor, ordinal: Int) =
+        encodeTaggedString(tag, enumDescription.getElementName(ordinal))
 
     override fun encodeTaggedValue(tag: String, value: Any) = encodeTaggedString(tag, value.toString())
 
@@ -50,7 +52,9 @@ private sealed class AbstractBsonTreeOutput(
     private fun encodeTaggedDateTime(tag: String, value: Long) = putElement(tag, BsonDateTime(value))
     private fun encodeTaggedJavaScript(tag: String, value: String) = putElement(tag, BsonJavaScript(value))
     private fun encodeTaggedDecimal128(tag: String, value: Decimal128) = putElement(tag, BsonDecimal128(value))
-    private fun encodeTaggedRegularExpression(tag: String, value: Regex) = putElement(tag, value.toBsonRegularExpression())
+    private fun encodeTaggedRegularExpression(tag: String, value: Regex) =
+        putElement(tag, value.toBsonRegularExpression())
+
     private fun encodeTaggedBson(tag: String, value: BsonValue) = putElement(tag, value)
 
     override fun encodeBinary(binary: Binary) = encodeTaggedBinary(popTag(), binary)
@@ -90,8 +94,8 @@ private sealed class AbstractBsonTreeOutput(
     }
 
     override fun beginStructure(
-            descriptor: SerialDescriptor,
-            vararg typeSerializers: KSerializer<*>
+        descriptor: SerialDescriptor,
+        vararg typeSerializers: KSerializer<*>
     ): CompositeEncoder {
         val consumer = if (currentTagOrNull == null) nodeConsumer else { node -> putElement(currentTag, node) }
         val encoder = when (descriptor.kind) {
@@ -116,7 +120,7 @@ private sealed class AbstractBsonTreeOutput(
 }
 
 private class BsonPrimitiveOutput(bson: Bson, nodeConsumer: (BsonValue) -> Unit) :
-        AbstractBsonTreeOutput(bson, nodeConsumer) {
+    AbstractBsonTreeOutput(bson, nodeConsumer) {
 
     private var content: BsonValue? = null
 
@@ -131,12 +135,12 @@ private class BsonPrimitiveOutput(bson: Bson, nodeConsumer: (BsonValue) -> Unit)
     }
 
     override fun getCurrent(): BsonValue = content
-            ?: throw BsonEncodingException("Primitive element has not been recorded. Is call to encodeXxx is missing in serializer?")
+        ?: throw BsonEncodingException("Primitive element has not been recorded. Is call to encodeXxx is missing in serializer?")
 
 }
 
 private open class BsonTreeOutput(bson: Bson, nodeConsumer: (BsonValue) -> Unit) :
-        AbstractBsonTreeOutput(bson, nodeConsumer) {
+    AbstractBsonTreeOutput(bson, nodeConsumer) {
 
     protected val content: BsonDocument = BsonDocument()
 
@@ -169,9 +173,8 @@ private class BsonTreeMapOutput(bson: Bson, nodeConsumer: (BsonValue) -> Unit) :
                 BsonType.INT64 -> element.asInt64().value.toString()
                 BsonType.DECIMAL128 -> element.asDecimal128().value.toString()
                 BsonType.DOCUMENT, BsonType.ARRAY, BsonType.BINARY -> throw BsonEncodingException("Invalid key kind '${element.bsonType}'")
-                BsonType.END_OF_DOCUMENT, BsonType.UNDEFINED, BsonType.DB_POINTER, BsonType.SYMBOL, BsonType.TIMESTAMP, BsonType.MIN_KEY, BsonType.MAX_KEY, BsonType.JAVASCRIPT_WITH_SCOPE, null -> throw BsonEncodingException(
-                        "Unexpected BsonType, type = '${element.bsonType}'"
-                )
+                BsonType.END_OF_DOCUMENT, BsonType.UNDEFINED, BsonType.DB_POINTER, BsonType.SYMBOL, BsonType.TIMESTAMP, BsonType.MIN_KEY, BsonType.MAX_KEY, BsonType.JAVASCRIPT_WITH_SCOPE, null ->
+                    throw BsonEncodingException("Unexpected BsonType, type = '${element.bsonType}'")
             }
             isKey = false
         } else {
@@ -186,7 +189,8 @@ private class BsonTreeMapOutput(bson: Bson, nodeConsumer: (BsonValue) -> Unit) :
 
 }
 
-private class BsonTreeListOutput(bson: Bson, nodeConsumer: (BsonValue) -> Unit) : AbstractBsonTreeOutput(bson, nodeConsumer) {
+private class BsonTreeListOutput(bson: Bson, nodeConsumer: (BsonValue) -> Unit) :
+    AbstractBsonTreeOutput(bson, nodeConsumer) {
 
     private val array: BsonArray = BsonArray()
 
@@ -195,7 +199,11 @@ private class BsonTreeListOutput(bson: Bson, nodeConsumer: (BsonValue) -> Unit) 
     override fun shouldWriteElement(desc: SerialDescriptor, tag: String, index: Int): Boolean = true
 
     override fun putElement(key: String, element: BsonValue) {
-        array.add(key.toIntOrNull() ?: throw BsonEncodingException("Array key cannot be non-integer. This should not normally happen"), element)
+        array.add(
+            key.toIntOrNull()
+                ?: throw BsonEncodingException("Array key cannot be non-integer. This should not normally happen"),
+            element
+        )
     }
 
     override fun getCurrent(): BsonValue = array
