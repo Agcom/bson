@@ -13,7 +13,7 @@ import org.bson.BsonValue
 object BsonPrimitiveSerializer : KSerializer<BsonValue> {
 
     // The serial name is as exact as BsonValueSerializer
-    override val descriptor: SerialDescriptor = SerialDescriptor("org.bson.BsonValue", PrimitiveKind.STRING)
+    override val descriptor: SerialDescriptor = SerialDescriptor(BsonValue::class.qualifiedName!!, PrimitiveKind.STRING)
 
     override fun serialize(encoder: Encoder, value: BsonValue) {
         encoder.verify(); encoder as BsonOutput

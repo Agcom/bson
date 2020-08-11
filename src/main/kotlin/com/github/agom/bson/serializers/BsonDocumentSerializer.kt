@@ -10,7 +10,7 @@ import org.bson.BsonDocument
 object BsonDocumentSerializer : KSerializer<BsonDocument> {
     
     override val descriptor: SerialDescriptor = NamedMapClassDescriptor(
-        "org.bson.BsonDocument",
+        BsonDocument::class.qualifiedName!!,
         String.serializer().descriptor,
         BsonValueSerializer.descriptor
     )

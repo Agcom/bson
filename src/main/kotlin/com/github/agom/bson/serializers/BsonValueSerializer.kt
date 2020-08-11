@@ -9,7 +9,7 @@ import org.bson.BsonValue
 @Serializer(BsonValue::class)
 object BsonValueSerializer : KSerializer<BsonValue> {
 
-    override val descriptor: SerialDescriptor = SerialDescriptor("org.bson.BsonValue", PolymorphicKind.SEALED)
+    override val descriptor: SerialDescriptor = SerialDescriptor(BsonValue::class.qualifiedName!!, PolymorphicKind.SEALED)
 
     override fun serialize(encoder: Encoder, value: BsonValue) {
         encoder.verify()

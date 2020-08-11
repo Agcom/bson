@@ -8,7 +8,7 @@ import org.bson.BsonArray
 @Serializer(BsonArray::class)
 object BsonArraySerializer : KSerializer<BsonArray> {
     
-    override val descriptor: SerialDescriptor = NamedListClassDescriptor("org.bson.BsonArray", BsonValueSerializer.descriptor)
+    override val descriptor: SerialDescriptor = NamedListClassDescriptor(BsonArray::class.qualifiedName!!, BsonValueSerializer.descriptor)
 
     private val bsonValueListSerializer = BsonValueSerializer.list // Cache
 
