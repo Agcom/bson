@@ -72,23 +72,53 @@ class BsonPrimitiveTest : FreeSpec({
         bson.fromBson(Decimal128Serializer, BsonDecimal128(decimal)) shouldBe decimal
     }
 
-    "regular expresion" {
-        val bsonRegex = bson.fromBson(
-            RegexSerializer,
-            BsonRegularExpression("[+-]?(\\d+(\\.\\d+)?|\\.\\d+)([eE][+-]?\\d+)?", "imdxs")
-        )
-        val expected = Regex(
-            "[+-]?(\\d+(\\.\\d+)?|\\.\\d+)([eE][+-]?\\d+)?", setOf(
-                RegexOption.IGNORE_CASE,
-                RegexOption.MULTILINE,
-                RegexOption.UNIX_LINES,
-                RegexOption.COMMENTS,
-                RegexOption.DOT_MATCHES_ALL
-            )
-        )
+    "regular expresion" - {
 
-        bsonRegex.pattern shouldBe expected.pattern
-        expected.options shouldBe expected.options
+        "without options" {
+            val expected = Regex("acme.*corp")
+            val regex = bson.fromBson(RegexSerializer, BsonRegularExpression(expected.pattern))
+
+            regex.pattern shouldBe expected.pattern
+            regex.options shouldBe expected.options
+        }
+
+        "with options" {
+            val expected = Regex(
+                "acme.*corp", setOf(
+                    RegexOption.IGNORE_CASE,
+                    RegexOption.MULTILINE,
+                    RegexOption.UNIX_LINES,
+                    RegexOption.COMMENTS,
+                    RegexOption.DOT_MATCHES_ALL
+                )
+            )
+            val regex = bson.fromBson(
+                RegexSerializer,
+                BsonRegularExpression(expected.pattern, "imdxs")
+            )
+
+            regex.pattern shouldBe expected.pattern
+            regex.options shouldBe expected.options
+        }
+
+        "a hard one" {
+            val expected = Regex(
+                "[+-]?(\\d+(\\.\\d+)?|\\.\\d+)([eE][+-]?\\d+)?", setOf(
+                    RegexOption.IGNORE_CASE,
+                    RegexOption.MULTILINE,
+                    RegexOption.UNIX_LINES,
+                    RegexOption.COMMENTS,
+                    RegexOption.DOT_MATCHES_ALL
+                )
+            )
+            val regex = bson.fromBson(
+                RegexSerializer,
+                BsonRegularExpression(expected.pattern, "imdxs")
+            )
+
+            regex.pattern shouldBe expected.pattern
+            regex.options shouldBe expected.options
+        }
     }
 
     "enum kind" {

@@ -2,6 +2,7 @@ package com.github.agcom.bson.decoders
 
 import com.github.agom.bson.*
 import com.github.agom.bson.serializers.BsonValueSerializer
+import com.github.agom.bson.serializers.RegexSerializer
 import io.kotest.core.spec.style.FreeSpec
 import io.kotest.matchers.shouldBe
 import org.bson.*
@@ -34,47 +35,52 @@ class BsonValuePrimitiveTest : FreeSpec({
         bson.fromBson(BsonValueSerializer, decimal) shouldBe decimal
     }
 
-
     "bson double" {
         val d = BsonDouble(Random.nextDouble())
         bson.fromBson(BsonValueSerializer, d) shouldBe d
     }
-
 
     "bson int 32" {
         val i = BsonInt32(Random.nextInt())
         bson.fromBson(BsonValueSerializer, i) shouldBe i
     }
 
-
     "bson int 64" {
         val l = BsonInt64(Random.nextLong())
         bson.fromBson(BsonValueSerializer, l) shouldBe l
     }
-
 
     "bson java script" {
         val js = BsonJavaScript("main() {}")
         bson.fromBson(BsonValueSerializer, js) shouldBe js
     }
 
-
     "bson null" {
         bson.fromBson(BsonValueSerializer, BsonNull.VALUE) shouldBe BsonNull.VALUE
     }
-
 
     "bson object id" {
         val id = BsonObjectId(ObjectId())
         bson.fromBson(BsonValueSerializer, id) shouldBe id
     }
 
+    "bson regular expresion" - {
 
-    "bson regular expression" {
-        val regex = BsonRegularExpression("foo")
-        bson.fromBson(BsonValueSerializer, regex) shouldBe regex
+        "without options" {
+            val regex = BsonRegularExpression("acme.*corp")
+            bson.fromBson(BsonValueSerializer, regex) shouldBe regex
+        }
+
+        "with options" {
+            val regex = BsonRegularExpression("acme.*corp", "imdxs")
+            bson.fromBson(BsonValueSerializer, regex) shouldBe regex
+        }
+
+        "a hard one" {
+            val regex = BsonRegularExpression("[+-]?(\\d+(\\.\\d+)?|\\.\\d+)([eE][+-]?\\d+)?", "imdxs")
+            bson.fromBson(BsonValueSerializer, regex) shouldBe regex
+        }
     }
-
 
     "bson string" {
         val str = BsonString("hello")
