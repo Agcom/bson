@@ -1,0 +1,26 @@
+plugins {
+    id 'org.jetbrains.kotlin.jvm' version "$kotlin_version"
+    id 'java'
+}
+
+group = 'com.github.agcom'
+version = '0.9.0'
+sourceCompatibility = '11'
+
+repositories {
+    mavenCentral()
+    jcenter()
+}
+
+dependencies {
+    implementation 'org.jetbrains.kotlin:kotlin-stdlib-jdk8'
+    implementation "org.jetbrains.kotlinx:kotlinx-serialization-runtime:$kotlinx_serialization_runtime_version"
+    implementation "org.mongodb:bson:$mongo_version"
+    // Kotest
+    testImplementation "io.kotest:kotest-runner-junit5-jvm:$kotest_version"
+    testImplementation "io.kotest:kotest-assertions-core-jvm:$kotest_version"
+    testRuntimeOnly "io.kotest:kotest-runner-console-jvm:$kotest_version" // For the Kotest Intellij plugin
+}
+
+compileKotlin.kotlinOptions { jvmTarget = '11' }
+compileTestKotlin.kotlinOptions { jvmTarget = '11' }
