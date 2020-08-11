@@ -1,5 +1,6 @@
 package com.github.agom.bson
 
+import com.github.agom.bson.decoders.readBson
 import com.github.agom.bson.encoders.writeBson
 import com.github.agom.bson.serializers.*
 import kotlinx.serialization.BinaryFormat
@@ -24,9 +25,7 @@ class Bson(
 
     fun <T> toBson(serializer: SerializationStrategy<T>, value: T): BsonValue = writeBson(value, serializer)
 
-    fun <T> fromBson(deserializer: DeserializationStrategy<T>, bson: BsonValue): T {
-        TODO()
-    }
+    fun <T> fromBson(deserializer: DeserializationStrategy<T>, bson: BsonValue): T = readBson(bson, deserializer)
 
     override fun <T> dump(serializer: SerializationStrategy<T>, value: T): ByteArray {
         TODO()
