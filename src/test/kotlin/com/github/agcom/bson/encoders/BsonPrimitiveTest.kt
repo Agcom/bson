@@ -2,10 +2,10 @@ package com.github.agcom.bson.encoders
 
 import com.github.agcom.bson.models.HttpError
 import com.github.agcom.bson.serializers.NullSerializer
-import com.github.agom.bson.Bson
-import com.github.agom.bson.BsonConfiguration
-import com.github.agom.bson.serializers.*
-import com.github.agom.bson.utils.toBsonBinary
+import com.github.agcom.bson.Bson
+import com.github.agcom.bson.BsonConfiguration
+import com.github.agcom.bson.serializers.*
+import com.github.agcom.bson.utils.toBsonBinary
 import io.kotest.core.spec.style.FreeSpec
 import io.kotest.matchers.shouldBe
 import kotlinx.serialization.builtins.serializer

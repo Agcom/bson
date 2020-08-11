@@ -1,6 +1,6 @@
-package com.github.agom.bson.serializers
+package com.github.agcom.bson.serializers
 
-import com.github.agom.bson.utils.NamedListClassDescriptor
+import com.github.agcom.bson.utils.NamedListClassDescriptor
 import kotlinx.serialization.*
 import kotlinx.serialization.builtins.list
 import org.bson.BsonArray

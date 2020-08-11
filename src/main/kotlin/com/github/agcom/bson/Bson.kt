@@ -1,8 +1,8 @@
-package com.github.agom.bson
+package com.github.agcom.bson
 
-import com.github.agom.bson.decoders.readBson
-import com.github.agom.bson.encoders.writeBson
-import com.github.agom.bson.serializers.*
+import com.github.agcom.bson.decoders.readBson
+import com.github.agcom.bson.encoders.writeBson
+import com.github.agcom.bson.serializers.*
 import kotlinx.serialization.BinaryFormat
 import kotlinx.serialization.DeserializationStrategy
 import kotlinx.serialization.SerializationStrategy

@@ -1,9 +1,9 @@
-package com.github.agom.bson.serializers
+package com.github.agcom.bson.serializers
 
 import kotlinx.serialization.*
 import java.time.*
 import java.time.temporal.Temporal
-import com.github.agom.bson.encoders.BsonOutput
+import com.github.agcom.bson.encoders.BsonOutput
 
 /**
  * Serializer for time objects which can be represented as epoch millis.

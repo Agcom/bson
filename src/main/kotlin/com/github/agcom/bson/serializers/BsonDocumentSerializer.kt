@@ -1,6 +1,6 @@
-package com.github.agom.bson.serializers
+package com.github.agcom.bson.serializers
 
-import com.github.agom.bson.utils.NamedMapClassDescriptor
+import com.github.agcom.bson.utils.NamedMapClassDescriptor
 import kotlinx.serialization.*
 import kotlinx.serialization.builtins.MapSerializer
 import kotlinx.serialization.builtins.serializer

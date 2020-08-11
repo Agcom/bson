@@ -1,4 +1,4 @@
-package com.github.agom.bson
+package com.github.agcom.bson
 
 import kotlinx.serialization.SerializationException
 

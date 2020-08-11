@@ -1,8 +1,7 @@
 package com.github.agcom.bson.decoders
 
-import com.github.agom.bson.*
-import com.github.agom.bson.serializers.BsonValueSerializer
-import com.github.agom.bson.serializers.RegexSerializer
+import com.github.agcom.bson.*
+import com.github.agcom.bson.serializers.BsonValueSerializer
 import io.kotest.core.spec.style.FreeSpec
 import io.kotest.matchers.shouldBe
 import org.bson.*

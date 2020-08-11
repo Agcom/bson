@@ -1,7 +1,7 @@
-package com.github.agom.bson.serializers
+package com.github.agcom.bson.serializers
 
-import com.github.agom.bson.decoders.BsonInput
-import com.github.agom.bson.encoders.BsonOutput
+import com.github.agcom.bson.decoders.BsonInput
+import com.github.agcom.bson.encoders.BsonOutput
 import kotlinx.serialization.Decoder
 import kotlinx.serialization.Encoder
 

@@ -1,10 +1,10 @@
-package com.github.agom.bson.encoders
+package com.github.agcom.bson.encoders
 
-import com.github.agom.bson.Bson
-import com.github.agom.bson.BsonEncodingException
-import com.github.agom.bson.serializers.BsonValueSerializer
-import com.github.agom.bson.utils.PRIMITIVE_TAG
-import com.github.agom.bson.utils.toBsonRegularExpression
+import com.github.agcom.bson.Bson
+import com.github.agcom.bson.BsonEncodingException
+import com.github.agcom.bson.serializers.BsonValueSerializer
+import com.github.agcom.bson.utils.PRIMITIVE_TAG
+import com.github.agcom.bson.utils.toBsonRegularExpression
 import kotlinx.serialization.*
 import kotlinx.serialization.internal.AbstractPolymorphicSerializer
 import kotlinx.serialization.internal.NamedValueEncoder

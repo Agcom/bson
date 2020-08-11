@@ -1,10 +1,10 @@
-package com.github.agom.bson.decoders
+package com.github.agcom.bson.decoders
 
-import com.github.agom.bson.Bson
-import com.github.agom.bson.BsonDecodingException
-import com.github.agom.bson.utils.PRIMITIVE_TAG
-import com.github.agom.bson.utils.toBinary
-import com.github.agom.bson.utils.toRegex
+import com.github.agcom.bson.Bson
+import com.github.agcom.bson.BsonDecodingException
+import com.github.agcom.bson.utils.PRIMITIVE_TAG
+import com.github.agcom.bson.utils.toBinary
+import com.github.agcom.bson.utils.toRegex
 import kotlinx.serialization.*
 import kotlinx.serialization.internal.AbstractPolymorphicSerializer
 import kotlinx.serialization.internal.NamedValueDecoder

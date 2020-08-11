@@ -1,10 +1,10 @@
-package com.github.agom.bson.serializers
+package com.github.agcom.bson.serializers
 
-import com.github.agom.bson.BsonEncodingException
-import com.github.agom.bson.decoders.BsonInput
-import com.github.agom.bson.encoders.BsonOutput
-import com.github.agom.bson.utils.toBinary
-import com.github.agom.bson.utils.toRegex
+import com.github.agcom.bson.BsonEncodingException
+import com.github.agcom.bson.decoders.BsonInput
+import com.github.agcom.bson.encoders.BsonOutput
+import com.github.agcom.bson.utils.toBinary
+import com.github.agcom.bson.utils.toRegex
 import kotlinx.serialization.*
 import org.bson.BsonType.*
 import org.bson.BsonValue
