@@ -23,49 +23,49 @@ class BsonPrimitiveTest : FreeSpec({
 
     "double" {
         val d = Random.nextDouble()
-        BsonDouble(d) shouldBe bson.toBson(Double.serializer(), d)
+        bson.toBson(Double.serializer(), d) shouldBe BsonDouble(d)
     }
     "string" {
         val str = UUID.randomUUID().toString()
-        BsonString(str) shouldBe bson.toBson(String.serializer(), str)
+        bson.toBson(String.serializer(), str) shouldBe BsonString(str)
     }
     "binary" {
         val binary = Binary(Random.nextBytes(100))
-        binary.toBsonBinary() shouldBe bson.toBson(BinarySerializer, binary)
+        bson.toBson(BinarySerializer, binary) shouldBe binary.toBsonBinary()
     }
     "object id" {
         val id = ObjectId()
-        BsonObjectId(id) shouldBe bson.toBson(ObjectIdSerializer, id)
+        bson.toBson(ObjectIdSerializer, id) shouldBe BsonObjectId(id)
     }
     "boolean" {
         val bool = Random.nextBoolean()
-        BsonBoolean(bool) shouldBe bson.toBson(Boolean.serializer(), bool)
+        bson.toBson(Boolean.serializer(), bool) shouldBe BsonBoolean(bool)
     }
     "date time" {
         val t = Clock.systemUTC().millis()
-        BsonDateTime(t) shouldBe bson.toBson(DateTimeSerializer, t)
+        bson.toBson(DateTimeSerializer, t) shouldBe BsonDateTime(t)
     }
     "null" {
-        BsonNull.VALUE shouldBe bson.toBson(NullSerializer, null)
+        bson.toBson(NullSerializer, null) shouldBe BsonNull.VALUE
     }
     "java script" {
         val code = "main() {}"
-        BsonJavaScript(code) shouldBe bson.toBson(JavaScriptSerializer, code)
+        bson.toBson(JavaScriptSerializer, code) shouldBe BsonJavaScript(code)
     }
     "int 32" {
         val i = Random.nextInt()
-        BsonInt32(i) shouldBe bson.toBson(Int.serializer(), i)
+        bson.toBson(Int.serializer(), i) shouldBe BsonInt32(i)
     }
     "int 64" {
         val l = Random.nextLong()
-        BsonInt64(l) shouldBe bson.toBson(Long.serializer(), l)
+        bson.toBson(Long.serializer(), l) shouldBe BsonInt64(l)
     }
     "decimal 128" {
         val decimal = Decimal128(Random.nextLong())
-        BsonDecimal128(decimal) shouldBe bson.toBson(Decimal128Serializer, decimal)
+        bson.toBson(Decimal128Serializer, decimal) shouldBe BsonDecimal128(decimal)
     }
     "regular expresion" {
-        BsonRegularExpression("[+-]?(\\d+(\\.\\d+)?|\\.\\d+)([eE][+-]?\\d+)?", "imdxs") shouldBe bson.toBson(
+        bson.toBson(
             RegexSerializer, Regex(
                 "[+-]?(\\d+(\\.\\d+)?|\\.\\d+)([eE][+-]?\\d+)?", setOf(
                     RegexOption.IGNORE_CASE,
@@ -75,14 +75,14 @@ class BsonPrimitiveTest : FreeSpec({
                     RegexOption.DOT_MATCHES_ALL
                 )
             )
-        )
+        ) shouldBe BsonRegularExpression("[+-]?(\\d+(\\.\\d+)?|\\.\\d+)([eE][+-]?\\d+)?", "imdxs")
     }
     "enum kind" {
         val notFound = HttpError.NOT_FOUND
         val error = HttpError.INTERNAL_SERVER_ERROR
 
-        BsonString(notFound.name) shouldBe bson.toBson(HttpError.serializer(), notFound)
-        BsonString(error.name) shouldBe bson.toBson(HttpError.serializer(), error)
+        bson.toBson(HttpError.serializer(), notFound) shouldBe BsonString(notFound.name)
+        bson.toBson(HttpError.serializer(), error) shouldBe BsonString(error.name)
     }
 
 })

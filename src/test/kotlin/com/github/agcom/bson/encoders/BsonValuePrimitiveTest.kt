@@ -17,51 +17,51 @@ class BsonValuePrimitiveTest : FreeSpec({
     
     "bson binary" {
         val binary = BsonBinary(Random.nextBytes(100))
-        binary shouldBe bson.toBson(BsonValueSerializer, binary)
+        bson.toBson(BsonValueSerializer, binary) shouldBe binary
     }
     "bson boolean" {
         val bool = BsonBoolean(Random.nextBoolean())
-        bool shouldBe bson.toBson(BsonValueSerializer, bool)
+        bson.toBson(BsonValueSerializer, bool) shouldBe bool
     }
     "bson date-time" {
         val t = BsonDateTime(Clock.systemUTC().millis())
-        t shouldBe bson.toBson(BsonValueSerializer, t)
+        bson.toBson(BsonValueSerializer, t) shouldBe t
     }
     "bson decimal-128" {
         val decimal = BsonDecimal128(Decimal128(Random.nextLong()))
-        decimal shouldBe bson.toBson(BsonValueSerializer, decimal)
+        bson.toBson(BsonValueSerializer, decimal) shouldBe decimal
     }
     "bson double" {
         val d = BsonDouble(Random.nextDouble())
-        d shouldBe bson.toBson(BsonValueSerializer, d)
+        bson.toBson(BsonValueSerializer, d) shouldBe d
     }
     "bson int-32" {
         val i = BsonInt32(Random.nextInt())
-        i shouldBe  bson.toBson(BsonValueSerializer, i)
+        bson.toBson(BsonValueSerializer, i) shouldBe i
 
     }
     "bson int-64" {
         val l = BsonInt64(Random.nextLong())
-        l shouldBe bson.toBson(BsonValueSerializer, l)
+        bson.toBson(BsonValueSerializer, l) shouldBe l
     }
     "bson java-script" {
         val js = BsonJavaScript("main() {}")
-        js shouldBe bson.toBson(BsonValueSerializer, js)
+        bson.toBson(BsonValueSerializer, js) shouldBe js
     }
     "bson null" {
-        BsonNull.VALUE shouldBe bson.toBson(BsonValueSerializer, BsonNull.VALUE)
+        bson.toBson(BsonValueSerializer, BsonNull.VALUE) shouldBe BsonNull.VALUE
     }
     "bson object-id" {
         val id = BsonObjectId(ObjectId())
-        id shouldBe bson.toBson(BsonValueSerializer, id)
+        bson.toBson(BsonValueSerializer, id) shouldBe id
     }
     "bson regular expression" {
         val regex = BsonRegularExpression("foo")
-        regex shouldBe bson.toBson(BsonValueSerializer, regex)
+        bson.toBson(BsonValueSerializer, regex) shouldBe regex
     }
     "bson string" {
         val str = BsonString("hello")
-        str shouldBe bson.toBson(BsonValueSerializer, str)
+        bson.toBson(BsonValueSerializer, str) shouldBe str
     }
 
 })
