@@ -175,7 +175,7 @@ private class BsonTreeMapOutput(bson: Bson, nodeConsumer: (BsonValue) -> Unit) :
             }
             isKey = false
         } else {
-            super.putElement(key, element)
+            super.putElement(tag, element)
             isKey = true
         }
     }
