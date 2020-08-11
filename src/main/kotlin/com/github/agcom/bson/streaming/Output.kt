@@ -32,7 +32,8 @@ private fun BsonOutput.writePrimitive(bson: BsonValue) {
         OBJECT_ID -> writeObjectId(bson.asObjectId().value)
         BOOLEAN -> writeByte(if (bson.asBoolean().value) 1 else 0)
         DATE_TIME -> writeInt64(bson.asDateTime().value)
-        NULL -> { /* Nothing */ }
+        NULL -> { /* Nothing */
+        }
         REGULAR_EXPRESSION -> {
             bson.asRegularExpression(); bson as BsonRegularExpression
             writeCString(bson.pattern)
@@ -51,17 +52,9 @@ private fun BsonOutput.writePrimitive(bson: BsonValue) {
 }
 
 private fun BsonOutput.writeDocument(doc: BsonDocument) {
-
-    writeInt32(0) // reserve space for size
-    val startPosition = position
-    for ((key, value) in doc) {
-        writeCString(key)
-        writeBson(value)
+    BsonBinaryWriter(this).use {
+        it.pipe(BsonDocumentReader(doc))
     }
-    writeByte(END_OF_DOCUMENT.value)
-
-    val size: Int = position - startPosition
-    writeInt32(startPosition, size)
 }
 
 private fun BsonOutput.writeArray(array: BsonArray) {
