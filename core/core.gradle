@@ -1,6 +1,9 @@
+plugins {
+    id 'org.jetbrains.kotlin.plugin.serialization' version "$kotlin_version" // For test purposes
+}
+
 dependencies {
     implementation "org.mongodb:bson:$mongo_version"
-    testImplementation project(':test-fixtures')
 }
 
 compileKotlin {

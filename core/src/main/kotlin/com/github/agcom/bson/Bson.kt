@@ -7,6 +7,8 @@ import com.github.agcom.bson.streaming.readBson
 import com.github.agcom.bson.streaming.writeBson
 import kotlinx.serialization.*
 import kotlinx.serialization.internal.AbstractPolymorphicSerializer
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.float
 import kotlinx.serialization.modules.EmptyModule
 import kotlinx.serialization.modules.SerialModule
 import kotlinx.serialization.modules.plus
