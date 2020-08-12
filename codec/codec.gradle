@@ -3,6 +3,7 @@ plugins {
 }
 
 dependencies {
+    implementation project(':core')
     implementation "org.mongodb:bson:$mongo_version"
 }
 
