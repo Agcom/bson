@@ -1,33 +1,34 @@
-plugins {
-    id 'org.jetbrains.kotlin.jvm' version "$kotlin_version"
-    id 'java'
-    id 'org.jetbrains.kotlin.plugin.serialization' version "$kotlin_version" // For test purposes
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+    }
 }
 
 group = 'com.github.agcom'
 version = '0.9.0'
-sourceCompatibility = '11'
 
-repositories {
-    mavenCentral()
-    jcenter()
-}
+subprojects {
+    apply plugin: 'kotlin'
 
-dependencies {
-    implementation 'org.jetbrains.kotlin:kotlin-stdlib-jdk8'
-    implementation "org.jetbrains.kotlinx:kotlinx-serialization-runtime:$kotlinx_serialization_runtime_version"
-    implementation "org.mongodb:bson:$mongo_version"
-    // Kotest
-    testImplementation "io.kotest:kotest-runner-junit5-jvm:$kotest_version"
-    testImplementation "io.kotest:kotest-assertions-core-jvm:$kotest_version"
-    testRuntimeOnly "io.kotest:kotest-runner-console-jvm:$kotest_version" // For the Kotest Intellij plugin
-}
+    repositories {
+        mavenCentral()
+    }
 
-compileKotlin.kotlinOptions { jvmTarget = '11' }
-compileTestKotlin.kotlinOptions { jvmTarget = '11' }
+    dependencies {
+        implementation 'org.jetbrains.kotlin:kotlin-stdlib-jdk8'
+        implementation "org.jetbrains.kotlinx:kotlinx-serialization-runtime:$kotlinx_serialization_runtime_version"
+        implementation "org.mongodb:bson:$mongo_version"
+        // Kotest
+        testImplementation "io.kotest:kotest-runner-junit5-jvm:$kotest_version"
+        testImplementation "io.kotest:kotest-assertions-core-jvm:$kotest_version"
+        testRuntimeOnly "io.kotest:kotest-runner-console-jvm:$kotest_version" // For the Kotest Intellij plugin
+    }
 
-test { useJUnitPlatform() }
+    compileKotlin.kotlinOptions { jvmTarget = '11' }
+    compileTestKotlin.kotlinOptions { jvmTarget = '11' }
 
-compileKotlin {
-    kotlinOptions.freeCompilerArgs = ['-Xopt-in=kotlin.RequiresOptIn']
+    test { useJUnitPlatform() }
 }
