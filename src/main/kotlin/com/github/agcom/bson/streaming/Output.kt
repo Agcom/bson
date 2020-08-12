@@ -58,15 +58,22 @@ private fun BsonOutput.writeDocument(doc: BsonDocument) {
 }
 
 private fun BsonOutput.writeArray(array: BsonArray) {
+    val doc = BsonDocument()
+    array.forEachIndexed { i, value ->
+        doc[i.toString()] = value
+    }
+    writeDocument(doc)
+    /* Old procedure
     val startPosition = position
     writeInt32(0) // reserve space for size
     array.forEachIndexed { i, it ->
-        writeByte(it.bsonType.value)
-        writeCString(i.toString())
-        writeBson(it)
+    writeByte(it.bsonType.value)
+    writeCString(i.toString())
+    writeBson(it)
     }
     writeByte(END_OF_DOCUMENT.value)
 
     val size = position - startPosition
     writeInt32(startPosition, size)
+    */
 }
