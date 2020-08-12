@@ -1,12 +1,10 @@
 plugins {
     id 'org.jetbrains.kotlin.jvm' version "$kotlin_version"
-    id 'java'
     id 'org.jetbrains.kotlin.plugin.serialization' version "$kotlin_version" // For test purposes
 }
 
 group = 'com.github.agcom'
 version = '0.9.0'
-sourceCompatibility = '11'
 
 repositories {
     mavenCentral()
