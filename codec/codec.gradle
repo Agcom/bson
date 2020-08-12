@@ -1,3 +1,5 @@
 dependencies {
     implementation project(':core')
+    implementation "org.mongodb:bson:$mongo_version"
+    testImplementation project(':test-fixtures')
 }
