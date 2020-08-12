@@ -16,7 +16,6 @@ internal fun BsonOutput.writeBson(bson: BsonValue) {
 }
 
 private fun BsonOutput.writePrimitive(bson: BsonValue) {
-    writeByte(bson.bsonType.value)
     when (bson.bsonType) {
         DOUBLE -> writeDouble(bson.asDouble().value)
         STRING -> writeString(bson.asString().value)
@@ -58,10 +57,13 @@ private fun BsonOutput.writeDocument(doc: BsonDocument) {
 }
 
 private fun BsonOutput.writeArray(array: BsonArray) {
-    writeByte(ARRAY.value)
     val startPosition = position
     writeInt32(0) // reserve space for size
-    array.forEach(::writeBson)
+    array.forEachIndexed { i, it ->
+        writeByte(it.bsonType.value)
+        writeCString(i.toString())
+        writeBson(it)
+    }
     writeByte(END_OF_DOCUMENT.value)
 
     val size = position - startPosition
