@@ -55,7 +55,7 @@ private fun BsonInput.readPrimitive(type: BsonType): BsonValue {
         }
         else -> throw BsonDecodingException("Unexpected bson type '$type'")
     }
-    if (hasRemaining()) throw BsonDecodingException("Not a bson primitive")
+    if (hasRemaining()) throw BsonDecodingException("Not a '$type' bson primitive")
     return value
 }
 
