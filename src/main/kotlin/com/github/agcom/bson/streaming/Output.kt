@@ -51,8 +51,9 @@ private fun BsonOutput.writePrimitive(bson: BsonValue) {
 }
 
 private fun BsonOutput.writeDocument(doc: BsonDocument) {
+    val reader = BsonDocumentReader(doc)
     BsonBinaryWriter(this).use {
-        it.pipe(BsonDocumentReader(doc))
+        it.pipe(reader)
     }
 }
 

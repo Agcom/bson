@@ -30,8 +30,9 @@ class Bson(
     fun <T> fromBson(deserializer: DeserializationStrategy<T>, bson: BsonValue): T = readBson(bson, deserializer)
 
     override fun <T> dump(serializer: SerializationStrategy<T>, value: T): ByteArray {
+        val bson = toBson(serializer, value)
         return BasicOutputBuffer().use {
-            it.writeBson(toBson(serializer, value))
+            it.writeBson(bson)
             it.toByteArray()
         }
     }
