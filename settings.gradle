@@ -1,1 +1,12 @@
 rootProject.name = 'bson'
+include ':core'
+
+// <module-name>.gradle
+private void buildFileNameConvention(ProjectDescriptor p) {
+    p.children.forEach {
+        it.buildFileName = "${it.name}.gradle"
+        buildFileNameConvention(it)
+    }
+}
+
+buildFileNameConvention(rootProject)
