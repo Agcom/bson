@@ -51,9 +51,11 @@ private fun BsonOutput.writePrimitive(bson: BsonValue) {
 }
 
 private fun BsonOutput.writeDocument(doc: BsonDocument) {
-    val reader = BsonDocumentReader(doc)
-    BsonBinaryWriter(this).use {
-        it.pipe(reader)
+    val writer = BsonBinaryWriter(this)
+    BsonDocumentReader(doc).use { reader ->
+        writer.use {
+            it.pipe(reader)
+        }
     }
 }
 
@@ -63,7 +65,7 @@ private fun BsonOutput.writeArray(array: BsonArray) {
         doc[i.toString()] = value
     }
     writeDocument(doc)
-    /* Old procedure
+    /*// Old procedure
     val startPosition = position
     writeInt32(0) // reserve space for size
     array.forEachIndexed { i, it ->
