@@ -3,6 +3,7 @@ package com.github.agcom.bson
 import com.github.agcom.bson.decoders.readBson
 import com.github.agcom.bson.encoders.writeBson
 import com.github.agcom.bson.serializers.*
+import com.github.agcom.bson.streaming.writeBson
 import kotlinx.serialization.BinaryFormat
 import kotlinx.serialization.DeserializationStrategy
 import kotlinx.serialization.SerializationStrategy
@@ -11,6 +12,7 @@ import kotlinx.serialization.modules.SerialModule
 import kotlinx.serialization.modules.plus
 import kotlinx.serialization.modules.serializersModuleOf
 import org.bson.BsonValue
+import org.bson.io.BasicOutputBuffer
 import org.bson.types.Binary
 import org.bson.types.Decimal128
 import org.bson.types.ObjectId
@@ -28,7 +30,11 @@ class Bson(
     fun <T> fromBson(deserializer: DeserializationStrategy<T>, bson: BsonValue): T = readBson(bson, deserializer)
 
     override fun <T> dump(serializer: SerializationStrategy<T>, value: T): ByteArray {
-        TODO()
+        val bson = toBson(serializer, value)
+        return BasicOutputBuffer().use {
+            it.writeBson(bson)
+            it.toByteArray()
+        }
     }
 
     override fun <T> load(deserializer: DeserializationStrategy<T>, bytes: ByteArray): T {
