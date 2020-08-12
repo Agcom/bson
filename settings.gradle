@@ -1,5 +1,5 @@
 rootProject.name = 'bson'
-include ':core', ':codec-registry'
+include ':core', ':codec-registry', ':test-fixtures'
 
 // <module-name>.gradle
 private void buildFileNameConvention(ProjectDescriptor p) {

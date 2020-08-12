@@ -1,5 +1,5 @@
-plugins {
-    id 'org.jetbrains.kotlin.plugin.serialization' version "$kotlin_version" // For test purposes
+dependencies {
+    testImplementation project(':test-fixtures')
 }
 
 compileKotlin {
