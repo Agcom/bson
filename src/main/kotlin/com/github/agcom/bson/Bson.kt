@@ -45,20 +45,20 @@ class Bson(
 
     @OptIn(InternalSerializationApi::class)
     override fun <T> load(deserializer: DeserializationStrategy<T>, bytes: ByteArray): T {
-        val type: BsonType = when(deserializer.descriptor.kind) {
-            PrimitiveKind.BOOLEAN -> BsonType.BOOLEAN // Safe
-            PrimitiveKind.INT, PrimitiveKind.BYTE, PrimitiveKind.SHORT -> BsonType.INT32 // Safe
-            PrimitiveKind.STRING, PrimitiveKind.CHAR, UnionKind.ENUM_KIND -> BsonType.STRING // Safe
-            PrimitiveKind.LONG -> BsonType.INT64 // Safe
-            PrimitiveKind.DOUBLE, PrimitiveKind.FLOAT -> BsonType.DOUBLE // Safe
-            StructureKind.CLASS, StructureKind.MAP, StructureKind.OBJECT -> BsonType.DOCUMENT // Safe
+        val type: BsonType = when (deserializer.descriptor.kind) {
             StructureKind.LIST -> BsonType.ARRAY // Safe
-            UnionKind.CONTEXTUAL -> throw BsonDecodingException("Unable to detect bytes bson type\nuse load(deserializer, bytes, type) if you're sure about the bytes bson type, else this is an issue and is filed for fix") // Unsafe
+            is StructureKind -> BsonType.DOCUMENT
             is PolymorphicKind -> {
-                if(deserializer is AbstractPolymorphicSerializer) BsonType.DOCUMENT // Safe
-                else throw BsonDecodingException("Unable to detect bytes bson type\nuse load(deserializer, bytes, type) if you're sure about the bytes bson type, else this is a bug and is filed for fix") // Unsafe
+                if (deserializer is AbstractPolymorphicSerializer) BsonType.DOCUMENT
+                else throw BsonDecodingException(
+                    "Unable to infer the bytes bson type\n" +
+                            "Supply the bson type using load(deserializer, bytes, type) function if you're sure about the bytes bson type, else this is a bug and is filed for fix"
+                )
             }
-            else -> throw BsonDecodingException("Unexpected kind '${deserializer.descriptor.kind}'")
+            else -> throw BsonDecodingException(
+                "Unable to infer the bytes bson type\n" +
+                        "Supply the bson type using load(deserializer, bytes, type) function if you're sure about the bytes bson type, else this is a bug and is filed for fix"
+            )
         }
         return load(deserializer, bytes, type)
     }
@@ -82,9 +82,3 @@ private val defaultBsonModule: SerialModule = serializersModuleOf(
         Pattern::class to PatternSerializer
     )
 )
-
-fun main() {
-    println(Json.parseJson("""
-        "10"
-    """.trimIndent()).float)
-}
