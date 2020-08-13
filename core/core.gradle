@@ -24,7 +24,7 @@ bintray {
     publications = ['bsonCore']
     pkg {
         repo = 'bson'
-        name = 'bson-core'
+        name = 'core'
         version {
             name = '1.0.0'
             desc = 'First release'
