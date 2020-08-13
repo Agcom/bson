@@ -1,5 +1,8 @@
 plugins {
     id 'org.jetbrains.kotlin.plugin.serialization' version "$kotlin_version" // For test purposes
+    id 'java-library'
+    id 'maven-publish'
+    id 'com.jfrog.bintray' version "$bintray_version"
 }
 
 dependencies {
@@ -8,4 +11,73 @@ dependencies {
 
 compileKotlin {
     kotlinOptions.freeCompilerArgs = ['-Xopt-in=kotlin.RequiresOptIn']
+}
+
+java {
+    withSourcesJar()
+    withJavadocJar()
+}
+
+bintray {
+    user = 'agcom'
+    key = System.env.BINTRAY_KEY
+    publications = ['bsonCore']
+    pkg {
+        repo = 'bson'
+        name = 'core'
+        version {
+            name = '1.0.0'
+            desc = 'First release'
+            released = new Date()
+            vcsTag = 'v1.0.0'
+        }
+    }
+}
+
+publishing {
+    publications {
+        bsonCore(MavenPublication) {
+            artifactId = 'bson-core'
+            pom {
+                def git = 'https://github.com/agcom/bson'
+                packaging = 'jar'
+                name = 'bson-core'
+                description = 'Bson implementation for Kotlinx serialization'
+                url = git
+                inceptionYear = '2020'
+                licenses {
+                    license {
+                        name = 'Apache License 2.0'
+                        url = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+                        distribution = 'repo'
+                    }
+                }
+                developers {
+                    developer {
+                        id = 'agcom'
+                        name = 'Alireza Ghasemi'
+                        email = 'agcombest@gmail.com'
+                        url = 'https://github.com/agcom'
+                    }
+                }
+                scm {
+                    connection = "${git}.git"
+                    developerConnection = connection
+                    url = git
+                }
+                issueManagement {
+                    system = 'Github Issues'
+                    url = "$git/issues"
+                }
+                ciManagement {
+                    system = 'Github Actions'
+                    url = "$git/actions"
+                }
+                distributionManagement {
+                    downloadUrl = 'https://bintray.com/agcom/bson/bson-core'
+                }
+            }
+            from components.java
+        }
+    }
 }
