@@ -1,6 +1,6 @@
 package com.github.agcom.bson.codecs
 
-import com.github.agcom.bson.Bson
+import com.github.agcom.bson.serialization.Bson
 import kotlinx.serialization.KSerializer
 import org.bson.BsonValue
 import kotlin.reflect.KClass
