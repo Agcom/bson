@@ -1,6 +1,6 @@
 package com.github.agcom.bson.codecs
 
-import com.github.agcom.bson.Bson
+import com.github.agcom.bson.serialization.Bson
 import kotlinx.serialization.ImplicitReflectionSerializer
 import kotlinx.serialization.PolymorphicSerializer
 import org.bson.codecs.Codec
@@ -18,7 +18,11 @@ class SerializationCodecRegistry(private val bson: Bson) : CodecRegistry {
         @Suppress("UNCHECKED_CAST")
         return cache.getOrPut(clazz, {
             val kClazz = clazz.kotlin
-            SerializationCodec(bson, kClazz.serializerOrNull() ?: bson.context.getContextual(kClazz) ?: PolymorphicSerializer(kClazz), kClazz)
+            SerializationCodec(
+                bson,
+                kClazz.serializerOrNull() ?: bson.context.getContextual(kClazz) ?: PolymorphicSerializer(kClazz),
+                kClazz
+            )
         }) as Codec<T>
     }
 
