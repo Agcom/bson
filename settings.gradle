@@ -1,5 +1,5 @@
 rootProject.name = 'bson'
-include ':serialization', ':codec'
+include ':serialization', ':mongodb'
 
 // <module-name>.gradle
 private void buildFileNameConvention(ProjectDescriptor p) {

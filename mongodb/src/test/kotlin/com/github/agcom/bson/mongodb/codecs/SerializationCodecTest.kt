@@ -1,6 +1,6 @@
-package com.github.agcom.bson.codecs.models.models
+package com.github.agcom.bson.mongodb.codecs
 
-import com.github.agcom.bson.codecs.SerializationCodec
+import com.github.agcom.bson.mongodb.models.*
 import io.kotest.core.spec.style.FreeSpec
 import io.kotest.matchers.shouldBe
 import kotlinx.serialization.*
@@ -20,7 +20,10 @@ class SerializationCodecTest : FreeSpec({
 
         "simple" {
             val codec =
-                SerializationCodec(bson, StringMessage.serializer())
+                SerializationCodec(
+                    bson,
+                    StringMessage.serializer()
+                )
             val value = StringMessage("hello")
             val expected = BsonDocument("value", BsonString("hello"))
             BsonDocument().also {
@@ -68,7 +71,10 @@ class SerializationCodecTest : FreeSpec({
         }
 
         "null" {
-            val codec = SerializationCodec(bson, Data.serializer())
+            val codec = SerializationCodec(
+                bson,
+                Data.serializer()
+            )
             val expected = BsonDocument("value", BsonNull.VALUE)
             val value = Data(null)
             BsonDocument().also {
@@ -82,7 +88,10 @@ class SerializationCodecTest : FreeSpec({
 
         "simple" {
             val codec =
-                SerializationCodec(bson, StringMessage.serializer())
+                SerializationCodec(
+                    bson,
+                    StringMessage.serializer()
+                )
             val expected = StringMessage("hello")
             val value = BsonDocument("value", BsonString("hello"))
             codec.decode(BsonDocumentReader(value).apply { readBsonType() }, DecoderContext.builder().build()) shouldBe expected
@@ -126,7 +135,10 @@ class SerializationCodecTest : FreeSpec({
         }
 
         "null" {
-            val codec = SerializationCodec(bson, Data.serializer())
+            val codec = SerializationCodec(
+                bson,
+                Data.serializer()
+            )
             val value = BsonDocument("value", BsonNull.VALUE)
             val expected = Data(null)
             codec.decode(BsonDocumentReader(value).apply { readBsonType() }, DecoderContext.builder().build()) shouldBe expected

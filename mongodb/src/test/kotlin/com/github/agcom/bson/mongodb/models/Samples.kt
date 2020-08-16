@@ -1,4 +1,4 @@
-package com.github.agcom.bson.codecs.models.models
+package com.github.agcom.bson.mongodb.models
 
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.SerialName
@@ -38,7 +38,8 @@ data class IntMessage(val value: Int) : Message
 
 @Serializable
 @SerialName("string")
-data class StringMessage(val value: String) : Message
+data class StringMessage(val value: String) :
+    Message
 
 object EmptyMessage : Message {
 
