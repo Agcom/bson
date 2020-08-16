@@ -73,7 +73,7 @@ publishing {
                     url = "$git/actions"
                 }
                 distributionManagement {
-                    downloadUrl = 'https://bintray.com/agcom/bson/bson-serialization'
+                    downloadUrl = 'https://bintray.com/agcom/bson/serialization'
                 }
             }
             from components.java

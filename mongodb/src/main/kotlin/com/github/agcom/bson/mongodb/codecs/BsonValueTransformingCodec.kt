@@ -1,4 +1,4 @@
-package com.github.agcom.bson.codecs
+package com.github.agcom.bson.mongodb.codecs
 
 import org.bson.BsonReader
 import org.bson.BsonValue

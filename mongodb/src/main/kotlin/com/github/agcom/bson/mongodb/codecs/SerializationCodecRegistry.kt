@@ -1,4 +1,4 @@
-package com.github.agcom.bson.codecs
+package com.github.agcom.bson.mongodb.codecs
 
 import com.github.agcom.bson.serialization.Bson
 import kotlinx.serialization.ImplicitReflectionSerializer
