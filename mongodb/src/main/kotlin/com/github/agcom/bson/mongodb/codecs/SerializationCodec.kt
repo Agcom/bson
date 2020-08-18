@@ -5,7 +5,17 @@ import kotlinx.serialization.KSerializer
 import org.bson.BsonValue
 import kotlin.reflect.KClass
 
+/**
+ * Adapter between [KSerializer] and [org.bson.codecs.Codec].
+ */
 class SerializationCodec<T : Any>(private val bson: Bson, private val serializer: KSerializer<T>, private val clazz: KClass<T>) : BsonValueTransformingCodec<T>() {
+
+    companion object {
+        /**
+         * Kotlin friendly builder.
+         */
+        inline operator fun <reified T : Any> invoke(bson: Bson, serializer: KSerializer<T>): SerializationCodec<T> = SerializationCodec(bson, serializer, T::class)
+    }
 
     override fun getEncoderClass(): Class<T> = clazz.java
 
@@ -14,6 +24,3 @@ class SerializationCodec<T : Any>(private val bson: Bson, private val serializer
     override fun fromBson(value: BsonValue): T = bson.fromBson(serializer, value)
 
 }
-
-inline fun <reified T : Any> SerializationCodec(bson: Bson, serializer: KSerializer<T>): SerializationCodec<T> =
-    SerializationCodec(bson, serializer, T::class)
