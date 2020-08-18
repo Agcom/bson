@@ -14,18 +14,16 @@ Currently, only supports **Kotlin 1.3.72** and **Kotlinx serialization runtime 0
 
 - `*.gradle`
 
-	```groovy
-	repositories {
-	    jcenter() // Make sure jcenter is added to the repositories
-	}
-	
-	def bson_serialization_version = '1.0.1'
-	
-	dependencies {
-	    implementation "com.github.agcom:bson-serialization:$bson_serialization_version" // The bson serialization library
-	    implementation "com.github.agcom:bson-mongodb:$bson_serialization_version" // MongoDB driver extensions; Requires the above dependency
-	}
-	```
+  ```groovy
+  repositories {
+      jcenter() // Make sure jcenter is added to your project repositories
+  }
+  
+  dependencies {
+      implementation 'com.github.agcom:bson-serialization:1.0.1' // The bson serialization library
+      implementation 'com.github.agcom:bson-mongodb:1.0.1' // MongoDB driver extensions
+  }
+  ```
 
 - `*.gradle.kts`: Same as `*.gradle`, with small tweaks.
 
