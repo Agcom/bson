@@ -3,15 +3,17 @@ package com.github.agcom.bson.serialization.serializers
 import kotlinx.serialization.*
 import java.time.*
 import java.time.temporal.Temporal
-import com.github.agcom.bson.serialization.encoders.BsonOutput
 
 /**
  * Serializer for time objects which can be represented as epoch millis.
- * Uses [BsonOutput.encodeDateTime].
+ * Uses [DateTimeSerializer].
  */
 @Serializer(Temporal::class)
 abstract class TemporalSerializer<T : Temporal>(serialName: String) : KSerializer<T> {
 
+    /**
+     * The parent class [Temporal] serializer. Ports to a child serializer when serializing, and always deserializes to an [Instant] instance.
+     */
     companion object : TemporalSerializer<Temporal>(Temporal::class.qualifiedName!!) {
         override fun toEpochMillis(temporal: Temporal): Long {
             return when(temporal) {

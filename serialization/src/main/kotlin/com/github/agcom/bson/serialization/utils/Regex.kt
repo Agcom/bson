@@ -8,9 +8,9 @@ fun BsonRegularExpression.toRegex(): Regex = Regex(pattern, options.toRegexOptio
 
 /**
  * Ignores [LITERAL] and [CANON_EQ].
- * @return E.g. 'im' for [IGNORE_CASE] + [MULTILINE], null for empty set.
+ * @return E.g. 'im' for [IGNORE_CASE] + [MULTILINE], empty string for empty set.
  */
-fun Set<RegexOption>.asEmbedded(): String {
+internal fun Set<RegexOption>.asEmbedded(): String {
     val builder = StringBuilder(size)
     forEach {
         when(it) {
@@ -25,7 +25,7 @@ fun Set<RegexOption>.asEmbedded(): String {
     }
     return if(builder.isEmpty()) "" else builder.toString()
 }
-fun String.toRegexOptions(): Set<RegexOption> {
+internal fun String.toRegexOptions(): Set<RegexOption> {
     return map {
         when(it) {
             'i' -> IGNORE_CASE

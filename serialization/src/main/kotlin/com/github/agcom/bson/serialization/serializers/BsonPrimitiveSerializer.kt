@@ -9,6 +9,9 @@ import kotlinx.serialization.*
 import org.bson.BsonType.*
 import org.bson.BsonValue
 
+/**
+ * Serializes anything other than [org.bson.BsonDocument] and [org.bson.BsonArray].
+ */
 @Serializer(BsonValue::class)
 object BsonPrimitiveSerializer : KSerializer<BsonValue> {
 
