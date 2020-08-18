@@ -6,8 +6,8 @@ plugins {
 }
 
 dependencies {
-    implementation project(':serialization')
-    implementation "org.mongodb:bson:$mongo_version"
+    api project(':serialization')
+    api "org.mongodb:bson:$mongo_version"
 }
 
 compileKotlin {
