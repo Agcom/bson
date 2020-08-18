@@ -9,6 +9,14 @@ import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.ConcurrentMap
 import kotlinx.serialization.serializerOrNull
 
+/**
+ * Adapter between serialization [Bson] and [CodecRegistry].
+ * Extracts the requested class serializer in the following order,
+ * 1. Class annotated with `@Serializable`
+ * 2. Built-in type. E.g. `String`, `Long`, ...
+ * 3. Contextual
+ * 4. Polymorphic serializer (never fails, #26)
+ */
 class SerializationCodecRegistry(private val bson: Bson) : CodecRegistry {
 
     private val cache: ConcurrentMap<Class<*>, Codec<*>> = ConcurrentHashMap()

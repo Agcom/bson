@@ -9,6 +9,9 @@ import org.bson.types.Decimal128
 import org.bson.types.ObjectId
 import java.util.regex.Pattern
 
+/**
+ * Uses [BsonOutput.encodeBinary] / [BsonInput.decodeBinary]
+ */
 @Serializer(Binary::class)
 object BinarySerializer : KSerializer<Binary> {
 
@@ -26,6 +29,9 @@ object BinarySerializer : KSerializer<Binary> {
 
 }
 
+/**
+ * Uses [BsonOutput.encodeObjectId] / [BsonInput.decodeObjectId]
+ */
 @Serializer(ObjectId::class)
 object ObjectIdSerializer : KSerializer<ObjectId> {
 
@@ -43,6 +49,9 @@ object ObjectIdSerializer : KSerializer<ObjectId> {
 
 }
 
+/**
+ * Uses [BsonOutput.encodeDateTime] / [BsonInput.decodeDateTime]
+ */
 @Serializer(Long::class)
 object DateTimeSerializer : KSerializer<Long> {
 
@@ -60,6 +69,9 @@ object DateTimeSerializer : KSerializer<Long> {
 
 }
 
+/**
+ * Uses [BsonOutput.encodeJavaScript] / [BsonInput.decodeJavaScript]
+ */
 @Serializer(String::class)
 object JavaScriptSerializer : KSerializer<String> {
 
@@ -77,6 +89,9 @@ object JavaScriptSerializer : KSerializer<String> {
 
 }
 
+/**
+ * Uses [BsonOutput.encodeDecimal128] / [BsonInput.decodeDecimal128]
+ */
 @Serializer(Decimal128::class)
 object Decimal128Serializer : KSerializer<Decimal128> {
 
@@ -94,6 +109,9 @@ object Decimal128Serializer : KSerializer<Decimal128> {
 
 }
 
+/**
+ * Uses [BsonOutput.encodeRegularExpression] / [BsonInput.decodeRegularExpression]
+ */
 @Serializer(Regex::class)
 object RegexSerializer : KSerializer<Regex> {
 
