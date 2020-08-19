@@ -9,10 +9,8 @@ import kotlinx.serialization.Serializer
 data class Data(val value: String?)
 
 data class NoSerializableAnnotationData(val value: String?) {
-
     @Serializer(NoSerializableAnnotationData::class)
     companion object : KSerializer<NoSerializableAnnotationData>
-
 }
 
 enum class Field {
@@ -38,8 +36,7 @@ data class IntMessage(val value: Int) : Message
 
 @Serializable
 @SerialName("string")
-data class StringMessage(val value: String) :
-    Message
+data class StringMessage(val value: String) : Message
 
 object EmptyMessage : Message {
 

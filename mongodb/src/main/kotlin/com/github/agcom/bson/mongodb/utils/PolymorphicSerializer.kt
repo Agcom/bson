@@ -14,7 +14,7 @@ import kotlin.reflect.KClass
  * The serializer yielded from the second condition is unsafe, because there is no guarantee that all sub-classes of [kClass] are present.
  * @return A [PolymorphicSerializer] for the [kClass] or null if no polymorphic serializer related to the [kClass] is registered.
  */
-fun <T : Any> SerialModule.getPolymorphic(kClass: KClass<T>): PolymorphicSerializer<T>? {
+internal fun <T : Any> SerialModule.getPolymorphic(kClass: KClass<T>): PolymorphicSerializer<T>? {
     lateinit var baseClazz: KClass<T> // The T type is not correct (should be 'in T' = '? super T'), yet I'm forced to do this because of the PolymorphicSerializer's type parameter
     try {
         dumpTo(object : SerialModuleCollector {
