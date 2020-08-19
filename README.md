@@ -96,7 +96,7 @@ The following functions can be found in the `com.github.agcom.bson.serialization
 
 #### Serializers
 
-Various **bson types adapter serializers** can be found under `com.github.agcom.bson.serialization.serializers` package. Be sure to check them before implementing yours.
+Various **bson types adapter serializers** can be found under `com.github.agcom.bson.serialization.serializers` package. Be sure to check them before implementing yours. Also, you can always use `@ContextualSerializer` for them.
 
 > E.g. `BsonValueSerializer`, `TemporalSerializer` and `RegexSerializer`.
 

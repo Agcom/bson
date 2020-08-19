@@ -84,13 +84,33 @@ class Bson(
 
 }
 
-private val defaultBsonModule: SerialModule = serializersModuleOf(
+private val bsonTypesModule: SerialModule = serializersModuleOf(
     mapOf(
         BsonValue::class to BsonValueSerializer,
+        BsonDocument::class to BsonDocumentSerializer,
+        BsonArray::class to BsonArraySerializer,
+        BsonBinary::class to BsonPrimitiveSerializer,
+        BsonBoolean::class to BsonPrimitiveSerializer,
+        BsonDateTime::class to BsonPrimitiveSerializer,
+        BsonDecimal128::class to BsonPrimitiveSerializer,
+        BsonDouble::class to BsonPrimitiveSerializer,
+        BsonInt32::class to BsonPrimitiveSerializer,
+        BsonInt64::class to BsonPrimitiveSerializer,
+        BsonJavaScript::class to BsonPrimitiveSerializer,
+        BsonNull::class to BsonPrimitiveSerializer,
+        BsonNumber::class to BsonPrimitiveSerializer,
+        BsonObjectId::class to BsonPrimitiveSerializer,
+        BsonRegularExpression::class to BsonPrimitiveSerializer,
+        BsonString::class to BsonPrimitiveSerializer,
         Binary::class to BinarySerializer,
         ObjectId::class to ObjectIdSerializer,
-        Decimal128::class to Decimal128Serializer,
-        Regex::class to RegexSerializer,
-        Pattern::class to PatternSerializer
+        Decimal128::class to Decimal128Serializer
     )
 )
+
+private val defaultBsonModule: SerialModule = SerializersModule {
+    include(bsonTypesModule)
+    include(bsonTemporalModule)
+    contextual(RegexSerializer)
+    contextual(PatternSerializer)
+}
