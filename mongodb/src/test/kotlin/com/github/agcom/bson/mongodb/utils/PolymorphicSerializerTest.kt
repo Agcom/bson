@@ -20,11 +20,17 @@ class PolymorphicSerializerTest : FreeSpec({
     }
 
     "registered as a subclass; Safe" {
-        module.getPolymorphic(IntMessage::class).shouldNotBeNull()
+        module.getPolymorphic(IntMessage::class).let {
+            it.shouldNotBeNull()
+            it.baseClass shouldBe Message::class
+        }
     }
 
     "registered as a base class; Unsafe" {
-        module.getPolymorphic(Message::class).shouldNotBeNull()
+        module.getPolymorphic(Message::class).let {
+            it.shouldNotBeNull()
+            it.baseClass shouldBe Message::class
+        }
     }
 
     "not registered; Fails" {
