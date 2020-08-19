@@ -96,7 +96,7 @@ The following functions can be found in the `com.github.agcom.bson.serialization
 
 #### Serializers
 
-Various **bson types adapter serializers** can be found under `com.github.agcom.bson.serialization.serializers` package. Be sure to check them before implementing yours.
+Various **bson types adapter serializers** can be found under `com.github.agcom.bson.serialization.serializers` package. Be sure to check them before implementing yours. Also, you can always use `@ContextualSerializer` for the bson types.
 
 > E.g. `BsonValueSerializer`, `TemporalSerializer` and `RegexSerializer`.
 
@@ -125,54 +125,47 @@ Provides extensions to use the serialization library with [MongoDB Java driver](
 	}
 	```
 
-- Serialization codec registry (*1)
+- Serialization codec registry
 
-	An adapter between a serialization `Bson` instance and `CodecRegistry`.
+  An adapter between a serialization `Bson` instance and `CodecRegistry`.
 
-	```kotlin
-	import kotlinx.serialization.*
-	import com.github.agcom.bson.serialization.*
-	import com.github.agcom.bson.mongodb.codecs.*
-	import org.bson.codecs.configuration.CodecRegistry
-	
-	@Serializable
-	data class Project(val name: String, val language: String)
-	
-	val bson = Bson(BsonConfiguration.DEFAULT)
-	
-	fun main() {
-	    val registry: CodecRegistry = SerializationCodecRegistry(bson) // Look here
-	    ...
-	}
-	```
+  ```kotlin
+  import kotlinx.serialization.*
+  import com.github.agcom.bson.serialization.*
+  import com.github.agcom.bson.mongodb.codecs.*
+  import org.bson.codecs.configuration.CodecRegistry
+  
+  @Serializable
+  data class Project(val name: String, val language: String)
+  
+  val bson = Bson(BsonConfiguration.DEFAULT)
+  
+  fun main() {
+      val registry: CodecRegistry = SerializationCodecRegistry(bson) // Look here
+      ...
+  }
+  ```
 
-	The registry infers the serializer instance for a requested class in the following order,
-
-	1. Class annotated with `@Serializable`
-	2. Build-in types. E.g. `String`, `Long`, ...
-	3. Contextual (`context` parameter provided at `Bson` instance creation)
-	4. Polymorphic serializer (never fails, #26)
-
-	> 1. May behave inconsistently (#26). So, it's recommended to be composed after a more trusted registry.
-	>
-	> 	```kotlin
-	> 	import kotlinx.serialization.*
-	> 	import com.github.agcom.bson.serialization.*
-	> 	import com.github.agcom.bson.mongodb.codecs.*
-	> 	import com.mongodb.MongoClientSettings
-	> 	import org.bson.codecs.configuration.CodecRegistries
-	> 	
-	> 	@Serializable
-	> 	data class Project(val name: String, val language: String)
-	> 	
-	> 	val bson = Bson(BsonConfiguration.DEFAULT)
-	> 	
-	> 	fun main() {
-	> 	    val registry = CodecRegistries.fromRegistries(
-	> 	        MongoClientSettings.getDefaultCodecRegistry(), // The default driver codec registry
-	> 	        SerializationCodecRegistry(bson)
-	> 	    )
-	> 	    ...
-	> 	}
-	> 	```
+  > It's recommended to compose the registry after the default registry. This reduces hip-hops (better performance) when working with simple bson types.
+  >
+  > ```kotlin
+  > import kotlinx.serialization.*
+  > import com.github.agcom.bson.serialization.*
+  > import com.github.agcom.bson.mongodb.codecs.*
+  > import com.mongodb.MongoClientSettings
+  > import org.bson.codecs.configuration.CodecRegistries
+  > 
+  > @Serializable
+  > data class Project(val name: String, val language: String)
+  > 
+  > val bson = Bson(BsonConfiguration.DEFAULT)
+  > 
+  > fun main() {
+  >     val registry = CodecRegistries.fromRegistries(
+  >         MongoClientSettings.getDefaultCodecRegistry(), // The driver's default codec registry
+  >         SerializationCodecRegistry(bson)
+  >     )
+  >     ...
+  > }
+  > ```
 

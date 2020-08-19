@@ -1,6 +1,8 @@
 package com.github.agcom.bson.serialization.serializers
 
 import kotlinx.serialization.*
+import kotlinx.serialization.modules.SerializersModule
+import kotlinx.serialization.modules.contextual
 import java.time.*
 import java.time.temporal.Temporal
 
@@ -110,4 +112,15 @@ object ZonedDateTimeSerializer : TemporalSerializer<ZonedDateTime>(ZonedDateTime
     override fun ofEpochMillis(temporal: Long): ZonedDateTime =
         ZonedDateTime.ofInstant(InstantSerializer.ofEpochMillis(temporal), ZoneOffset.UTC)
 
+}
+
+internal val bsonTemporalModule = SerializersModule {
+    contextual(InstantSerializer)
+    contextual(LocalDateTimeSerializer)
+    contextual(LocalDateSerializer)
+    contextual(LocalTimeSerializer)
+    contextual(OffsetDateTimeSerializer)
+    contextual(OffsetTimeSerializer)
+    contextual(ZonedDateTimeSerializer)
+    contextual(TemporalSerializer)
 }
