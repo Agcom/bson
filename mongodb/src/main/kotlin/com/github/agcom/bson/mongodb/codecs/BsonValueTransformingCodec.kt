@@ -8,10 +8,13 @@ import org.bson.codecs.Codec
 import org.bson.codecs.DecoderContext
 import org.bson.codecs.EncoderContext
 
+/**
+ * For internal use.
+ */
 abstract class BsonValueTransformingCodec<T> : Codec<T> {
 
     companion object {
-        val bsonCodec: Codec<BsonValue> = BsonValueCodec()
+        private val bsonCodec: Codec<BsonValue> = BsonValueCodec()
     }
 
     final override fun encode(writer: BsonWriter, value: T, encoderContext: EncoderContext) {

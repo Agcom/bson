@@ -15,7 +15,7 @@ import kotlin.reflect.KClass
  * @return A [PolymorphicSerializer] for the [kClass] or null if no polymorphic serializer related to the [kClass] is registered.
  */
 internal fun <T : Any> SerialModule.getPolymorphic(kClass: KClass<T>): PolymorphicSerializer<T>? {
-    lateinit var baseClazz: KClass<T> // The T type is not correct (should be 'in T' = '? super T'), yet I'm forced to do this because of the PolymorphicSerializer's type parameter
+    lateinit var baseClazz: KClass<T>
     try {
         dumpTo(object : SerialModuleCollector {
             override fun <T : Any> contextual(kClass: KClass<T>, serializer: KSerializer<T>) {
