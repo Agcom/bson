@@ -133,7 +133,8 @@ Provides extensions to use the serialization library with [MongoDB Java driver](
   import kotlinx.serialization.*
   import com.github.agcom.bson.serialization.*
   import com.github.agcom.bson.mongodb.codecs.*
-  import org.bson.codecs.configuration.CodecRegistry
+  import org.bson.codecs.configuration.*
+  import com.mongodb.MongoClientSettings
   
   @Serializable
   data class Project(val name: String, val language: String)
@@ -141,31 +142,15 @@ Provides extensions to use the serialization library with [MongoDB Java driver](
   val bson = Bson(BsonConfiguration.DEFAULT)
   
   fun main() {
-      val registry: CodecRegistry = SerializationCodecRegistry(bson) // Look here
+      // Composing two registries
+  	val registry: CodecRegistry = CodecRegistries.fromRegistries(
+          MongoClientSettings.getDefaultCodecRegistry(), // The driver's default codec registry
+		SerializationCodecRegistry(bson) // Serialization registry
+  	)
       ...
   }
   ```
-
-  > It's recommended to compose the registry after the default registry. This reduces hip-hops (better performance) when working with simple bson types.
+  
+  > It's **recommended** to compose the serialization registry after the **default registry**. This reduces hip-hops (better performance) when working with simple bson types.
   >
-  > ```kotlin
-  > import kotlinx.serialization.*
-  > import com.github.agcom.bson.serialization.*
-  > import com.github.agcom.bson.mongodb.codecs.*
-  > import com.mongodb.MongoClientSettings
-  > import org.bson.codecs.configuration.CodecRegistries
-  > 
-  > @Serializable
-  > data class Project(val name: String, val language: String)
-  > 
-  > val bson = Bson(BsonConfiguration.DEFAULT)
-  > 
-  > fun main() {
-  >     val registry = CodecRegistries.fromRegistries(
-  >         MongoClientSettings.getDefaultCodecRegistry(), // The driver's default codec registry
-  >         SerializationCodecRegistry(bson)
-  >     )
-  >     ...
-  > }
-  > ```
 
