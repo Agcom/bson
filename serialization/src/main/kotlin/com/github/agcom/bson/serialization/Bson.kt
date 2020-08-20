@@ -4,6 +4,7 @@ import com.github.agcom.bson.serialization.decoders.readBson
 import com.github.agcom.bson.serialization.encoders.writeBson
 import com.github.agcom.bson.serialization.serializers.*
 import com.github.agcom.bson.serialization.streaming.*
+import com.github.agcom.bson.serialization.utils.RawBsonValue
 import kotlinx.serialization.*
 import kotlinx.serialization.internal.AbstractPolymorphicSerializer
 import kotlinx.serialization.modules.*
@@ -11,7 +12,6 @@ import org.bson.*
 import org.bson.io.*
 import org.bson.types.*
 import java.nio.ByteBuffer
-import java.util.regex.Pattern
 
 /**
  * Main entry point to work with BSON serialization.
@@ -46,40 +46,33 @@ class Bson(
 
     /**
      * Transform some [bytes] into a value.
-     * You can pas [BsonValueSerializer] as [deserializer] to get a [BsonValue].
-     * It's always safer to use the other signature [load] below.
+     * You can pass [BsonValueSerializer] as [deserializer] to get a [BsonValue].
+     * Changes to [bytes] array won't reflect into the returned value.
+     * In case of multiple possible bson types, a custom indirect child of [BsonValue] will be returned which functions' would work as much possible as expected. It's called [RawBsonValue] and extends [BsonBinary].
      */
     @OptIn(InternalSerializationApi::class)
     override fun <T> load(deserializer: DeserializationStrategy<T>, bytes: ByteArray): T {
-        val type: BsonType = when (deserializer.descriptor.kind) {
-            StructureKind.LIST -> BsonType.ARRAY
-            is StructureKind -> BsonType.DOCUMENT
+        val input by lazy { ByteBufferBsonInput(ByteBufNIO(ByteBuffer.wrap(bytes))) }
+        val bson = when (deserializer.descriptor.kind) {
+            // can only use `input.readBson`, but inferring by the needed type (when it's safe) is more trusted and efficient
+            StructureKind.LIST -> input.use { it.readBsonArray() }
+            is StructureKind -> input.use { it.readBsonDocument() }
             is PolymorphicKind -> {
-                if (deserializer is AbstractPolymorphicSerializer) BsonType.DOCUMENT
-                else throw BsonDecodingException(
-                    "Unable to infer the bytes bson type\n" +
-                            "Supply the bson type using load(deserializer, bytes, type) function if you're sure about the bytes bson type, else this is a bug and is filed for fix"
-                )
+                if (deserializer is AbstractPolymorphicSerializer) input.use { it.readBsonDocument() }
+                else RawBsonValue.eager(bytes)
             }
-            else -> throw BsonDecodingException(
-                "Unable to infer the bytes bson type\n" +
-                        "Supply the bson type using load(deserializer, bytes, type) function if you're sure about the bytes bson type, else this is a bug and is filed for fix"
-            )
+            else -> RawBsonValue.eager(bytes)
         }
-        return load(deserializer, bytes, type)
+        return fromBson(deserializer, bson)
     }
 
     /**
      * This function was declared to semi-bypass the issue with inferring bytes bson type.
-     * It's always safer to use this signature instead of the main one.
-     * Still some issue remains, like you can't read a bson primitive not knowing [bytes] exact type.
      * @param type The expected bson type of the [bytes]. E.g. [BsonType.DOCUMENT].
      */
+    @Deprecated("Ports to the main load function; Issue was fixed", ReplaceWith("load(deserializer, bytes)"))
     fun <T> load(deserializer: DeserializationStrategy<T>, bytes: ByteArray, type: BsonType): T {
-        val bson = ByteBufferBsonInput(ByteBufNIO(ByteBuffer.wrap(bytes))).use {
-            it.readBson(type)
-        }
-        return fromBson(deserializer, bson)
+        return load(deserializer, bytes)
     }
 
 }

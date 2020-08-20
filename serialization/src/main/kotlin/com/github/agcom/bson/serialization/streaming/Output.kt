@@ -1,53 +1,56 @@
 package com.github.agcom.bson.serialization.streaming
 
 import com.github.agcom.bson.serialization.BsonEncodingException
+import com.github.agcom.bson.serialization.utils.*
 import org.bson.*
-import org.bson.BsonType.*
 import org.bson.io.BsonOutput
 
 internal fun BsonOutput.writeBson(bson: BsonValue) {
-    when (bson.bsonType) {
-        DOUBLE, STRING, BINARY, OBJECT_ID, BOOLEAN, DATE_TIME, NULL, REGULAR_EXPRESSION, JAVASCRIPT, INT32, INT64, DECIMAL128 ->
-            writePrimitive(bson)
-        DOCUMENT -> writeDocument(bson.asDocument())
-        ARRAY -> writeArray(bson.asArray())
-        else -> throw BsonEncodingException("Unexpected bson type '${bson.bsonType}'")
-    }
+    bson.fold(
+        primitive = { writePrimitive(it) },
+        document = { writeDocument(it) },
+        array = { writeArray(it) },
+        unexpected = { throw BsonEncodingException("Unexpected bson type '${it.bsonType}'") }
+    )
 }
 
 private fun BsonOutput.writePrimitive(bson: BsonValue) {
-    when (bson.bsonType) {
-        DOUBLE -> writeDouble(bson.asDouble().value)
-        STRING -> writeString(bson.asString().value)
-        BINARY -> {
-            bson.asBinary(); bson as BsonBinary
-            var totalLen: Int = bson.data.size
-            if (bson.type == BsonBinarySubType.OLD_BINARY.value) totalLen += 4
-            writeInt32(totalLen)
-            writeByte(bson.type.toInt())
-            if (bson.type == BsonBinarySubType.OLD_BINARY.value) writeInt32(totalLen - 4)
-            writeBytes(bson.data)
-        }
-        OBJECT_ID -> writeObjectId(bson.asObjectId().value)
-        BOOLEAN -> writeByte(if (bson.asBoolean().value) 1 else 0)
-        DATE_TIME -> writeInt64(bson.asDateTime().value)
-        NULL -> { /* Nothing */
-        }
-        REGULAR_EXPRESSION -> {
-            bson.asRegularExpression(); bson as BsonRegularExpression
-            writeCString(bson.pattern)
-            writeCString(bson.options)
-        }
-        JAVASCRIPT -> writeString(bson.asJavaScript().code)
-        INT32 -> writeInt32(bson.asInt32().value)
-        INT64 -> writeInt64(bson.asInt64().value)
-        DECIMAL128 -> {
-            bson.asDecimal128(); bson as BsonDecimal128
-            writeInt64(bson.value.low)
-            writeInt64(bson.value.high)
-        }
-        else -> throw BsonEncodingException("Unexpected bson type '${bson.bsonType}'")
-    }
+    bson.fold(
+        primitive = {
+            when {
+                it.isDouble -> writeDouble(it.asDouble().value)
+                it.isString -> writeString(it.asString().value)
+                it.isBinary -> {
+                    it.asBinary(); it as BsonBinary
+                    var totalLen: Int = it.data.size
+                    if (it.type == BsonBinarySubType.OLD_BINARY.value) totalLen += 4
+                    writeInt32(totalLen)
+                    writeByte(it.type.toInt())
+                    if (it.type == BsonBinarySubType.OLD_BINARY.value) writeInt32(totalLen - 4)
+                    writeBytes(it.data)
+                }
+                it.isObjectId -> writeObjectId(it.asObjectId().value)
+                it.isBoolean -> writeByte(if (it.asBoolean().value) 1 else 0)
+                it.isDateTime -> writeInt64(it.asDateTime().value)
+                it.isNull -> { /* No op */ }
+                it.isRegularExpression -> {
+                    it.asRegularExpression(); it as BsonRegularExpression
+                    writeCString(it.pattern)
+                    writeCString(it.options)
+                }
+                it.isJavaScript -> writeString(it.asJavaScript().code)
+                it.isInt32 -> writeInt32(it.asInt32().value)
+                it.isInt64 -> writeInt64(it.asInt64().value)
+                it.isDecimal128 -> {
+                    it.asDecimal128(); it as BsonDecimal128
+                    writeInt64(it.value.low)
+                    writeInt64(it.value.high)
+                }
+                else -> throw BsonEncodingException("Unexpected bson type '${it.bsonType}'")
+            }
+        },
+        unexpected = { throw BsonEncodingException("Unexpected bson type '${it.bsonType}'") }
+    )
 }
 
 private fun BsonOutput.writeDocument(doc: BsonDocument) {

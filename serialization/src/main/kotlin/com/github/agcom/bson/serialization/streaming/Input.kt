@@ -1,65 +1,14 @@
 package com.github.agcom.bson.serialization.streaming
 
-import com.github.agcom.bson.serialization.BsonDecodingException
+import com.github.agcom.bson.serialization.utils.RawBsonValue
 import org.bson.*
+import org.bson.BsonType.*
 import org.bson.io.BsonInput
 import org.bson.types.Decimal128
 
-internal fun BsonInput.readBson(type: BsonType): BsonValue {
-    return when (type) {
-        BsonType.DOUBLE, BsonType.STRING, BsonType.BINARY, BsonType.OBJECT_ID, BsonType.BOOLEAN, BsonType.DATE_TIME, BsonType.NULL, BsonType.REGULAR_EXPRESSION, BsonType.JAVASCRIPT, BsonType.INT32, BsonType.INT64, BsonType.DECIMAL128 ->
-            readPrimitive(type)
-        BsonType.DOCUMENT -> readDocument()
-        BsonType.ARRAY -> readArray()
-        else -> throw BsonDecodingException("Unexpected bson type '$type'")
-    }
-}
+internal fun BsonInput.readBson(): BsonValue = RawBsonValue.eager(this)
 
-private fun BsonInput.readPrimitive(type: BsonType): BsonValue {
-    val value: BsonValue = when (type) {
-        BsonType.DOUBLE -> BsonDouble(readDouble())
-        BsonType.STRING -> BsonString(readString())
-        BsonType.BINARY -> {
-            var size = readInt32()
-            if (size < 0) throw BsonDecodingException("Invalid binary data size '$size'")
-            val binaryType = readByte()
-            if (binaryType == BsonBinarySubType.OLD_BINARY.value) {
-                val repeatedSize: Int = readInt32()
-                if (repeatedSize != size - 4) throw BsonDecodingException("Binary sub type OldBinary has inconsistent sizes")
-                size -= 4
-            }
-            val bytes = ByteArray(size)
-            readBytes(bytes)
-            BsonBinary(binaryType, bytes)
-        }
-        BsonType.OBJECT_ID -> BsonObjectId(readObjectId())
-        BsonType.BOOLEAN -> {
-            BsonBoolean(
-                when (readByte()) {
-                    1.toByte() -> true
-                    0.toByte() -> false
-                    else -> throw BsonDecodingException("Not a bson boolean")
-                }
-            )
-        }
-        BsonType.DATE_TIME -> BsonDateTime(readInt64())
-        BsonType.NULL -> BsonNull.VALUE
-        BsonType.REGULAR_EXPRESSION -> BsonRegularExpression(readCString(), readCString())
-        BsonType.JAVASCRIPT -> BsonJavaScript(readString())
-        BsonType.INT32 -> BsonInt32(readInt32())
-        BsonType.INT64 -> BsonInt64(readInt64())
-        BsonType.DECIMAL128 -> {
-            val low = readInt64()
-            val high = readInt64()
-            return BsonDecimal128(Decimal128.fromIEEE754BIDEncoding(high, low))
-        }
-        else -> throw BsonDecodingException("Unexpected bson type '$type'")
-    }
-    if (hasRemaining()) throw BsonDecodingException("Not a '$type' bson primitive")
-    return value
-}
-
-private fun BsonInput.readDocument(): BsonDocument {
+internal fun BsonInput.readBsonDocument(): BsonDocument {
     val doc = BsonDocument()
     val reader = BsonBinaryReader(this)
     BsonDocumentWriter(doc).use { writer ->
@@ -70,14 +19,80 @@ private fun BsonInput.readDocument(): BsonDocument {
     return doc
 }
 
-private fun BsonInput.readArray(): BsonArray {
-    val doc = readDocument()
+internal fun BsonInput.readBsonArray(): BsonArray {
+    val doc = readBsonDocument()
     val arr = BsonArray()
     var counter = 0
     doc.forEach { (key, value) ->
-        val index = key.toIntOrNull() ?: throw BsonDecodingException("Not a bson array")
-        if (index != counter++) throw BsonDecodingException("Not a bson array")
+        val index = key.toIntOrNull() ?: throw BsonSerializationException("Not a bson array")
+        if (index != counter++) throw BsonSerializationException("Not a bson array")
         arr.add(value)
     }
     return arr
+}
+
+internal fun BsonInput.readBsonJavaScript(): BsonJavaScript {
+    return BsonJavaScript(readString())
+}
+
+internal fun BsonInput.readBsonInt64(): BsonInt64 {
+    return BsonInt64(readInt64())
+}
+
+internal fun BsonInput.readBsonDateTime(): BsonDateTime {
+    return BsonDateTime(readInt64())
+}
+
+internal fun BsonInput.readBsonBoolean(): BsonBoolean {
+    return BsonBoolean(
+        when (readByte()) {
+            1.toByte() -> true
+            0.toByte() -> false
+            else -> throw BsonSerializationException("Not a '$BOOLEAN'")
+        }
+    )
+}
+
+internal fun BsonInput.readBsonBinary(): BsonBinary {
+    var size = readInt32()
+    if (size < 0) throw BsonSerializationException("Invalid binary data size '$size'")
+    val binaryType = readByte()
+    if (binaryType == BsonBinarySubType.OLD_BINARY.value) {
+        val repeatedSize: Int = readInt32()
+        if (repeatedSize != size - 4) throw BsonSerializationException("Binary sub type OldBinary has inconsistent sizes")
+        size -= 4
+    }
+    val bytes = ByteArray(size)
+    readBytes(bytes)
+    return BsonBinary(binaryType, bytes)
+}
+
+internal fun BsonInput.readBsonInt32(): BsonInt32 {
+    return BsonInt32(readInt32())
+}
+
+internal fun BsonInput.readBsonString(): BsonString {
+    return BsonString(readString())
+}
+
+internal fun BsonInput.readBsonDouble(): BsonDouble {
+    return BsonDouble(readDouble())
+}
+
+internal fun BsonInput.readBsonObjectId(): BsonObjectId {
+    return BsonObjectId(readObjectId())
+}
+
+internal fun BsonInput.readBsonRegularExpression(): BsonRegularExpression {
+    return BsonRegularExpression(readCString(), readCString())
+}
+
+internal fun BsonInput.readBsonDecimal128(): BsonDecimal128 {
+    val low = readInt64()
+    val high = readInt64()
+    return BsonDecimal128(Decimal128.fromIEEE754BIDEncoding(high, low))
+}
+
+internal fun BsonInput.readBsonNull(): BsonNull {
+    return BsonNull.VALUE
 }
