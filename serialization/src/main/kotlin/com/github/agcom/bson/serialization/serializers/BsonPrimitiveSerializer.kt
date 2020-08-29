@@ -3,10 +3,8 @@ package com.github.agcom.bson.serialization.serializers
 import com.github.agcom.bson.serialization.BsonEncodingException
 import com.github.agcom.bson.serialization.decoders.BsonInput
 import com.github.agcom.bson.serialization.encoders.BsonOutput
-import com.github.agcom.bson.serialization.utils.toBinary
-import com.github.agcom.bson.serialization.utils.toRegex
+import com.github.agcom.bson.serialization.utils.*
 import kotlinx.serialization.*
-import org.bson.BsonType.*
 import org.bson.BsonValue
 
 /**
@@ -20,31 +18,35 @@ object BsonPrimitiveSerializer : KSerializer<BsonValue> {
 
     override fun serialize(encoder: Encoder, value: BsonValue) {
         encoder.verify(); encoder as BsonOutput
-        when (value.bsonType) {
-            DOUBLE -> encoder.encodeDouble(value.asDouble().value)
-            STRING -> encoder.encodeString(value.asString().value)
-            BINARY -> encoder.encodeBinary(value.asBinary().toBinary())
-            OBJECT_ID -> encoder.encodeObjectId(value.asObjectId().value)
-            BOOLEAN -> encoder.encodeBoolean(value.asBoolean().value)
-            DATE_TIME -> encoder.encodeDateTime(value.asDateTime().value)
-            NULL -> encoder.encodeNull()
-            JAVASCRIPT -> encoder.encodeJavaScript(value.asJavaScript().code)
-            INT32 -> encoder.encodeInt(value.asInt32().value)
-            INT64 -> encoder.encodeLong(value.asInt64().value)
-            DECIMAL128 -> encoder.encodeDecimal128(value.asDecimal128().value)
-            REGULAR_EXPRESSION -> encoder.encodeRegularExpression(value.asRegularExpression().toRegex())
-            else -> throw BsonEncodingException("Unexpected bson type '${value.bsonType}'")
-        }
+        value.fold(
+            primitive = {
+                when {
+                    it.isDouble -> encoder.encodeDouble(it.asDouble().value)
+                    it.isString -> encoder.encodeString(it.asString().value)
+                    it.isBinary -> encoder.encodeBinary(it.asBinary().toBinary())
+                    it.isObjectId -> encoder.encodeObjectId(it.asObjectId().value)
+                    it.isBoolean -> encoder.encodeBoolean(it.asBoolean().value)
+                    it.isDateTime -> encoder.encodeDateTime(it.asDateTime().value)
+                    it.isNull -> encoder.encodeNull()
+                    it.isJavaScript -> encoder.encodeJavaScript(it.asJavaScript().code)
+                    it.isInt32 -> encoder.encodeInt(it.asInt32().value)
+                    it.isInt64 -> encoder.encodeLong(it.asInt64().value)
+                    it.isDecimal128 -> encoder.encodeDecimal128(it.asDecimal128().value)
+                    it.isRegularExpression -> encoder.encodeRegularExpression(it.asRegularExpression().toRegex())
+                    else -> throw BsonEncodingException("Unexpected bson type '${it.bsonType}'")
+                }
+            },
+            unexpected = { throw BsonEncodingException("Unexpected bson type '${it.bsonType}'") }
+        )
     }
 
     override fun deserialize(decoder: Decoder): BsonValue {
         decoder.verify(); decoder as BsonInput
         val value = decoder.decodeBson()
-        return when (value.bsonType) {
-            END_OF_DOCUMENT, TIMESTAMP, UNDEFINED, DB_POINTER, SYMBOL, DOCUMENT, ARRAY, JAVASCRIPT_WITH_SCOPE, null ->
-                throw BsonEncodingException("Unexpected bson type '${value.bsonType}'")
-            else -> value
-        }
+        return value.fold(
+            primitive = { it },
+            unexpected = { throw BsonEncodingException("Unexpected bson type '${it.bsonType}'") }
+        )
     }
 
 }

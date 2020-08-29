@@ -1,19 +1,12 @@
 package com.github.agcom.bson.serialization.decoders
 
-import com.github.agcom.bson.serialization.Bson
-import com.github.agcom.bson.serialization.BsonDecodingException
-import com.github.agcom.bson.serialization.utils.PRIMITIVE_TAG
-import com.github.agcom.bson.serialization.utils.toBinary
-import com.github.agcom.bson.serialization.utils.toRegex
+import com.github.agcom.bson.serialization.*
+import com.github.agcom.bson.serialization.utils.*
 import kotlinx.serialization.*
-import kotlinx.serialization.internal.AbstractPolymorphicSerializer
-import kotlinx.serialization.internal.NamedValueDecoder
+import kotlinx.serialization.internal.*
 import kotlinx.serialization.modules.SerialModule
 import org.bson.*
-import org.bson.BsonType.*
-import org.bson.types.Binary
-import org.bson.types.Decimal128
-import org.bson.types.ObjectId
+import org.bson.types.*
 
 @OptIn(InternalSerializationApi::class)
 private sealed class AbstractBsonTreeInput(
@@ -57,10 +50,12 @@ private sealed class AbstractBsonTreeInput(
 
     protected open fun getValue(tag: String): BsonValue {
         val currentElement = currentElement(tag)
-        return when (currentElement.bsonType) {
-            DOUBLE, STRING, BINARY, OBJECT_ID, BOOLEAN, DATE_TIME, REGULAR_EXPRESSION, JAVASCRIPT, INT32, INT64, DECIMAL128, NULL -> currentElement
-            else -> throw BsonDecodingException("Unexpected bson type '${currentElement.bsonType}'")
-        }
+        return currentElement.fold(
+            primitive = { it },
+            unexpected = {
+                throw BsonDecodingException("Unexpected bson type '${it.bsonType}'")
+            }
+        )
     }
 
     protected abstract fun currentElement(tag: String): BsonValue
@@ -98,11 +93,12 @@ private sealed class AbstractBsonTreeInput(
 private class BsonPrimitiveInput(bson: Bson, override val value: BsonValue) : AbstractBsonTreeInput(bson, value) {
 
     init {
-        @Suppress("NON_EXHAUSTIVE_WHEN")
-        when (value.bsonType) {
-            DOCUMENT, ARRAY, END_OF_DOCUMENT, UNDEFINED, DB_POINTER, SYMBOL, TIMESTAMP, MIN_KEY, MAX_KEY, JAVASCRIPT_WITH_SCOPE, null ->
-                throw BsonDecodingException("Unexpected bson type '${value.bsonType}'")
-        }
+        value.fold(
+            primitive = { /* OK */ },
+            unexpected = {
+                throw BsonDecodingException("Unexpected bson type '${it.bsonType}'")
+            }
+        )
         pushTag(PRIMITIVE_TAG)
     }
 
@@ -188,13 +184,14 @@ internal fun <T> Bson.readBson(
     element: BsonValue,
     deserializer: DeserializationStrategy<T>
 ): T {
-    val input = when (element.bsonType) {
+    val input = element.fold(
+        primitive = { BsonPrimitiveInput(this, it) },
+        document = { BsonTreeInput(this, it) },
+        array = { BsonTreeListInput(this, it) },
+        unexpected = {
+            throw BsonDecodingException("Unexpected bson type '${it.bsonType}'")
+        }
+    )
 
-        DOUBLE, STRING, BINARY, OBJECT_ID, BOOLEAN, DATE_TIME, REGULAR_EXPRESSION, JAVASCRIPT, INT32, INT64, DECIMAL128, NULL ->
-            BsonPrimitiveInput(this, element)
-        DOCUMENT -> BsonTreeInput(this, element.asDocument())
-        ARRAY -> BsonTreeListInput(this, element.asArray())
-        else -> throw BsonDecodingException("Unexpected bson type '${element.bsonType}'")
-    }
     return input.decode(deserializer)
 }

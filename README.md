@@ -31,10 +31,6 @@ Currently, only supports **Kotlin 1.3.72** and **Kotlinx serialization runtime 0
 
 Here is a small example,
 
-> The following example illustrates working with `BsonValue` instances.
->
-> Read *[Serialization functions](#serialization-functions)* section below for byte arrays conversations (`dump`, `load`).
-
 ```kotlin
 import kotlinx.serialization.*
 import com.github.agcom.bson.serialization.*
@@ -49,7 +45,7 @@ fun main() {
     val data = Project("com.github.agcom.bson", "Kotlin")
     
     // Serializing
-    val bsonValue = bson.toBson(Project.serializer(), data) // A `BsonValue` child, in this case `BsonDocument`
+    val bsonValue = bson.toBson(Project.serializer(), data) // A `BsonValue` child, in this case a `BsonDocument`
     println(bsonValue) // {"name": "com.github.agcom.bson", "language": "Kotlin"}
     
     // Deserializing
@@ -69,34 +65,36 @@ The following functions can be found in the `com.github.agcom.bson.serialization
 
 - `dump` and `load`,
 
-	```kotlin
-	import kotlinx.serialization.*
-	import com.github.agcom.bson.serialization.*
-	import org.bson.*
-	
-	@Serializable
-	data class Project(val name: String, val language: String)
-	
-	val bson = Bson(BsonConfiguration.DEFAULT)
-	
-	fun main() {
-	    val data = Project("com.github.agcom.bson", "Kotlin")
-	
-	    // Dump
-	    val bytes = bson.dump(Project.serializer(), data)
-	
-	    // Load (*1)
-	    println(
-	        bson.load(Project.serializer(), bytes)
-	    ) // Project(name=com.github.agcom, language=Kotlin)
-	}
-	```
+  ```kotlin
+  import kotlinx.serialization.*
+  import com.github.agcom.bson.serialization.*
+  import org.bson.*
+  
+  @Serializable
+  data class Project(val name: String, val language: String)
+  
+  val bson = Bson(BsonConfiguration.DEFAULT)
+  
+  fun main() {
+      val data = Project("com.github.agcom.bson", "Kotlin")
+  
+      // Dump
+      val bytes = bson.dump(Project.serializer(), data)
+  
+      // Load
+      println(
+          bson.load(Project.serializer(), bytes)
+      ) // Project(name=com.github.agcom, language=Kotlin)
+  }
+  ```
 
-	> 1. Limited functionality (#18). You can use the other function signature `load(serializer, bytes, bsonType)` to semi-bypass this issue.
+  > Doesn't support loading/dumping **primitive types**.
 
 #### Serializers
 
-Various **bson types adapter serializers** can be found under `com.github.agcom.bson.serialization.serializers` package. Be sure to check them before implementing yours. Also, you can always use `@ContextualSerializer` for the bson types.
+Various **bson types adapter serializers** can be found under `com.github.agcom.bson.serialization.serializers` package.
+
+Those are all registered as default contextual serializers, so you can use `@ContextualSerializer` safely.
 
 > E.g. `BsonValueSerializer`, `TemporalSerializer` and `RegexSerializer`.
 
@@ -133,7 +131,8 @@ Provides extensions to use the serialization library with [MongoDB Java driver](
   import kotlinx.serialization.*
   import com.github.agcom.bson.serialization.*
   import com.github.agcom.bson.mongodb.codecs.*
-  import org.bson.codecs.configuration.CodecRegistry
+  import org.bson.codecs.configuration.*
+  import com.mongodb.MongoClientSettings
   
   @Serializable
   data class Project(val name: String, val language: String)
@@ -141,31 +140,15 @@ Provides extensions to use the serialization library with [MongoDB Java driver](
   val bson = Bson(BsonConfiguration.DEFAULT)
   
   fun main() {
-      val registry: CodecRegistry = SerializationCodecRegistry(bson) // Look here
+      // Composing two registries
+  	val registry: CodecRegistry = CodecRegistries.fromRegistries(
+          MongoClientSettings.getDefaultCodecRegistry(), // The driver's default codec registry
+			SerializationCodecRegistry(bson) // Serialization registry
+  	)
       ...
   }
   ```
-
-  > It's recommended to compose the registry after the default registry. This reduces hip-hops (better performance) when working with simple bson types.
+  
+  > It's **recommended** to compose the serialization registry after the **default registry**. This reduces hip-hops (better performance) when working with simple bson types.
   >
-  > ```kotlin
-  > import kotlinx.serialization.*
-  > import com.github.agcom.bson.serialization.*
-  > import com.github.agcom.bson.mongodb.codecs.*
-  > import com.mongodb.MongoClientSettings
-  > import org.bson.codecs.configuration.CodecRegistries
-  > 
-  > @Serializable
-  > data class Project(val name: String, val language: String)
-  > 
-  > val bson = Bson(BsonConfiguration.DEFAULT)
-  > 
-  > fun main() {
-  >     val registry = CodecRegistries.fromRegistries(
-  >         MongoClientSettings.getDefaultCodecRegistry(), // The driver's default codec registry
-  >         SerializationCodecRegistry(bson)
-  >     )
-  >     ...
-  > }
-  > ```
 

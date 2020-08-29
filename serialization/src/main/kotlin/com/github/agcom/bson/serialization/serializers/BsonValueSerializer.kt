@@ -2,8 +2,8 @@ package com.github.agcom.bson.serialization.serializers
 
 import com.github.agcom.bson.serialization.BsonEncodingException
 import com.github.agcom.bson.serialization.decoders.BsonInput
+import com.github.agcom.bson.serialization.utils.*
 import kotlinx.serialization.*
-import org.bson.BsonType.*
 import org.bson.BsonValue
 
 /**
@@ -16,23 +16,22 @@ object BsonValueSerializer : KSerializer<BsonValue> {
 
     override fun serialize(encoder: Encoder, value: BsonValue) {
         encoder.verify()
-        when (value.bsonType) {
-            DOUBLE, STRING, OBJECT_ID, BOOLEAN, DATE_TIME, NULL, INT32, INT64, REGULAR_EXPRESSION, JAVASCRIPT, DECIMAL128, MIN_KEY, MAX_KEY, BINARY ->
-                encoder.encode(BsonPrimitiveSerializer, value)
-            DOCUMENT -> encoder.encode(BsonDocumentSerializer, value.asDocument())
-            ARRAY -> encoder.encode(BsonArraySerializer, value.asArray())
-            else -> throw BsonEncodingException("Unexpected bson type '${value.bsonType}'")
-        }
+        value.fold(
+            primitive = { encoder.encode(BsonPrimitiveSerializer, it) },
+            document = { encoder.encode(BsonDocumentSerializer, it.asDocument()) },
+            array = { encoder.encode(BsonArraySerializer, it.asArray()) },
+            unexpected = { throw BsonEncodingException("Unexpected bson type '${it.bsonType}'") }
+        )
     }
 
     override fun deserialize(decoder: Decoder): BsonValue {
         decoder.verify(); decoder as BsonInput
         val value = decoder.decodeBson()
-        return when (value.bsonType) {
-            END_OF_DOCUMENT, TIMESTAMP, UNDEFINED, DB_POINTER, SYMBOL, JAVASCRIPT_WITH_SCOPE, null ->
-                throw BsonEncodingException("Unexpected bson type '${value.bsonType}'")
-            else -> value
-        }
+        return value.fold(
+            primitive = { it },
+            document = { it },
+            unexpected = { throw BsonEncodingException("Unexpected bson type '${it.bsonType}'") }
+        )
     }
 
 }

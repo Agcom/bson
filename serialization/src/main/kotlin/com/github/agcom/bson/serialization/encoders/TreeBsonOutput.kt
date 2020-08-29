@@ -1,18 +1,13 @@
 package com.github.agcom.bson.serialization.encoders
 
-import com.github.agcom.bson.serialization.Bson
-import com.github.agcom.bson.serialization.BsonEncodingException
+import com.github.agcom.bson.serialization.*
 import com.github.agcom.bson.serialization.serializers.BsonValueSerializer
-import com.github.agcom.bson.serialization.utils.PRIMITIVE_TAG
-import com.github.agcom.bson.serialization.utils.toBsonRegularExpression
+import com.github.agcom.bson.serialization.utils.*
 import kotlinx.serialization.*
-import kotlinx.serialization.internal.AbstractPolymorphicSerializer
-import kotlinx.serialization.internal.NamedValueEncoder
+import kotlinx.serialization.internal.*
 import kotlinx.serialization.modules.SerialModule
 import org.bson.*
-import org.bson.types.Binary
-import org.bson.types.Decimal128
-import org.bson.types.ObjectId
+import org.bson.types.*
 
 @OptIn(InternalSerializationApi::class)
 private sealed class AbstractBsonTreeOutput(
@@ -160,22 +155,24 @@ private class BsonTreeMapOutput(bson: Bson, nodeConsumer: (BsonValue) -> Unit) :
 
     override fun putElement(key: String, element: BsonValue) {
         if (isKey) { // Writing key
-            tag = when (element.bsonType) {
-                BsonType.DOUBLE -> element.asDouble().value.toString()
-                BsonType.STRING -> element.asString().value
-                BsonType.OBJECT_ID -> element.asObjectId().value.toHexString()
-                BsonType.BOOLEAN -> element.asBoolean().value.toString()
-                BsonType.DATE_TIME -> element.asDateTime().value.toString()
-                BsonType.NULL -> "null"
-                BsonType.REGULAR_EXPRESSION -> element.asRegularExpression().pattern
-                BsonType.JAVASCRIPT -> element.asJavaScript().code
-                BsonType.INT32 -> element.asInt32().value.toString()
-                BsonType.INT64 -> element.asInt64().value.toString()
-                BsonType.DECIMAL128 -> element.asDecimal128().value.toString()
-                BsonType.DOCUMENT, BsonType.ARRAY, BsonType.BINARY -> throw BsonEncodingException("Invalid key kind '${element.bsonType}'")
-                BsonType.END_OF_DOCUMENT, BsonType.UNDEFINED, BsonType.DB_POINTER, BsonType.SYMBOL, BsonType.TIMESTAMP, BsonType.MIN_KEY, BsonType.MAX_KEY, BsonType.JAVASCRIPT_WITH_SCOPE, null ->
-                    throw BsonEncodingException("Unexpected BsonType, type = '${element.bsonType}'")
-            }
+            element.fold(
+                primitive = {
+                    tag = when {
+                        it.isString -> it.asString().value
+                        it.isInt32 -> it.asInt32().value.toString()
+                        it.isInt64 -> it.asInt64().value.toString()
+                        it.isDouble -> it.asDouble().value.toString()
+                        it.isObjectId -> it.asObjectId().value.toHexString()
+                        it.isDecimal128 -> it.asDecimal128().value.toString()
+                        it.isDateTime -> it.asDateTime().value.toString()
+                        it.isBoolean -> it.asBoolean().value.toString()
+                        it.isRegularExpression -> it.asRegularExpression().pattern
+                        it.isJavaScript -> it.asJavaScript().code
+                        it.isNull -> "null"
+                        else -> throw BsonEncodingException("Unexpected BsonType, type = '${it.bsonType}'")
+                    }
+                }, unexpected = { throw BsonEncodingException("Unexpected BsonType, type = '${it.bsonType}'") }
+            )
             isKey = false
         } else {
             super.putElement(tag, element)
