@@ -3,14 +3,21 @@ package com.github.agcom.bson.serialization
 import com.github.agcom.bson.serialization.decoders.readBson
 import com.github.agcom.bson.serialization.encoders.writeBson
 import com.github.agcom.bson.serialization.serializers.*
-import com.github.agcom.bson.serialization.streaming.*
-import com.github.agcom.bson.serialization.utils.RawBsonValue
+import com.github.agcom.bson.serialization.streaming.readBsonDocument
+import com.github.agcom.bson.serialization.streaming.writeBsonArray
+import com.github.agcom.bson.serialization.streaming.writeBsonDocument
+import com.github.agcom.bson.serialization.utils.fold
+import com.github.agcom.bson.serialization.utils.toBsonArray
+import com.github.agcom.bson.serialization.utils.toBsonDocument
 import kotlinx.serialization.*
 import kotlinx.serialization.internal.AbstractPolymorphicSerializer
 import kotlinx.serialization.modules.*
 import org.bson.*
-import org.bson.io.*
-import org.bson.types.*
+import org.bson.io.BasicOutputBuffer
+import org.bson.io.ByteBufferBsonInput
+import org.bson.types.Binary
+import org.bson.types.Decimal128
+import org.bson.types.ObjectId
 import java.nio.ByteBuffer
 
 /**
@@ -33,44 +40,91 @@ class Bson(
      */
     fun <T> fromBson(deserializer: DeserializationStrategy<T>, bson: BsonValue): T = readBson(bson, deserializer)
 
+    fun loadBsonDocument(bytes: ByteArray): BsonDocument {
+        return ByteBufferBsonInput(ByteBufNIO(ByteBuffer.wrap(bytes))).use { it.readBsonDocument() }
+    }
+
+    fun loadBsonArray(bytes: ByteArray): BsonArray {
+        return loadBsonDocument(bytes).toBsonArray() ?: throw BsonDecodingException("Not a bson array")
+    }
+
+    fun dumpBson(bson: BsonDocument): ByteArray {
+        return BasicOutputBuffer().use { it.writeBsonDocument(bson); it.toByteArray() }
+    }
+
+    fun dumpBson(bson: BsonArray): ByteArray {
+        return dumpBson(bson.toBsonDocument())
+    }
+
     /**
      * Transform [value] into a [ByteArray].
+     * Dumping primitives are not supported.
      */
     override fun <T> dump(serializer: SerializationStrategy<T>, value: T): ByteArray {
-        val bson = toBson(serializer, value)
-        return BasicOutputBuffer().use {
-            it.writeBson(bson)
-            it.toByteArray()
-        }
+        return toBson(serializer, value).fold(
+            document = {
+                BasicOutputBuffer().use { output ->
+                    output.writeBsonDocument(it)
+                    output.toByteArray()
+                }
+            },
+            array = {
+                BasicOutputBuffer().use { output ->
+                    output.writeBsonArray(it)
+                    output.toByteArray()
+                }
+            },
+            primitive = { throw BsonEncodingException("Dumping primitives") },
+            unexpected = { throw BsonEncodingException("Unexpected bson type '${it.bsonType}'") }
+        )
     }
 
     /**
      * Transform some [bytes] into a value.
-     * You can pass [BsonValueSerializer] as [deserializer] to get a [BsonValue].
-     * Changes to [bytes] array won't reflect into the returned value.
-     * In case of multiple possible bson types, a custom indirect child of [BsonValue] will be returned which functions' would work as much possible as expected. It's called [RawBsonValue] and extends [BsonBinary].
+     * Loading primitives are not supported.
      */
     @OptIn(InternalSerializationApi::class)
     override fun <T> load(deserializer: DeserializationStrategy<T>, bytes: ByteArray): T {
-        val input by lazy { ByteBufferBsonInput(ByteBufNIO(ByteBuffer.wrap(bytes))) }
-        val bson = when (deserializer.descriptor.kind) {
-            // can only use `input.readBson`, but inferring by the needed type (when it's safe) is more trusted and efficient
-            StructureKind.LIST -> input.use { it.readBsonArray() }
-            is StructureKind -> input.use { it.readBsonDocument() }
-            is PolymorphicKind -> {
-                if (deserializer is AbstractPolymorphicSerializer) input.use { it.readBsonDocument() }
-                else RawBsonValue.eager(bytes)
-            }
-            else -> RawBsonValue.eager(bytes)
+        val input = ByteBufferBsonInput(ByteBufNIO(ByteBuffer.wrap(bytes)))
+        val doc = input.use {
+            it.readBsonDocument()
         }
-        return fromBson(deserializer, bson)
+        val array by lazy { doc.toBsonArray() }
+
+        fun trialAndError(): T {
+            // Trial and error
+            return try {
+                fromBson(deserializer, doc)
+            } catch (docEx: BsonException) {
+                try {
+                    fromBson(deserializer, array ?: throw BsonDecodingException("Not a bson array"))
+                } catch (arrayEx: BsonException) {
+                    docEx.addSuppressed(arrayEx)
+                    throw docEx
+                }
+            }
+        }
+
+        return when (deserializer.descriptor.kind) {
+            StructureKind.LIST -> fromBson(deserializer, array ?: throw BsonDecodingException("Not a bson array"))
+            is StructureKind -> fromBson(deserializer, doc)
+            is PrimitiveKind, UnionKind.ENUM_KIND -> throw BsonDecodingException("Loading primitives")
+            is PolymorphicKind -> {
+                if (deserializer is AbstractPolymorphicSerializer) fromBson(deserializer, doc)
+                else trialAndError()
+            }
+            UnionKind.CONTEXTUAL -> trialAndError()
+        }
     }
 
     /**
      * This function was declared to semi-bypass the issue with inferring bytes bson type.
      * @param type The expected bson type of the [bytes]. E.g. [BsonType.DOCUMENT].
      */
-    @Deprecated("Ports to the main load function; Issue was fixed", ReplaceWith("load(deserializer, bytes)"))
+    @Deprecated(
+        "Ports to the main load function; Loading primitives are no longer supported",
+        ReplaceWith("load(deserializer, bytes)")
+    )
     fun <T> load(deserializer: DeserializationStrategy<T>, bytes: ByteArray, type: BsonType): T {
         return load(deserializer, bytes)
     }
