@@ -3,6 +3,8 @@ package com.github.agcom.bson.serialization.utils
 import org.bson.BsonRegularExpression
 import kotlin.text.RegexOption.*
 
+operator fun BsonRegularExpression.invoke(regex: Regex): BsonRegularExpression = regex.toBsonRegularExpression()
+
 fun Regex.toBsonRegularExpression(): BsonRegularExpression = BsonRegularExpression(pattern, options.asEmbedded())
 fun BsonRegularExpression.toRegex(): Regex = Regex(pattern, options.toRegexOptions())
 

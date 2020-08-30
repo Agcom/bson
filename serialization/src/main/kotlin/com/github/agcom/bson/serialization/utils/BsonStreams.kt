@@ -1,8 +1,8 @@
-package com.github.agcom.bson.serialization.streaming
+package com.github.agcom.bson.serialization.utils
 
-import com.github.agcom.bson.serialization.utils.toBsonArray
 import org.bson.*
 import org.bson.io.BsonInput
+import org.bson.io.BsonOutput
 
 internal fun BsonInput.readBsonDocument(): BsonDocument {
     val doc = BsonDocument()
@@ -17,4 +17,17 @@ internal fun BsonInput.readBsonDocument(): BsonDocument {
 
 internal fun BsonInput.readBsonArray(): BsonArray {
     return readBsonDocument().toBsonArray() ?: throw BsonSerializationException("Not a bson array")
+}
+
+internal fun BsonOutput.writeBsonDocument(doc: BsonDocument) {
+    val writer = BsonBinaryWriter(this)
+    doc.asBsonReader().use { reader ->
+        writer.use {
+            it.pipe(reader)
+        }
+    }
+}
+
+internal fun BsonOutput.writeBsonArray(array: BsonArray) {
+    writeBsonDocument(array.toBsonDocument())
 }

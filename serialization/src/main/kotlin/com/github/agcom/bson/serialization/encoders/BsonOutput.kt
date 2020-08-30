@@ -9,41 +9,44 @@ import org.bson.types.Decimal128
 import org.bson.types.ObjectId
 
 /**
- * The [Encoder] instance passed to [kotlinx.serialization.KSerializer.serialize] when using [Bson].
+ * The [Encoder] instance which is passed to [serialize][kotlinx.serialization.KSerializer.serialize] function when using [Bson].
  */
 interface BsonOutput : Encoder, CompositeEncoder {
 
+    /**
+     * Instance of the current [Bson].
+     */
     val bson: Bson
 
     fun encodeBson(element: BsonValue)
 
     /**
-     * Corresponds to [org.bson.BsonBinary] type.
+     * Write a [bson binary][org.bson.BsonBinary] value.
      */
     fun encodeBinary(binary: Binary)
 
     /**
-     * Corresponds to [org.bson.BsonObjectId] type.
+     * Write a [bson object id][org.bson.BsonObjectId] value.
      */
     fun encodeObjectId(objectId: ObjectId)
 
     /**
-     * Corresponds to [org.bson.BsonDateTime] type.
+     * Write a [bson date time][org.bson.BsonDateTime] value.
      */
     fun encodeDateTime(time: Long)
 
     /**
-     * Corresponds to [org.bson.BsonJavaScript] type.
+     * Write a [bson java script][org.bson.BsonJavaScript] value.
      */
     fun encodeJavaScript(code: String)
 
     /**
-     * Corresponds to [org.bson.BsonDecimal128] type.
+     * Write a [bson decimal 128][org.bson.BsonDecimal128] value.
      */
     fun encodeDecimal128(decimal: Decimal128)
 
     /**
-     * Corresponds to [org.bson.BsonRegularExpression] type.
+     * Write a [bson regular expression][org.bson.BsonRegularExpression] value.
      */
     fun encodeRegularExpression(regex: Regex)
 

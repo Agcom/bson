@@ -3,12 +3,7 @@ package com.github.agcom.bson.serialization
 import com.github.agcom.bson.serialization.decoders.readBson
 import com.github.agcom.bson.serialization.encoders.writeBson
 import com.github.agcom.bson.serialization.serializers.*
-import com.github.agcom.bson.serialization.streaming.readBsonDocument
-import com.github.agcom.bson.serialization.streaming.writeBsonArray
-import com.github.agcom.bson.serialization.streaming.writeBsonDocument
-import com.github.agcom.bson.serialization.utils.fold
-import com.github.agcom.bson.serialization.utils.toBsonArray
-import com.github.agcom.bson.serialization.utils.toBsonDocument
+import com.github.agcom.bson.serialization.utils.*
 import kotlinx.serialization.*
 import kotlinx.serialization.internal.AbstractPolymorphicSerializer
 import kotlinx.serialization.modules.*

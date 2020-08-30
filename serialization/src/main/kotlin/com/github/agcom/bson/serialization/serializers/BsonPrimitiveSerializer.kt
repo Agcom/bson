@@ -1,14 +1,40 @@
 package com.github.agcom.bson.serialization.serializers
 
+import com.github.agcom.bson.serialization.BsonDecodingException
 import com.github.agcom.bson.serialization.BsonEncodingException
 import com.github.agcom.bson.serialization.decoders.BsonInput
 import com.github.agcom.bson.serialization.encoders.BsonOutput
-import com.github.agcom.bson.serialization.utils.*
+import com.github.agcom.bson.serialization.utils.fold
+import com.github.agcom.bson.serialization.utils.toBinary
+import com.github.agcom.bson.serialization.utils.toRegex
 import kotlinx.serialization.*
-import org.bson.BsonValue
+import org.bson.*
 
 /**
- * Serializes anything other than [org.bson.BsonDocument] and [org.bson.BsonArray].
+ * External serializer for bson primitive types (anything other than [BsonDocument] and [BsonArray]):
+ * - [BsonDouble]
+ * - [BsonString]
+ * - [BsonBinary]
+ * - [BsonObjectId]
+ * - [BsonBoolean]
+ * - [BsonDateTime]
+ * - [BsonNull]
+ * - [BsonJavaScript]
+ * - [BsonInt32]
+ * - [BsonInt64]
+ * - [BsonDecimal128]
+ * - [BsonRegularExpression]
+ *
+ * Note: Doesn't support deprecated or internal types:
+ * - [BsonDbPointer]
+ * - [BsonJavaScriptWithScope]
+ * - [BsonMaxKey]
+ * - [BsonMinKey]
+ * - [BsonSymbol]
+ * - [BsonTimestamp]
+ * - [BsonUndefined]
+ *
+ * Can only be used with [Bson][com.github.agcom.bson.serialization.Bson] format.
  */
 @Serializer(BsonValue::class)
 object BsonPrimitiveSerializer : KSerializer<BsonValue> {
@@ -45,7 +71,7 @@ object BsonPrimitiveSerializer : KSerializer<BsonValue> {
         val value = decoder.decodeBson()
         return value.fold(
             primitive = { it },
-            unexpected = { throw BsonEncodingException("Unexpected bson type '${it.bsonType}'") }
+            unexpected = { throw BsonDecodingException("Unexpected bson type '${it.bsonType}'") }
         )
     }
 

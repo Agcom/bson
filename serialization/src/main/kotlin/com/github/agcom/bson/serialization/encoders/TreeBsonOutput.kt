@@ -1,13 +1,19 @@
 package com.github.agcom.bson.serialization.encoders
 
-import com.github.agcom.bson.serialization.*
+import com.github.agcom.bson.serialization.Bson
+import com.github.agcom.bson.serialization.BsonEncodingException
 import com.github.agcom.bson.serialization.serializers.BsonValueSerializer
-import com.github.agcom.bson.serialization.utils.*
+import com.github.agcom.bson.serialization.utils.PRIMITIVE_TAG
+import com.github.agcom.bson.serialization.utils.fold
+import com.github.agcom.bson.serialization.utils.toBsonRegularExpression
 import kotlinx.serialization.*
-import kotlinx.serialization.internal.*
+import kotlinx.serialization.internal.AbstractPolymorphicSerializer
+import kotlinx.serialization.internal.NamedValueEncoder
 import kotlinx.serialization.modules.SerialModule
 import org.bson.*
-import org.bson.types.*
+import org.bson.types.Binary
+import org.bson.types.Decimal128
+import org.bson.types.ObjectId
 
 @OptIn(InternalSerializationApi::class)
 private sealed class AbstractBsonTreeOutput(

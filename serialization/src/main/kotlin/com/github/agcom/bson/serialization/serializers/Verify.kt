@@ -7,14 +7,14 @@ import kotlinx.serialization.Encoder
 
 internal fun Decoder.verify() {
     if (this !is BsonInput) throw IllegalStateException(
-            "This serializer can be used only with Bson format." +
-                    "Expected Decoder to be BsonInput, got ${this::class}"
+        "This serializer can be used only with Bson format." +
+                "Expected Decoder to be BsonInput, got ${this::class}."
     )
 }
 
 internal fun Encoder.verify() {
     if (this !is BsonOutput) throw IllegalStateException(
-            "This serializer can be used only with Bson format." +
-                    "Expected Encoder to be BsonOutput, got ${this::class}"
+        "This serializer can be used only with Bson format." +
+                "Expected Encoder to be BsonOutput, got ${this::class}."
     )
 }
