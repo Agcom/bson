@@ -2,6 +2,7 @@ package com.github.agcom.bson.serialization
 
 /**
  * The parameters are self explanatory.
+ *
  * If you want more information, checkout [kotlinx.serialization.json.JsonConfiguration] documentations for corresponding parameters.
  */
 data class BsonConfiguration(

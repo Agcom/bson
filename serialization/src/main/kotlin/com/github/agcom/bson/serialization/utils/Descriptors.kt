@@ -10,7 +10,7 @@ internal sealed class ListLikeDescriptor(val elementDesc: SerialDescriptor) : Se
 
     override fun getElementName(index: Int): String = index.toString()
     override fun getElementIndex(name: String): Int =
-            name.toIntOrNull() ?: throw IllegalArgumentException("$name is not a valid list index")
+        name.toIntOrNull() ?: throw IllegalArgumentException("$name is not a valid list index")
 
     override fun isElementOptional(index: Int): Boolean {
         if (index != 0) throw IllegalStateException("List descriptor has only one child element, index: $index")
@@ -39,18 +39,19 @@ internal sealed class ListLikeDescriptor(val elementDesc: SerialDescriptor) : Se
     }
 }
 
-internal class NamedListClassDescriptor(override val serialName: String, elementDescriptor: SerialDescriptor) : ListLikeDescriptor(elementDescriptor)
+internal class NamedListClassDescriptor(override val serialName: String, elementDescriptor: SerialDescriptor) :
+    ListLikeDescriptor(elementDescriptor)
 
 internal sealed class MapLikeDescriptor(
-        override val serialName: String,
-        val keyDescriptor: SerialDescriptor,
-        val valueDescriptor: SerialDescriptor
+    override val serialName: String,
+    val keyDescriptor: SerialDescriptor,
+    val valueDescriptor: SerialDescriptor
 ) : SerialDescriptor {
     override val kind: SerialKind get() = StructureKind.MAP
     override val elementsCount: Int = 2
     override fun getElementName(index: Int): String = index.toString()
     override fun getElementIndex(name: String): Int =
-            name.toIntOrNull() ?: throw IllegalArgumentException("$name is not a valid map index")
+        name.toIntOrNull() ?: throw IllegalArgumentException("$name is not a valid map index")
 
     override fun isElementOptional(index: Int): Boolean {
         if (index !in 0..1) throw IllegalStateException("Map descriptor has only two child elements, index: $index")
@@ -87,4 +88,8 @@ internal sealed class MapLikeDescriptor(
     }
 }
 
-internal class NamedMapClassDescriptor(name: String, keyDescriptor: SerialDescriptor, valueDescriptor: SerialDescriptor) : MapLikeDescriptor(name, keyDescriptor, valueDescriptor)
+internal class NamedMapClassDescriptor(
+    name: String,
+    keyDescriptor: SerialDescriptor,
+    valueDescriptor: SerialDescriptor
+) : MapLikeDescriptor(name, keyDescriptor, valueDescriptor)

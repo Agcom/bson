@@ -3,9 +3,19 @@ package com.github.agcom.bson.serialization.utils
 import org.bson.BsonRegularExpression
 import kotlin.text.RegexOption.*
 
+/**
+ * Constructor like builder for [BsonRegularExpression] using Kotlin [Regex].
+ */
 operator fun BsonRegularExpression.invoke(regex: Regex): BsonRegularExpression = regex.toBsonRegularExpression()
 
+/**
+ * Convert a Kotlin [Regex] into it's bson type class [BsonRegularExpression].
+ */
 fun Regex.toBsonRegularExpression(): BsonRegularExpression = BsonRegularExpression(pattern, options.asEmbedded())
+
+/**
+ * Convert a [BsonRegularExpression] into Kotlin [Regex].
+ */
 fun BsonRegularExpression.toRegex(): Regex = Regex(pattern, options.toRegexOptions())
 
 /**
@@ -15,7 +25,7 @@ fun BsonRegularExpression.toRegex(): Regex = Regex(pattern, options.toRegexOptio
 internal fun Set<RegexOption>.asEmbedded(): String {
     val builder = StringBuilder(size)
     forEach {
-        when(it) {
+        when (it) {
             IGNORE_CASE -> 'i'
             MULTILINE -> 'm'
             LITERAL -> null // Runtime flag. Only used for parsing the pattern in specific way if needed.
@@ -25,11 +35,12 @@ internal fun Set<RegexOption>.asEmbedded(): String {
             CANON_EQ -> null // Runtime flag. Used to restrict match algorithm if needed.
         }?.let(builder::append)
     }
-    return if(builder.isEmpty()) "" else builder.toString()
+    return if (builder.isEmpty()) "" else builder.toString()
 }
+
 internal fun String.toRegexOptions(): Set<RegexOption> {
     return map {
-        when(it) {
+        when (it) {
             'i' -> IGNORE_CASE
             'm' -> MULTILINE
             'd' -> UNIX_LINES
