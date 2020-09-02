@@ -127,10 +127,8 @@ class BsonPrimitiveTest : FreeSpec({
 
         "enum kind" {
             val notFound = HttpError.NOT_FOUND
-            val error = HttpError.INTERNAL_SERVER_ERROR
 
             bson.fromBson(HttpError.serializer(), BsonString(notFound.name)) shouldBe notFound
-            bson.fromBson(HttpError.serializer(), BsonString(error.name)) shouldBe error
         }
 
     }
