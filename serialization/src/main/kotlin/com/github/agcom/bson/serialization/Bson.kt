@@ -36,7 +36,8 @@ class Bson(
     /**
      * Transform a [BsonValue] into an object.
      */
-    fun <T> fromBson(deserializer: DeserializationStrategy<T>, bson: BsonValue): T = readBson(bson, deserializer)
+    fun <T> fromBson(deserializer: DeserializationStrategy<T>, bsonValue: BsonValue): T =
+        readBson(bsonValue, deserializer)
 
     /**
      * Read a [BsonDocument] from the given [bytes].
@@ -56,30 +57,17 @@ class Bson(
     }
 
     /**
-     * Read a [BsonValue] from the given [bytes].
-     *
-     * Warning: Doesn't support primitive types.
-     * Also, worths to mention that a valid bson data starts with document non-terminal according to bson specification.
-     *
-     * @return A [BsonDocument] or a [BsonArray].
-     */
-    fun loadBson(bytes: ByteArray): BsonValue {
-        val doc = loadBsonDocument(bytes)
-        return doc.toBsonArray() ?: doc
-    }
-
-    /**
      * Write a [BsonDocument] into a [ByteArray].
      */
-    fun dumpBson(bson: BsonDocument): ByteArray {
-        return BasicOutputBuffer().use { it.writeBsonDocument(bson); it.toByteArray() }
+    fun dumpBson(bsonDocument: BsonDocument): ByteArray {
+        return BasicOutputBuffer().use { it.writeBsonDocument(bsonDocument); it.toByteArray() }
     }
 
     /**
      * Write a [BsonArray] into a [ByteArray].
      */
-    fun dumpBson(bson: BsonArray): ByteArray {
-        return dumpBson(bson.toBsonDocument())
+    fun dumpBson(bsonArray: BsonArray): ByteArray {
+        return dumpBson(bsonArray.toBsonDocument())
     }
 
     /**
