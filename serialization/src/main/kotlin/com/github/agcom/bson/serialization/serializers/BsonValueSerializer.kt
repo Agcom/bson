@@ -36,6 +36,7 @@ object BsonValueSerializer : KSerializer<BsonValue> {
         return value.fold(
             primitive = { it },
             document = { it },
+            array = { it },
             unexpected = { throw BsonDecodingException("Unexpected bson type '${it.bsonType}'") }
         )
     }
