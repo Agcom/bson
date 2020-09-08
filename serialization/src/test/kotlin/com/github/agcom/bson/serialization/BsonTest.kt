@@ -15,8 +15,10 @@ import org.bson.io.BasicOutputBuffer
 import org.bson.types.Binary
 import org.bson.types.Decimal128
 import org.bson.types.ObjectId
-import java.time.Clock
+import java.time.*
+import java.time.temporal.Temporal
 import java.util.*
+import java.util.regex.Pattern
 import kotlin.random.Random
 
 class BsonTest : FreeSpec({
@@ -697,6 +699,134 @@ class BsonTest : FreeSpec({
                 }
 
                 bson.dump(Location.serializer().list, list) shouldBe bytes
+            }
+
+        }
+
+    }
+
+    "default context" - {
+
+        "bson value" {
+            bson.context.getContextual(BsonValue::class) shouldBe BsonValueSerializer
+        }
+
+        "bson document" {
+            bson.context.getContextual(BsonDocument::class) shouldBe BsonDocumentSerializer
+        }
+
+        "bson array" {
+            bson.context.getContextual(BsonArray::class) shouldBe BsonArraySerializer
+        }
+
+        "bson primitives" - {
+
+            "bson binary" {
+                bson.context.getContextual(BsonBinary::class) shouldBe BsonPrimitiveSerializer
+            }
+
+            "bson boolean" {
+                bson.context.getContextual(BsonBoolean::class) shouldBe BsonPrimitiveSerializer
+            }
+
+            "bson date time" {
+                bson.context.getContextual(BsonDateTime::class) shouldBe BsonPrimitiveSerializer
+            }
+
+            "bson decimal 128" {
+                bson.context.getContextual(BsonDecimal128::class) shouldBe BsonPrimitiveSerializer
+            }
+
+            "bson double" {
+                bson.context.getContextual(BsonDouble::class) shouldBe BsonPrimitiveSerializer
+            }
+
+            "bson int 32" {
+                bson.context.getContextual(BsonInt32::class) shouldBe BsonPrimitiveSerializer
+            }
+
+            "bson int 64" {
+                bson.context.getContextual(BsonInt64::class) shouldBe BsonPrimitiveSerializer
+            }
+
+            "bson java script" {
+                bson.context.getContextual(BsonJavaScript::class) shouldBe BsonPrimitiveSerializer
+            }
+
+            "bson null" {
+                bson.context.getContextual(BsonNull::class) shouldBe BsonPrimitiveSerializer
+            }
+
+            "bson number" {
+                bson.context.getContextual(BsonNumber::class) shouldBe BsonPrimitiveSerializer
+            }
+
+            "bson object id" {
+                bson.context.getContextual(BsonObjectId::class) shouldBe BsonPrimitiveSerializer
+            }
+
+            "bson regular expression" {
+                bson.context.getContextual(BsonRegularExpression::class) shouldBe BsonPrimitiveSerializer
+            }
+
+            "bson string" {
+                bson.context.getContextual(BsonString::class) shouldBe BsonPrimitiveSerializer
+            }
+
+        }
+
+        "binary" {
+            bson.context.getContextual(Binary::class) shouldBe BinarySerializer
+        }
+
+        "object id" {
+            bson.context.getContextual(ObjectId::class) shouldBe ObjectIdSerializer
+        }
+
+        "decimal 128" {
+            bson.context.getContextual(Decimal128::class) shouldBe Decimal128Serializer
+        }
+
+        "regex" {
+            bson.context.getContextual(Regex::class) shouldBe RegexSerializer
+        }
+
+        "pattern" {
+            bson.context.getContextual(Pattern::class) shouldBe PatternSerializer
+        }
+
+        "temporals" - {
+
+            "instant" {
+                bson.context.getContextual(Instant::class) shouldBe InstantSerializer
+            }
+
+            "local date time" {
+                bson.context.getContextual(LocalDateTime::class) shouldBe LocalDateTimeSerializer
+            }
+
+            "local date" {
+                bson.context.getContextual(LocalDate::class) shouldBe LocalDateSerializer
+            }
+
+            "local time" {
+                bson.context.getContextual(LocalTime::class) shouldBe LocalTimeSerializer
+            }
+
+            "offset date time" {
+                bson.context.getContextual(OffsetDateTime::class) shouldBe OffsetDateTimeSerializer
+            }
+
+            "offset time" {
+                bson.context.getContextual(OffsetTime::class) shouldBe OffsetTimeSerializer
+            }
+
+            "zoned date time" {
+                bson.context.getContextual(ZonedDateTime::class) shouldBe ZonedDateTimeSerializer
+            }
+
+            "temporal" {
+                bson.context.getContextual(Temporal::class) shouldBe TemporalSerializer.Companion
             }
 
         }
