@@ -3,7 +3,7 @@ package com.github.agcom.bson.serialization.serializers
 import com.github.agcom.bson.serialization.decoders.BsonInput
 import com.github.agcom.bson.serialization.encoders.BsonOutput
 import kotlinx.serialization.*
-import kotlinx.serialization.builtins.serializer
+import org.bson.*
 import org.bson.types.Binary
 import org.bson.types.Decimal128
 import org.bson.types.ObjectId
@@ -20,7 +20,8 @@ import java.util.regex.Pattern
 @Serializer(Binary::class)
 object BinarySerializer : KSerializer<Binary> {
 
-    override val descriptor: SerialDescriptor = PrimitiveDescriptor(Binary::class.qualifiedName!!, PrimitiveKind.STRING)
+    override val descriptor: SerialDescriptor =
+        PrimitiveDescriptor(BsonBinary::class.qualifiedName!!, PrimitiveKind.STRING)
 
     override fun serialize(encoder: Encoder, value: Binary) {
         encoder.verify(); encoder as BsonOutput
@@ -46,7 +47,7 @@ object BinarySerializer : KSerializer<Binary> {
 object ObjectIdSerializer : KSerializer<ObjectId> {
 
     override val descriptor: SerialDescriptor =
-        PrimitiveDescriptor(ObjectId::class.qualifiedName!!, PrimitiveKind.STRING)
+        PrimitiveDescriptor(BsonObjectId::class.qualifiedName!!, PrimitiveKind.STRING)
 
     override fun serialize(encoder: Encoder, value: ObjectId) {
         encoder.verify(); encoder as BsonOutput
@@ -71,7 +72,8 @@ object ObjectIdSerializer : KSerializer<ObjectId> {
 @Serializer(Long::class)
 object DateTimeSerializer : KSerializer<Long> {
 
-    override val descriptor: SerialDescriptor = Long.serializer().descriptor
+    override val descriptor: SerialDescriptor =
+        PrimitiveDescriptor(BsonDateTime::class.qualifiedName!!, PrimitiveKind.LONG)
 
     override fun serialize(encoder: Encoder, value: Long) {
         encoder.verify(); encoder as BsonOutput
@@ -96,7 +98,8 @@ object DateTimeSerializer : KSerializer<Long> {
 @Serializer(String::class)
 object JavaScriptSerializer : KSerializer<String> {
 
-    override val descriptor: SerialDescriptor = String.serializer().descriptor
+    override val descriptor: SerialDescriptor =
+        PrimitiveDescriptor(BsonJavaScript::class.qualifiedName!!, PrimitiveKind.STRING)
 
     override fun serialize(encoder: Encoder, value: String) {
         encoder.verify(); encoder as BsonOutput
@@ -122,7 +125,7 @@ object JavaScriptSerializer : KSerializer<String> {
 object Decimal128Serializer : KSerializer<Decimal128> {
 
     override val descriptor: SerialDescriptor =
-        PrimitiveDescriptor(Decimal128::class.qualifiedName!!, PrimitiveKind.STRING)
+        PrimitiveDescriptor(BsonDecimal128::class.qualifiedName!!, PrimitiveKind.STRING)
 
     override fun serialize(encoder: Encoder, value: Decimal128) {
         encoder.verify(); encoder as BsonOutput
@@ -147,7 +150,8 @@ object Decimal128Serializer : KSerializer<Decimal128> {
 @Serializer(Regex::class)
 object RegexSerializer : KSerializer<Regex> {
 
-    override val descriptor: SerialDescriptor = PrimitiveDescriptor(Regex::class.qualifiedName!!, PrimitiveKind.STRING)
+    override val descriptor: SerialDescriptor =
+        PrimitiveDescriptor(BsonRegularExpression::class.qualifiedName!!, PrimitiveKind.STRING)
 
     override fun serialize(encoder: Encoder, value: Regex) {
         encoder.verify(); encoder as BsonOutput
@@ -173,8 +177,7 @@ object RegexSerializer : KSerializer<Regex> {
 @Serializer(Pattern::class)
 object PatternSerializer : KSerializer<Pattern> {
 
-    override val descriptor: SerialDescriptor =
-        PrimitiveDescriptor(Pattern::class.qualifiedName!!, PrimitiveKind.STRING)
+    override val descriptor: SerialDescriptor = RegexSerializer.descriptor
 
     override fun serialize(encoder: Encoder, value: Pattern) = encoder.encode(RegexSerializer, value.toRegex())
 

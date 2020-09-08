@@ -30,8 +30,6 @@ abstract class TemporalSerializer<T : Temporal> : KSerializer<T> {
      * - [ZonedDateTime]
      */
     companion object : TemporalSerializer<Temporal>() {
-        override val descriptor: SerialDescriptor =
-            SerialDescriptor(Temporal::class.qualifiedName!!, PolymorphicKind.SEALED)
 
         override fun toEpochMillis(temporal: Temporal): Long {
             return when (temporal) {
@@ -48,6 +46,8 @@ abstract class TemporalSerializer<T : Temporal> : KSerializer<T> {
         override fun ofEpochMillis(temporal: Long): Temporal = Instant.ofEpochMilli(temporal)
     }
 
+    final override val descriptor: SerialDescriptor = DateTimeSerializer.descriptor
+
     final override fun serialize(encoder: Encoder, value: T) = encoder.encode(DateTimeSerializer, toEpochMillis(value))
 
     final override fun deserialize(decoder: Decoder): T = ofEpochMillis(decoder.decode(DateTimeSerializer))
@@ -60,8 +60,6 @@ abstract class TemporalSerializer<T : Temporal> : KSerializer<T> {
 
 object InstantSerializer : TemporalSerializer<Instant>() {
 
-    override val descriptor: SerialDescriptor = PrimitiveDescriptor(Instant::class.qualifiedName!!, PrimitiveKind.LONG)
-
     override fun toEpochMillis(temporal: Instant): Long = temporal.toEpochMilli()
 
     override fun ofEpochMillis(temporal: Long): Instant = Instant.ofEpochMilli(temporal)
@@ -69,9 +67,6 @@ object InstantSerializer : TemporalSerializer<Instant>() {
 }
 
 object LocalDateTimeSerializer : TemporalSerializer<LocalDateTime>() {
-
-    override val descriptor: SerialDescriptor =
-        PrimitiveDescriptor(LocalDateTime::class.qualifiedName!!, PrimitiveKind.LONG)
 
     override fun toEpochMillis(temporal: LocalDateTime): Long =
         InstantSerializer.toEpochMillis(temporal.toInstant(ZoneOffset.UTC))
@@ -83,9 +78,6 @@ object LocalDateTimeSerializer : TemporalSerializer<LocalDateTime>() {
 
 object LocalDateSerializer : TemporalSerializer<LocalDate>() {
 
-    override val descriptor: SerialDescriptor =
-        PrimitiveDescriptor(LocalDate::class.qualifiedName!!, PrimitiveKind.LONG)
-
     override fun toEpochMillis(temporal: LocalDate): Long =
         LocalDateTimeSerializer.toEpochMillis(temporal.atStartOfDay())
 
@@ -96,9 +88,6 @@ object LocalDateSerializer : TemporalSerializer<LocalDate>() {
 
 object LocalTimeSerializer : TemporalSerializer<LocalTime>() {
 
-    override val descriptor: SerialDescriptor =
-        PrimitiveDescriptor(LocalTime::class.qualifiedName!!, PrimitiveKind.LONG)
-
     override fun toEpochMillis(temporal: LocalTime): Long =
         LocalDateTimeSerializer.toEpochMillis(temporal.atDate(LocalDate.now()))
 
@@ -107,9 +96,6 @@ object LocalTimeSerializer : TemporalSerializer<LocalTime>() {
 }
 
 object OffsetDateTimeSerializer : TemporalSerializer<OffsetDateTime>() {
-
-    override val descriptor: SerialDescriptor =
-        PrimitiveDescriptor(OffsetDateTime::class.qualifiedName!!, PrimitiveKind.LONG)
 
     override fun toEpochMillis(temporal: OffsetDateTime): Long = InstantSerializer.toEpochMillis(temporal.toInstant())
 
@@ -120,9 +106,6 @@ object OffsetDateTimeSerializer : TemporalSerializer<OffsetDateTime>() {
 
 object OffsetTimeSerializer : TemporalSerializer<OffsetTime>() {
 
-    override val descriptor: SerialDescriptor =
-        PrimitiveDescriptor(OffsetTime::class.qualifiedName!!, PrimitiveKind.LONG)
-
     override fun toEpochMillis(temporal: OffsetTime): Long =
         OffsetDateTimeSerializer.toEpochMillis(temporal.atDate(LocalDate.now()))
 
@@ -131,9 +114,6 @@ object OffsetTimeSerializer : TemporalSerializer<OffsetTime>() {
 }
 
 object ZonedDateTimeSerializer : TemporalSerializer<ZonedDateTime>() {
-
-    override val descriptor: SerialDescriptor =
-        PrimitiveDescriptor(ZonedDateTime::class.qualifiedName!!, PrimitiveKind.LONG)
 
     override fun toEpochMillis(temporal: ZonedDateTime): Long = InstantSerializer.toEpochMillis(temporal.toInstant())
 
