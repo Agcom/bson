@@ -5,16 +5,17 @@ import kotlinx.serialization.modules.SerializersModule
 import kotlinx.serialization.modules.contextual
 import java.time.*
 import java.time.temporal.Temporal
+import java.time.temporal.TemporalAccessor
 
 /**
  * Serializer for [time][java.time] objects which can be represented as epoch millis.
  *
- * The companion object implements this serializer for [Temporal] interface which always deserializes an [Instant] when used.
+ * The companion object implements this serializer for [TemporalAccessor] interface which always deserializes an [Instant] when used.
  *
  * Can only be used with [Bson][com.github.agcom.bson.serialization.Bson] format.
  * Uses [DateTimeSerializer].
  */
-abstract class TemporalSerializer<T : Temporal> : KSerializer<T> {
+abstract class TemporalSerializer<T : TemporalAccessor> : KSerializer<T> {
 
     /**
      * The parent class [Temporal] serializer.
@@ -29,9 +30,9 @@ abstract class TemporalSerializer<T : Temporal> : KSerializer<T> {
      * - [OffsetTime]
      * - [ZonedDateTime]
      */
-    companion object : TemporalSerializer<Temporal>() {
+    companion object : TemporalSerializer<TemporalAccessor>() {
 
-        override fun toEpochMillis(temporal: Temporal): Long {
+        override fun toEpochMillis(temporal: TemporalAccessor): Long {
             return when (temporal) {
                 is Instant -> InstantSerializer.toEpochMillis(temporal)
                 is LocalDateTime -> LocalDateTimeSerializer.toEpochMillis(temporal)
@@ -43,7 +44,7 @@ abstract class TemporalSerializer<T : Temporal> : KSerializer<T> {
             }
         }
 
-        override fun ofEpochMillis(temporal: Long): Temporal = Instant.ofEpochMilli(temporal)
+        override fun ofEpochMillis(temporal: Long): Instant = Instant.ofEpochMilli(temporal)
     }
 
     final override val descriptor: SerialDescriptor = DateTimeSerializer.descriptor
