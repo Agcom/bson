@@ -79,8 +79,7 @@ class Bson(
         return toBson(serializer, value).fold(
             document = { dumpBson(it) },
             array = { dumpBson(it) },
-            primitive = { throw BsonEncodingException("Dumping primitives") },
-            unexpected = { throw BsonEncodingException("Unexpected bson type '${it.bsonType}'") }
+            primitive = { throw BsonEncodingException("Dumping primitives") }
         )
     }
 

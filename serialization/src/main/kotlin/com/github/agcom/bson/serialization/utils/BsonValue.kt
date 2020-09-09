@@ -1,7 +1,9 @@
 package com.github.agcom.bson.serialization.utils
 
+import com.github.agcom.bson.serialization.BsonDecodingException
 import org.bson.BsonArray
 import org.bson.BsonDocument
+import org.bson.BsonType
 import org.bson.BsonType.*
 import org.bson.BsonValue
 
@@ -36,12 +38,12 @@ fun BsonArray.toBsonDocument(): BsonDocument {
     return doc
 }
 
-// unexpected will be called in case of unknown type or a deprecated/internal bson type.
+// Unexpected will be called in case of unknown type or a deprecated/internal bson type.
 internal inline fun <R> BsonValue.fold(
+    noinline unexpected: (BsonValue) -> R = { unexpectedBsonType(it.bsonType) },
     primitive: (BsonValue) -> R = { unexpected(it) },
     document: (BsonDocument) -> R = { unexpected(it) },
-    array: (BsonArray) -> R = { unexpected(it) },
-    noinline unexpected: (BsonValue) -> R
+    array: (BsonArray) -> R = { unexpected(it) }
 ): R {
     return when (bsonType) {
         ARRAY -> array(asArray()) // Array should be checked first as any array is a document but any document is not an array; Although the user might meant a document.
@@ -50,4 +52,8 @@ internal inline fun <R> BsonValue.fold(
             primitive(this)
         else -> unexpected(this)
     }
+}
+
+internal fun unexpectedBsonType(type: BsonType): Nothing {
+    throw BsonDecodingException("Unexpected bson type '$type'")
 }

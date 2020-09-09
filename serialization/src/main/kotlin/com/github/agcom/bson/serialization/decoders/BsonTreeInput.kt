@@ -58,10 +58,7 @@ private sealed class AbstractBsonTreeInput(
     protected open fun getValue(tag: String): BsonValue {
         val currentElement = currentElement(tag)
         return currentElement.fold(
-            primitive = { it },
-            unexpected = {
-                throw BsonDecodingException("Unexpected bson type '${it.bsonType}'")
-            }
+            primitive = { it }
         )
     }
 
@@ -101,10 +98,7 @@ private class BsonPrimitiveInput(bson: Bson, override val value: BsonValue) : Ab
 
     init {
         value.fold(
-            primitive = { /* OK */ },
-            unexpected = {
-                throw BsonDecodingException("Unexpected bson type '${it.bsonType}'")
-            }
+            primitive = { /* OK */ }
         )
         pushTag(PRIMITIVE_TAG)
     }
@@ -194,10 +188,7 @@ internal fun <T> Bson.readBson(
     val input = element.fold(
         primitive = { BsonPrimitiveInput(this, it) },
         document = { BsonTreeInput(this, it) },
-        array = { BsonTreeListInput(this, it) },
-        unexpected = {
-            throw BsonDecodingException("Unexpected bson type '${it.bsonType}'")
-        }
+        array = { BsonTreeListInput(this, it) }
     )
 
     return input.decode(deserializer)

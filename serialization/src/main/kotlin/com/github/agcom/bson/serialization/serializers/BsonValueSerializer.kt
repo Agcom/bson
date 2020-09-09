@@ -1,7 +1,5 @@
 package com.github.agcom.bson.serialization.serializers
 
-import com.github.agcom.bson.serialization.BsonDecodingException
-import com.github.agcom.bson.serialization.BsonEncodingException
 import com.github.agcom.bson.serialization.decoders.BsonInput
 import com.github.agcom.bson.serialization.utils.fold
 import kotlinx.serialization.*
@@ -25,8 +23,7 @@ object BsonValueSerializer : KSerializer<BsonValue> {
         value.fold(
             primitive = { encoder.encode(BsonPrimitiveSerializer, it) },
             document = { encoder.encode(BsonDocumentSerializer, it.asDocument()) },
-            array = { encoder.encode(BsonArraySerializer, it.asArray()) },
-            unexpected = { throw BsonEncodingException("Unexpected bson type '${it.bsonType}'") }
+            array = { encoder.encode(BsonArraySerializer, it.asArray()) }
         )
     }
 
@@ -36,8 +33,7 @@ object BsonValueSerializer : KSerializer<BsonValue> {
         return value.fold(
             primitive = { it },
             document = { it },
-            array = { it },
-            unexpected = { throw BsonDecodingException("Unexpected bson type '${it.bsonType}'") }
+            array = { it }
         )
     }
 

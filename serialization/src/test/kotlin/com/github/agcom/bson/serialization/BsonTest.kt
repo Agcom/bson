@@ -17,6 +17,7 @@ import org.bson.types.Decimal128
 import org.bson.types.ObjectId
 import java.time.*
 import java.time.temporal.Temporal
+import java.time.temporal.TemporalAccessor
 import java.util.*
 import java.util.regex.Pattern
 import kotlin.random.Random
@@ -826,7 +827,11 @@ class BsonTest : BsonInstanceTest by DefaultBsonInstanceTest(), FreeSpec() {
                 }
 
                 "temporal" {
-                    bson.context.getContextual(Temporal::class) shouldBe TemporalSerializer.Companion
+                    bson.context.getContextual(Temporal::class) shouldBe TemporalAccessorSerializer.Companion
+                }
+
+                "temporal accessor" {
+                    bson.context.getContextual(TemporalAccessor::class) shouldBe TemporalSerializer
                 }
 
             }

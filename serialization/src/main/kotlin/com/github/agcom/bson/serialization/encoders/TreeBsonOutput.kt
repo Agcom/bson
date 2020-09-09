@@ -11,6 +11,7 @@ import kotlinx.serialization.internal.AbstractPolymorphicSerializer
 import kotlinx.serialization.internal.NamedValueEncoder
 import kotlinx.serialization.modules.SerialModule
 import org.bson.*
+import org.bson.BsonType.*
 import org.bson.types.Binary
 import org.bson.types.Decimal128
 import org.bson.types.ObjectId
@@ -163,21 +164,21 @@ private class BsonTreeMapOutput(bson: Bson, nodeConsumer: (BsonValue) -> Unit) :
         if (isKey) { // Writing key
             element.fold(
                 primitive = {
-                    tag = when {
-                        it.isString -> it.asString().value
-                        it.isInt32 -> it.asInt32().value.toString()
-                        it.isInt64 -> it.asInt64().value.toString()
-                        it.isDouble -> it.asDouble().value.toString()
-                        it.isObjectId -> it.asObjectId().value.toHexString()
-                        it.isDecimal128 -> it.asDecimal128().value.toString()
-                        it.isDateTime -> it.asDateTime().value.toString()
-                        it.isBoolean -> it.asBoolean().value.toString()
-                        it.isRegularExpression -> it.asRegularExpression().pattern
-                        it.isJavaScript -> it.asJavaScript().code
-                        it.isNull -> "null"
-                        else -> throw BsonEncodingException("Unexpected BsonType, type = '${it.bsonType}'")
+                    tag = when (it.bsonType) {
+                        STRING -> it.asString().value
+                        INT32 -> it.asInt32().value.toString()
+                        INT64 -> it.asInt64().value.toString()
+                        DOUBLE -> it.asDouble().value.toString()
+                        OBJECT_ID -> it.asObjectId().value.toHexString()
+                        DECIMAL128 -> it.asDecimal128().value.toString()
+                        DATE_TIME -> it.asDateTime().value.toString()
+                        BOOLEAN -> it.asBoolean().value.toString()
+                        REGULAR_EXPRESSION -> it.asRegularExpression().pattern
+                        JAVASCRIPT -> it.asJavaScript().code
+                        NULL -> "null"
+                        else -> throw RuntimeException("Should not reach here")
                     }
-                }, unexpected = { throw BsonEncodingException("Unexpected BsonType, type = '${it.bsonType}'") }
+                }
             )
             isKey = false
         } else {
