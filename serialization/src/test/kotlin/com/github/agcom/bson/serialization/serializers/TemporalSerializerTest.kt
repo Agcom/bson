@@ -13,7 +13,7 @@ class TemporalSerializerTest : FreeSpec(), BsonInstanceTest by DefaultBsonInstan
 
     private val testInstant = Instant.now()
 
-    private inline infix fun <reified T : TemporalAccessor> TemporalSerializer<T>.shouldBeOk(testTime: T) {
+    private inline infix fun <reified T : TemporalAccessor> TemporalAccessorSerializer<T>.shouldBeOk(testTime: T) {
         val serializer = this
         val testMillis = serializer.toEpochMillis(testTime)
         val encoded = bson.toBson(serializer, testTime)
@@ -27,7 +27,7 @@ class TemporalSerializerTest : FreeSpec(), BsonInstanceTest by DefaultBsonInstan
     init {
 
         "temporal" {
-            TemporalSerializer shouldBeOk testInstant
+            TemporalAccessorSerializer shouldBeOk testInstant
         }
 
         "instant" {
