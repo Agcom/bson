@@ -3,12 +3,7 @@ package com.github.agcom.bson.serialization
 import com.github.agcom.bson.serialization.decoders.readBson
 import com.github.agcom.bson.serialization.encoders.writeBson
 import com.github.agcom.bson.serialization.serializers.*
-import com.github.agcom.bson.serialization.streaming.readBsonDocument
-import com.github.agcom.bson.serialization.streaming.writeBsonArray
-import com.github.agcom.bson.serialization.streaming.writeBsonDocument
-import com.github.agcom.bson.serialization.utils.fold
-import com.github.agcom.bson.serialization.utils.toBsonArray
-import com.github.agcom.bson.serialization.utils.toBsonDocument
+import com.github.agcom.bson.serialization.utils.*
 import kotlinx.serialization.*
 import kotlinx.serialization.internal.AbstractPolymorphicSerializer
 import kotlinx.serialization.modules.*
@@ -19,76 +14,83 @@ import org.bson.types.Binary
 import org.bson.types.Decimal128
 import org.bson.types.ObjectId
 import java.nio.ByteBuffer
+import java.util.regex.Pattern
 
 /**
  * Main entry point to work with BSON serialization.
+ *
+ * If some serializers are present in both [context] and the default bson context, serializers from [context] will take place.
  */
 class Bson(
     val configuration: BsonConfiguration = BsonConfiguration.STABLE,
     context: SerialModule = EmptyModule
 ) : BinaryFormat {
 
-    override val context: SerialModule = context + defaultBsonModule
+    override val context: SerialModule = defaultBsonModule.overwriteWith(context)
 
     /**
-     * Transform [value] into a [BsonValue].
+     * Transform a [value] into a [BsonValue].
      */
     fun <T> toBson(serializer: SerializationStrategy<T>, value: T): BsonValue = writeBson(value, serializer)
 
     /**
      * Transform a [BsonValue] into an object.
      */
-    fun <T> fromBson(deserializer: DeserializationStrategy<T>, bson: BsonValue): T = readBson(bson, deserializer)
+    fun <T> fromBson(deserializer: DeserializationStrategy<T>, bsonValue: BsonValue): T =
+        readBson(bsonValue, deserializer)
 
+    /**
+     * Read a [BsonDocument] from the given [bytes].
+     *
+     * Note: Bson arrays are just documents with numerical consecutive indexes (starting from 0) as keys.
+     * You can use [loadBsonArray] if you want to directly read an array, or use convertor function [toBsonArray] after reading a document.
+     */
     fun loadBsonDocument(bytes: ByteArray): BsonDocument {
         return ByteBufferBsonInput(ByteBufNIO(ByteBuffer.wrap(bytes))).use { it.readBsonDocument() }
     }
 
+    /**
+     * Read a [BsonArray] from the given [bytes].
+     */
     fun loadBsonArray(bytes: ByteArray): BsonArray {
         return loadBsonDocument(bytes).toBsonArray() ?: throw BsonDecodingException("Not a bson array")
     }
 
-    fun dumpBson(bson: BsonDocument): ByteArray {
-        return BasicOutputBuffer().use { it.writeBsonDocument(bson); it.toByteArray() }
-    }
-
-    fun dumpBson(bson: BsonArray): ByteArray {
-        return dumpBson(bson.toBsonDocument())
+    /**
+     * Write a [BsonDocument] into a [ByteArray].
+     */
+    fun dumpBson(bsonDocument: BsonDocument): ByteArray {
+        return BasicOutputBuffer().use { it.writeBsonDocument(bsonDocument); it.toByteArray() }
     }
 
     /**
-     * Transform [value] into a [ByteArray].
-     * Dumping primitives are not supported.
+     * Write a [BsonArray] into a [ByteArray].
+     */
+    fun dumpBson(bsonArray: BsonArray): ByteArray {
+        return dumpBson(bsonArray.toBsonDocument())
+    }
+
+    /**
+     * Write [value] into a [ByteArray] according to bson format specification.
+     *
+     * Warning: Dumping primitives are not supported.
      */
     override fun <T> dump(serializer: SerializationStrategy<T>, value: T): ByteArray {
         return toBson(serializer, value).fold(
-            document = {
-                BasicOutputBuffer().use { output ->
-                    output.writeBsonDocument(it)
-                    output.toByteArray()
-                }
-            },
-            array = {
-                BasicOutputBuffer().use { output ->
-                    output.writeBsonArray(it)
-                    output.toByteArray()
-                }
-            },
-            primitive = { throw BsonEncodingException("Dumping primitives") },
-            unexpected = { throw BsonEncodingException("Unexpected bson type '${it.bsonType}'") }
+            document = { dumpBson(it) },
+            array = { dumpBson(it) },
+            primitive = { throw BsonEncodingException("Dumping primitives") }
         )
     }
 
     /**
-     * Transform some [bytes] into a value.
-     * Loading primitives are not supported.
+     * Read an object from the given [bytes] according to bson format specification.
+     *
+     * Warning: Loading primitives are not supported.
      */
     @OptIn(InternalSerializationApi::class)
     override fun <T> load(deserializer: DeserializationStrategy<T>, bytes: ByteArray): T {
-        val input = ByteBufferBsonInput(ByteBufNIO(ByteBuffer.wrap(bytes)))
-        val doc = input.use {
-            it.readBsonDocument()
-        }
+        val doc = loadBsonDocument(bytes)
         val array by lazy { doc.toBsonArray() }
 
         fun trialAndError(): T {
@@ -119,6 +121,7 @@ class Bson(
 
     /**
      * This function was declared to semi-bypass the issue with inferring bytes bson type.
+     *
      * @param type The expected bson type of the [bytes]. E.g. [BsonType.DOCUMENT].
      */
     @Deprecated(
@@ -151,13 +154,13 @@ private val bsonTypesModule: SerialModule = serializersModuleOf(
         BsonString::class to BsonPrimitiveSerializer,
         Binary::class to BinarySerializer,
         ObjectId::class to ObjectIdSerializer,
-        Decimal128::class to Decimal128Serializer
+        Decimal128::class to Decimal128Serializer,
+        Regex::class to RegexSerializer,
+        Pattern::class to PatternSerializer
     )
 )
 
 private val defaultBsonModule: SerialModule = SerializersModule {
     include(bsonTypesModule)
     include(bsonTemporalModule)
-    contextual(RegexSerializer)
-    contextual(PatternSerializer)
 }

@@ -4,7 +4,8 @@ import kotlinx.serialization.SerializationException
 
 /**
  * Generic exception indicating a problem in the serialization or deserialization process.
- * Don't confuse it with [org.bson.BSONException], although it also may be thrown (#12).
+ *
+ * Don't confuse it with [org.bson.BSONException], although it also may be thrown (issue #12).
  */
 sealed class BsonException(final override val message: String) : SerializationException(message)
 

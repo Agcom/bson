@@ -9,7 +9,7 @@ import org.bson.codecs.DecoderContext
 import org.bson.codecs.EncoderContext
 
 /**
- * For internal use.
+ * For internal use only.
  */
 abstract class BsonValueTransformingCodec<T> : Codec<T> {
 

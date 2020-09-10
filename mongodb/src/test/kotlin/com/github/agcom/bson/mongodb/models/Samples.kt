@@ -20,14 +20,6 @@ enum class Field {
 @Serializable
 sealed class Filter
 
-@Serializable
-@SerialName("tag")
-data class Tag(val tag: String) : Filter()
-
-@Serializable
-@SerialName("duration")
-data class Duration(val duration: Long) : Filter()
-
 interface Message
 
 @Serializable

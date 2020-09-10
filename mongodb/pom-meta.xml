@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<meta>
+    <name>bson-mongodb</name>
+    <description>MongoDB POJO codec registry using Kotlinx serialization</description>
+    <url>https://github.com/agcom/bson</url>
+    <inceptionYear>2020</inceptionYear>
+    <licenses>
+        <license>
+            <name>Apache License 2.0</name>
+            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
+    <developers>
+        <developer>
+            <id>agcom</id>
+            <name>Alireza Ghasemi</name>
+            <email>agcombest@gmail.com</email>
+            <url>https://github.com/agcom</url>
+        </developer>
+    </developers>
+    <scm>
+        <connection>https://github.com/agcom/bson.git</connection>
+        <developerConnection>https://github.com/agcom/bson.git</developerConnection>
+        <url>https://github.com/agcom/bson</url>
+    </scm>
+    <issueManagement>
+        <system>Github Issues</system>
+        <url>https://github.com/agcom/bson/issues</url>
+    </issueManagement>
+    <ciManagement>
+        <system>Github Actions</system>
+        <url>https://github.com/agcom/bson/actions</url>
+    </ciManagement>
+    <distributionManagement>
+        <downloadUrl>https://bintray.com/agcom/bson/mongodb</downloadUrl>
+    </distributionManagement>
+</meta>

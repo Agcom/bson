@@ -4,7 +4,7 @@ import io.kotest.core.spec.style.FreeSpec
 import io.kotest.matchers.shouldBe
 import org.bson.BsonRegularExpression
 
-class RegexTest : FreeSpec({
+class BsonRegularExpressionTest : FreeSpec({
 
     "options as embedded" - {
 

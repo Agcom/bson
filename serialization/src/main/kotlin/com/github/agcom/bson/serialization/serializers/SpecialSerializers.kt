@@ -3,17 +3,25 @@ package com.github.agcom.bson.serialization.serializers
 import com.github.agcom.bson.serialization.decoders.BsonInput
 import com.github.agcom.bson.serialization.encoders.BsonOutput
 import kotlinx.serialization.*
-import kotlinx.serialization.builtins.serializer
-import org.bson.types.*
+import org.bson.*
+import org.bson.types.Binary
+import org.bson.types.Decimal128
+import org.bson.types.ObjectId
 import java.util.regex.Pattern
 
 /**
- * Uses [BsonOutput.encodeBinary] / [BsonInput.decodeBinary]
+ * [Binary] serializer.
+ *
+ * Corresponds to [BsonBinary][org.bson.BsonBinary] type.
+ *
+ * Can only be used with [Bson][com.github.agcom.bson.serialization.Bson] format.
+ * Uses [BsonOutput.encodeBinary] / [BsonInput.decodeBinary].
  */
 @Serializer(Binary::class)
 object BinarySerializer : KSerializer<Binary> {
 
-    override val descriptor: SerialDescriptor = PrimitiveDescriptor(Binary::class.qualifiedName!!, PrimitiveKind.STRING)
+    override val descriptor: SerialDescriptor =
+        PrimitiveDescriptor(BsonBinary::class.qualifiedName!!, PrimitiveKind.STRING)
 
     override fun serialize(encoder: Encoder, value: Binary) {
         encoder.verify(); encoder as BsonOutput
@@ -28,12 +36,18 @@ object BinarySerializer : KSerializer<Binary> {
 }
 
 /**
- * Uses [BsonOutput.encodeObjectId] / [BsonInput.decodeObjectId]
+ * [ObjectId] serializer.
+ *
+ * Corresponds to [BsonObjectId][org.bson.BsonObjectId] type.
+ *
+ * Can only be used with [Bson][com.github.agcom.bson.serialization.Bson] format.
+ * Uses [BsonOutput.encodeObjectId] / [BsonInput.decodeObjectId].
  */
 @Serializer(ObjectId::class)
 object ObjectIdSerializer : KSerializer<ObjectId> {
 
-    override val descriptor: SerialDescriptor = PrimitiveDescriptor(ObjectId::class.qualifiedName!!, PrimitiveKind.STRING)
+    override val descriptor: SerialDescriptor =
+        PrimitiveDescriptor(BsonObjectId::class.qualifiedName!!, PrimitiveKind.STRING)
 
     override fun serialize(encoder: Encoder, value: ObjectId) {
         encoder.verify(); encoder as BsonOutput
@@ -48,12 +62,18 @@ object ObjectIdSerializer : KSerializer<ObjectId> {
 }
 
 /**
+ * Epoch millis time serializer.
+ *
+ * Corresponds to [BsonDateTime][org.bson.BsonDateTime] type.
+ *
+ * Can only be used with [Bson][com.github.agcom.bson.serialization.Bson] format.
  * Uses [BsonOutput.encodeDateTime] / [BsonInput.decodeDateTime]
  */
 @Serializer(Long::class)
 object DateTimeSerializer : KSerializer<Long> {
 
-    override val descriptor: SerialDescriptor = Long.serializer().descriptor
+    override val descriptor: SerialDescriptor =
+        PrimitiveDescriptor(BsonDateTime::class.qualifiedName!!, PrimitiveKind.LONG)
 
     override fun serialize(encoder: Encoder, value: Long) {
         encoder.verify(); encoder as BsonOutput
@@ -68,12 +88,18 @@ object DateTimeSerializer : KSerializer<Long> {
 }
 
 /**
+ * Java script code serializer.
+ *
+ * Corresponds to [BsonJavaScript][org.bson.BsonJavaScript] type.
+ *
+ * Can only be used with [Bson][com.github.agcom.bson.serialization.Bson] format.
  * Uses [BsonOutput.encodeJavaScript] / [BsonInput.decodeJavaScript]
  */
 @Serializer(String::class)
 object JavaScriptSerializer : KSerializer<String> {
 
-    override val descriptor: SerialDescriptor = String.serializer().descriptor
+    override val descriptor: SerialDescriptor =
+        PrimitiveDescriptor(BsonJavaScript::class.qualifiedName!!, PrimitiveKind.STRING)
 
     override fun serialize(encoder: Encoder, value: String) {
         encoder.verify(); encoder as BsonOutput
@@ -88,12 +114,18 @@ object JavaScriptSerializer : KSerializer<String> {
 }
 
 /**
+ * [Decimal128] serializer.
+ *
+ * Corresponds to [BsonDecimal128][org.bson.BsonDecimal128] type.
+ *
+ * Can only be used with [Bson][com.github.agcom.bson.serialization.Bson] format.
  * Uses [BsonOutput.encodeDecimal128] / [BsonInput.decodeDecimal128]
  */
 @Serializer(Decimal128::class)
 object Decimal128Serializer : KSerializer<Decimal128> {
 
-    override val descriptor: SerialDescriptor = PrimitiveDescriptor(Decimal128::class.qualifiedName!!, PrimitiveKind.STRING)
+    override val descriptor: SerialDescriptor =
+        PrimitiveDescriptor(BsonDecimal128::class.qualifiedName!!, PrimitiveKind.STRING)
 
     override fun serialize(encoder: Encoder, value: Decimal128) {
         encoder.verify(); encoder as BsonOutput
@@ -108,12 +140,18 @@ object Decimal128Serializer : KSerializer<Decimal128> {
 }
 
 /**
+ * [Regex] serializer.
+ *
+ * Corresponds to [BsonRegularExpression][org.bson.BsonRegularExpression] type.
+ *
+ * Can only be used with [Bson][com.github.agcom.bson.serialization.Bson] format.
  * Uses [BsonOutput.encodeRegularExpression] / [BsonInput.decodeRegularExpression]
  */
 @Serializer(Regex::class)
 object RegexSerializer : KSerializer<Regex> {
 
-    override val descriptor: SerialDescriptor = PrimitiveDescriptor(Regex::class.qualifiedName!!, PrimitiveKind.STRING)
+    override val descriptor: SerialDescriptor =
+        PrimitiveDescriptor(BsonRegularExpression::class.qualifiedName!!, PrimitiveKind.STRING)
 
     override fun serialize(encoder: Encoder, value: Regex) {
         encoder.verify(); encoder as BsonOutput
@@ -128,12 +166,18 @@ object RegexSerializer : KSerializer<Regex> {
 }
 
 /**
+ * [Pattern] serializer.
  * Ports to [RegexSerializer] using [toRegex] extension.
+ *
+ * Corresponds to [BsonRegularExpression][org.bson.BsonRegularExpression] type.
+ *
+ * Can only be used with [Bson][com.github.agcom.bson.serialization.Bson] format.
+ * Uses [BsonOutput.encodeRegularExpression] / [BsonInput.decodeRegularExpression]
  */
 @Serializer(Pattern::class)
 object PatternSerializer : KSerializer<Pattern> {
 
-    override val descriptor: SerialDescriptor = PrimitiveDescriptor(Pattern::class.qualifiedName!!, PrimitiveKind.STRING)
+    override val descriptor: SerialDescriptor = RegexSerializer.descriptor
 
     override fun serialize(encoder: Encoder, value: Pattern) = encoder.encode(RegexSerializer, value.toRegex())
 

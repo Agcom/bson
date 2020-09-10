@@ -1,24 +1,38 @@
 package com.github.agcom.bson.serialization.serializers
 
 import kotlinx.serialization.*
-import kotlinx.serialization.modules.SerializersModule
-import kotlinx.serialization.modules.contextual
+import kotlinx.serialization.modules.serializersModuleOf
 import java.time.*
 import java.time.temporal.Temporal
+import java.time.temporal.TemporalAccessor
 
 /**
- * Serializer for time objects which can be represented as epoch millis.
+ * Serializer for [time][java.time] objects which can be represented as epoch millis.
+ *
+ * The companion object implements this serializer for [TemporalAccessor] interface which always deserializes an [Instant] when used.
+ *
+ * Can only be used with [Bson][com.github.agcom.bson.serialization.Bson] format.
  * Uses [DateTimeSerializer].
  */
-@Serializer(Temporal::class)
-abstract class TemporalSerializer<T : Temporal>(serialName: String) : KSerializer<T> {
+abstract class TemporalAccessorSerializer<T : TemporalAccessor> : KSerializer<T> {
 
     /**
-     * The parent class [Temporal] serializer. Ports to a child serializer when serializing, and always deserializes to an [Instant] instance.
+     * The parent class [Temporal] serializer.
+     *
+     * Ports to a child serializer when serializing, and always deserializes as [Instant] class.
+     *
+     * Supports serializing:
+     * - [Instant]
+     * - [LocalDateTime]
+     * - [LocalDate]
+     * - [LocalTime]
+     * - [OffsetTime]
+     * - [ZonedDateTime]
      */
-    companion object : TemporalSerializer<Temporal>(Temporal::class.qualifiedName!!) {
-        override fun toEpochMillis(temporal: Temporal): Long {
-            return when(temporal) {
+    companion object : TemporalAccessorSerializer<TemporalAccessor>() {
+
+        override fun toEpochMillis(temporal: TemporalAccessor): Long {
+            return when (temporal) {
                 is Instant -> InstantSerializer.toEpochMillis(temporal)
                 is LocalDateTime -> LocalDateTimeSerializer.toEpochMillis(temporal)
                 is LocalDate -> LocalDateSerializer.toEpochMillis(temporal)
@@ -29,10 +43,10 @@ abstract class TemporalSerializer<T : Temporal>(serialName: String) : KSerialize
             }
         }
 
-        override fun ofEpochMillis(temporal: Long): Temporal = Instant.ofEpochMilli(temporal)
+        override fun ofEpochMillis(temporal: Long): Instant = Instant.ofEpochMilli(temporal)
     }
 
-    final override val descriptor: SerialDescriptor = PrimitiveDescriptor(serialName, PrimitiveKind.LONG)
+    final override val descriptor: SerialDescriptor = DateTimeSerializer.descriptor
 
     final override fun serialize(encoder: Encoder, value: T) = encoder.encode(DateTimeSerializer, toEpochMillis(value))
 
@@ -44,8 +58,9 @@ abstract class TemporalSerializer<T : Temporal>(serialName: String) : KSerialize
 
 }
 
-//@Serializer(Instant::class) // Should not activate this, or will get weird exceptions like java.lang.NoSuchMethodError: java.time.Instant: method 'void <init>()' not found
-object InstantSerializer : TemporalSerializer<Instant>(Instant::class.qualifiedName!!) {
+typealias TemporalSerializer = TemporalAccessorSerializer.Companion
+
+object InstantSerializer : TemporalAccessorSerializer<Instant>() {
 
     override fun toEpochMillis(temporal: Instant): Long = temporal.toEpochMilli()
 
@@ -53,8 +68,7 @@ object InstantSerializer : TemporalSerializer<Instant>(Instant::class.qualifiedN
 
 }
 
-//@Serializer(LocalDateTime::class)
-object LocalDateTimeSerializer : TemporalSerializer<LocalDateTime>(LocalDateTime::class.qualifiedName!!) {
+object LocalDateTimeSerializer : TemporalAccessorSerializer<LocalDateTime>() {
 
     override fun toEpochMillis(temporal: LocalDateTime): Long =
         InstantSerializer.toEpochMillis(temporal.toInstant(ZoneOffset.UTC))
@@ -64,18 +78,17 @@ object LocalDateTimeSerializer : TemporalSerializer<LocalDateTime>(LocalDateTime
 
 }
 
-//@Serializer(LocalDate::class)
-object LocalDateSerializer : TemporalSerializer<LocalDate>(LocalDate::class.qualifiedName!!) {
+object LocalDateSerializer : TemporalAccessorSerializer<LocalDate>() {
 
-    override fun toEpochMillis(temporal: LocalDate): Long = LocalDateTimeSerializer.toEpochMillis(temporal.atStartOfDay())
+    override fun toEpochMillis(temporal: LocalDate): Long =
+        LocalDateTimeSerializer.toEpochMillis(temporal.atStartOfDay())
 
     override fun ofEpochMillis(temporal: Long): LocalDate =
         LocalDateTimeSerializer.ofEpochMillis(temporal).toLocalDate()
 
 }
 
-//@Serializer(LocalTime::class)
-object LocalTimeSerializer : TemporalSerializer<LocalTime>(LocalTime::class.qualifiedName!!) {
+object LocalTimeSerializer : TemporalAccessorSerializer<LocalTime>() {
 
     override fun toEpochMillis(temporal: LocalTime): Long =
         LocalDateTimeSerializer.toEpochMillis(temporal.atDate(LocalDate.now()))
@@ -84,8 +97,7 @@ object LocalTimeSerializer : TemporalSerializer<LocalTime>(LocalTime::class.qual
         LocalDateTimeSerializer.ofEpochMillis(temporal).toLocalTime()
 }
 
-//@Serializer(OffsetDateTime::class)
-object OffsetDateTimeSerializer : TemporalSerializer<OffsetDateTime>(OffsetDateTime::class.qualifiedName!!) {
+object OffsetDateTimeSerializer : TemporalAccessorSerializer<OffsetDateTime>() {
 
     override fun toEpochMillis(temporal: OffsetDateTime): Long = InstantSerializer.toEpochMillis(temporal.toInstant())
 
@@ -94,8 +106,7 @@ object OffsetDateTimeSerializer : TemporalSerializer<OffsetDateTime>(OffsetDateT
 
 }
 
-//@Serializer(OffsetTime::class)
-object OffsetTimeSerializer : TemporalSerializer<OffsetTime>(OffsetTime::class.qualifiedName!!) {
+object OffsetTimeSerializer : TemporalAccessorSerializer<OffsetTime>() {
 
     override fun toEpochMillis(temporal: OffsetTime): Long =
         OffsetDateTimeSerializer.toEpochMillis(temporal.atDate(LocalDate.now()))
@@ -104,8 +115,7 @@ object OffsetTimeSerializer : TemporalSerializer<OffsetTime>(OffsetTime::class.q
         OffsetDateTimeSerializer.ofEpochMillis(temporal).toOffsetTime()
 }
 
-//@Serializer(ZonedDateTime::class)
-object ZonedDateTimeSerializer : TemporalSerializer<ZonedDateTime>(ZonedDateTime::class.qualifiedName!!) {
+object ZonedDateTimeSerializer : TemporalAccessorSerializer<ZonedDateTime>() {
 
     override fun toEpochMillis(temporal: ZonedDateTime): Long = InstantSerializer.toEpochMillis(temporal.toInstant())
 
@@ -114,13 +124,16 @@ object ZonedDateTimeSerializer : TemporalSerializer<ZonedDateTime>(ZonedDateTime
 
 }
 
-internal val bsonTemporalModule = SerializersModule {
-    contextual(InstantSerializer)
-    contextual(LocalDateTimeSerializer)
-    contextual(LocalDateSerializer)
-    contextual(LocalTimeSerializer)
-    contextual(OffsetDateTimeSerializer)
-    contextual(OffsetTimeSerializer)
-    contextual(ZonedDateTimeSerializer)
-    contextual(TemporalSerializer)
-}
+internal val bsonTemporalModule = serializersModuleOf(
+    mapOf(
+        Instant::class to InstantSerializer,
+        LocalDateTime::class to LocalDateTimeSerializer,
+        LocalDate::class to LocalDateSerializer,
+        LocalTime::class to LocalTimeSerializer,
+        OffsetDateTime::class to OffsetDateTimeSerializer,
+        OffsetTime::class to OffsetTimeSerializer,
+        ZonedDateTime::class to ZonedDateTimeSerializer,
+        TemporalAccessor::class to TemporalAccessorSerializer,
+        Temporal::class to TemporalSerializer
+    )
+)

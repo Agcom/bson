@@ -9,41 +9,47 @@ import org.bson.types.Decimal128
 import org.bson.types.ObjectId
 
 /**
- * The [Decoder] instance passed to [kotlinx.serialization.KSerializer.deserialize] when using [Bson].
+ * The [Decoder] instance which is passed to the [`deserialize`][kotlinx.serialization.KSerializer.deserialize] function when using [Bson].
  */
 interface BsonInput : Decoder, CompositeDecoder {
 
+    /**
+     * Instance of the current [Bson].
+     */
     val bson: Bson
 
+    /**
+     * Read a bson value.
+     */
     fun decodeBson(): BsonValue
 
     /**
-     * Corresponds to [org.bson.BsonBinary] type.
+     * Read a [bson binary][org.bson.BsonBinary] value.
      */
     fun decodeBinary(): Binary
 
     /**
-     * Corresponds to [org.bson.BsonObjectId] type.
+     * Read a [bson object id][org.bson.BsonObjectId] value.
      */
     fun decodeObjectId(): ObjectId
 
     /**
-     * Corresponds to [org.bson.BsonDateTime] type.
+     * Read a [bson date time][org.bson.BsonDateTime] value.
      */
     fun decodeDateTime(): Long
 
     /**
-     * Corresponds to [org.bson.BsonJavaScript] type.
+     * Read a [bson java script][org.bson.BsonJavaScript] value.
      */
     fun decodeJavaScript(): String
 
     /**
-     * Corresponds to [org.bson.BsonDecimal128] type.
+     * Read a [bson decimal 128][org.bson.BsonDecimal128] value.
      */
     fun decodeDecimal128(): Decimal128
 
     /**
-     * Corresponds to [org.bson.BsonRegularExpression] type.
+     * Read a [bson regular expression][org.bson.BsonRegularExpression] value.
      */
     fun decodeRegularExpression(): Regex
 

@@ -1,12 +1,19 @@
 package com.github.agcom.bson.serialization.decoders
 
-import com.github.agcom.bson.serialization.*
-import com.github.agcom.bson.serialization.utils.*
+import com.github.agcom.bson.serialization.Bson
+import com.github.agcom.bson.serialization.BsonDecodingException
+import com.github.agcom.bson.serialization.utils.PRIMITIVE_TAG
+import com.github.agcom.bson.serialization.utils.fold
+import com.github.agcom.bson.serialization.utils.toBinary
+import com.github.agcom.bson.serialization.utils.toRegex
 import kotlinx.serialization.*
-import kotlinx.serialization.internal.*
+import kotlinx.serialization.internal.AbstractPolymorphicSerializer
+import kotlinx.serialization.internal.NamedValueDecoder
 import kotlinx.serialization.modules.SerialModule
 import org.bson.*
-import org.bson.types.*
+import org.bson.types.Binary
+import org.bson.types.Decimal128
+import org.bson.types.ObjectId
 
 @OptIn(InternalSerializationApi::class)
 private sealed class AbstractBsonTreeInput(
@@ -51,10 +58,7 @@ private sealed class AbstractBsonTreeInput(
     protected open fun getValue(tag: String): BsonValue {
         val currentElement = currentElement(tag)
         return currentElement.fold(
-            primitive = { it },
-            unexpected = {
-                throw BsonDecodingException("Unexpected bson type '${it.bsonType}'")
-            }
+            primitive = { it }
         )
     }
 
@@ -94,10 +98,7 @@ private class BsonPrimitiveInput(bson: Bson, override val value: BsonValue) : Ab
 
     init {
         value.fold(
-            primitive = { /* OK */ },
-            unexpected = {
-                throw BsonDecodingException("Unexpected bson type '${it.bsonType}'")
-            }
+            primitive = { /* OK */ }
         )
         pushTag(PRIMITIVE_TAG)
     }
@@ -187,10 +188,7 @@ internal fun <T> Bson.readBson(
     val input = element.fold(
         primitive = { BsonPrimitiveInput(this, it) },
         document = { BsonTreeInput(this, it) },
-        array = { BsonTreeListInput(this, it) },
-        unexpected = {
-            throw BsonDecodingException("Unexpected bson type '${it.bsonType}'")
-        }
+        array = { BsonTreeListInput(this, it) }
     )
 
     return input.decode(deserializer)
