@@ -1,6 +1,6 @@
 package com.github.agcom.bson.serialization
 
-class DefaultBsonInstanceTest : BsonInstanceTest {
+class BsonInstanceTestDefault : BsonInstanceTest {
     override val bson = Bson(BsonConfiguration.DEFAULT)
 }
 

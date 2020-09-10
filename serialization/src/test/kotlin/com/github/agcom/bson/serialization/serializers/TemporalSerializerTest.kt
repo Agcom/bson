@@ -1,7 +1,7 @@
 package com.github.agcom.bson.serialization.serializers
 
 import com.github.agcom.bson.serialization.BsonInstanceTest
-import com.github.agcom.bson.serialization.DefaultBsonInstanceTest
+import com.github.agcom.bson.serialization.BsonInstanceTestDefault
 import io.kotest.core.spec.style.FreeSpec
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.types.shouldBeInstanceOf
@@ -9,7 +9,7 @@ import org.bson.BsonDateTime
 import java.time.*
 import java.time.temporal.TemporalAccessor
 
-class TemporalSerializerTest : FreeSpec(), BsonInstanceTest by DefaultBsonInstanceTest() {
+class TemporalSerializerTest : FreeSpec(), BsonInstanceTest by BsonInstanceTestDefault() {
 
     private val testInstant = Instant.now()
 

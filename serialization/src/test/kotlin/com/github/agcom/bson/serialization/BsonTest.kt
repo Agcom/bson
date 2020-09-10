@@ -22,7 +22,7 @@ import java.util.*
 import java.util.regex.Pattern
 import kotlin.random.Random
 
-class BsonTest : BsonInstanceTest by DefaultBsonInstanceTest(), FreeSpec() {
+class BsonTest : BsonInstanceTest by BsonInstanceTestDefault(), FreeSpec() {
 
     init {
 
