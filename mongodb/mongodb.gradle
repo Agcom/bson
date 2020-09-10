@@ -1,3 +1,5 @@
+import org.w3c.dom.Element
+
 plugins {
     id 'org.jetbrains.kotlin.plugin.serialization' version "$kotlin_version" // For test purposes
     id 'java-library'
@@ -40,42 +42,12 @@ publishing {
         bsonMongodb(MavenPublication) {
             artifactId = 'bson-mongodb'
             pom {
-                def git = 'https://github.com/agcom/bson'
                 packaging = 'jar'
-                name = 'bson-mongodb'
-                description = 'MongoDB POJO codec registry using Kotlinx serialization'
-                url = git
-                inceptionYear = '2020'
-                licenses {
-                    license {
-                        name = 'Apache License 2.0'
-                        url = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
-                        distribution = 'repo'
+                withXml {
+                    def root = asNode()
+                    new XmlParser().parse(buildFile.toPath().parent.resolve('pom-meta.xml').toFile()).each {
+                        root.append(it)
                     }
-                }
-                developers {
-                    developer {
-                        id = 'agcom'
-                        name = 'Alireza Ghasemi'
-                        email = 'agcombest@gmail.com'
-                        url = 'https://github.com/agcom'
-                    }
-                }
-                scm {
-                    connection = "${git}.git"
-                    developerConnection = connection
-                    url = git
-                }
-                issueManagement {
-                    system = 'Github Issues'
-                    url = "$git/issues"
-                }
-                ciManagement {
-                    system = 'Github Actions'
-                    url = "$git/actions"
-                }
-                distributionManagement {
-                    downloadUrl = 'https://bintray.com/agcom/bson/mongodb'
                 }
             }
             from components.java
