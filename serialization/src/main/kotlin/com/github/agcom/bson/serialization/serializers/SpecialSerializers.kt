@@ -140,7 +140,33 @@ object Decimal128Serializer : KSerializer<Decimal128> {
 }
 
 /**
+ * [Pattern] serializer.
+ *
+ * Corresponds to [BsonRegularExpression][org.bson.BsonRegularExpression] type.
+ *
+ * Can only be used with [Bson][com.github.agcom.bson.serialization.Bson] format.
+ * Uses [BsonOutput.encodeRegularExpression] / [BsonInput.decodeRegularExpression]
+ */
+@Serializer(Pattern::class)
+object PatternSerializer : KSerializer<Pattern> {
+
+    override val descriptor: SerialDescriptor = RegexSerializer.descriptor
+
+    override fun serialize(encoder: Encoder, value: Pattern) {
+        encoder.verify(); encoder as BsonOutput
+        encoder.encodeRegularExpression(value)
+    }
+
+    override fun deserialize(decoder: Decoder): Pattern {
+        decoder.verify(); decoder as BsonInput
+        return decoder.decodeRegularExpression()
+    }
+
+}
+
+/**
  * [Regex] serializer.
+ * Ports to [PatternSerializer]. Uses [toPattern] extension function when serializing and [toRegex] when deserializing.
  *
  * Corresponds to [BsonRegularExpression][org.bson.BsonRegularExpression] type.
  *
@@ -154,33 +180,11 @@ object RegexSerializer : KSerializer<Regex> {
         PrimitiveDescriptor(BsonRegularExpression::class.qualifiedName!!, PrimitiveKind.STRING)
 
     override fun serialize(encoder: Encoder, value: Regex) {
-        encoder.verify(); encoder as BsonOutput
-        encoder.encodeRegularExpression(value)
+        encoder.encode(PatternSerializer, value.toPattern())
     }
 
     override fun deserialize(decoder: Decoder): Regex {
-        decoder.verify(); decoder as BsonInput
-        return decoder.decodeRegularExpression()
+        return decoder.decode(PatternSerializer).toRegex()
     }
-
-}
-
-/**
- * [Pattern] serializer.
- * Ports to [RegexSerializer] using [toRegex] extension.
- *
- * Corresponds to [BsonRegularExpression][org.bson.BsonRegularExpression] type.
- *
- * Can only be used with [Bson][com.github.agcom.bson.serialization.Bson] format.
- * Uses [BsonOutput.encodeRegularExpression] / [BsonInput.decodeRegularExpression]
- */
-@Serializer(Pattern::class)
-object PatternSerializer : KSerializer<Pattern> {
-
-    override val descriptor: SerialDescriptor = RegexSerializer.descriptor
-
-    override fun serialize(encoder: Encoder, value: Pattern) = encoder.encode(RegexSerializer, value.toRegex())
-
-    override fun deserialize(decoder: Decoder): Pattern = decoder.decode(RegexSerializer).toPattern()
 
 }

@@ -1,5 +1,3 @@
-import org.w3c.dom.Element
-
 plugins {
     id 'org.jetbrains.kotlin.plugin.serialization' version "$kotlin_version" // For test purposes
     id 'java-library'

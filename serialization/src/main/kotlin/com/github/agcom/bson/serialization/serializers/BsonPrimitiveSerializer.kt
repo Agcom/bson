@@ -4,7 +4,7 @@ import com.github.agcom.bson.serialization.decoders.BsonInput
 import com.github.agcom.bson.serialization.encoders.BsonOutput
 import com.github.agcom.bson.serialization.utils.fold
 import com.github.agcom.bson.serialization.utils.toBinary
-import com.github.agcom.bson.serialization.utils.toRegex
+import com.github.agcom.bson.serialization.utils.toPattern
 import kotlinx.serialization.*
 import org.bson.*
 import org.bson.BsonType.*
@@ -57,7 +57,7 @@ object BsonPrimitiveSerializer : KSerializer<BsonValue> {
                     INT32 -> encoder.encodeInt(it.asInt32().value)
                     INT64 -> encoder.encodeLong(it.asInt64().value)
                     DECIMAL128 -> encoder.encodeDecimal128(it.asDecimal128().value)
-                    REGULAR_EXPRESSION -> encoder.encodeRegularExpression(it.asRegularExpression().toRegex())
+                    REGULAR_EXPRESSION -> encoder.encodeRegularExpression(it.asRegularExpression().toPattern())
                     else -> throw RuntimeException("Should not reach here")
                 }
             }
