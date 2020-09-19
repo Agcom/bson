@@ -46,8 +46,8 @@ val testBsonValuePrimitives: List<BsonValue>
         BsonJavaScript("main() {}"),
         BsonNull.VALUE,
         BsonObjectId(ObjectId()),
-        BsonRegularExpression("acme.*corp"),
-        BsonRegularExpression("acme.*corp", "imdxs"),
+        BsonRegularExpression("hello"),
+        BsonRegularExpression("hello", "cdgimstux"),
         BsonString("hello")
     )
 

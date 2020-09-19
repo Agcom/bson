@@ -15,6 +15,7 @@ import org.bson.BsonType.*
 import org.bson.types.Binary
 import org.bson.types.Decimal128
 import org.bson.types.ObjectId
+import java.util.regex.Pattern
 
 @OptIn(InternalSerializationApi::class)
 private sealed class AbstractBsonTreeOutput(
@@ -54,7 +55,7 @@ private sealed class AbstractBsonTreeOutput(
     private fun encodeTaggedDateTime(tag: String, value: Long) = putElement(tag, BsonDateTime(value))
     private fun encodeTaggedJavaScript(tag: String, value: String) = putElement(tag, BsonJavaScript(value))
     private fun encodeTaggedDecimal128(tag: String, value: Decimal128) = putElement(tag, BsonDecimal128(value))
-    private fun encodeTaggedRegularExpression(tag: String, value: Regex) =
+    private fun encodeTaggedRegularExpression(tag: String, value: Pattern) =
         putElement(tag, value.toBsonRegularExpression())
 
     private fun encodeTaggedBson(tag: String, value: BsonValue) = putElement(tag, value)
@@ -64,7 +65,7 @@ private sealed class AbstractBsonTreeOutput(
     override fun encodeDateTime(time: Long) = encodeTaggedDateTime(popTag(), time)
     override fun encodeJavaScript(code: String) = encodeTaggedJavaScript(popTag(), code)
     override fun encodeDecimal128(decimal: Decimal128) = encodeTaggedDecimal128(popTag(), decimal)
-    override fun encodeRegularExpression(regex: Regex) = encodeTaggedRegularExpression(popTag(), regex)
+    override fun encodeRegularExpression(pattern: Pattern) = encodeTaggedRegularExpression(popTag(), pattern)
 
     private fun checkClassDiscriminatorConflict(serializer: SerializationStrategy<*>) {
         if (bson.configuration.classDiscriminator in serializer.descriptor.elementNames())

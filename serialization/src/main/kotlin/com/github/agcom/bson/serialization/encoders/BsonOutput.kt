@@ -7,6 +7,7 @@ import org.bson.BsonValue
 import org.bson.types.Binary
 import org.bson.types.Decimal128
 import org.bson.types.ObjectId
+import java.util.regex.Pattern
 
 /**
  * The [Encoder] instance which is passed to [serialize][kotlinx.serialization.KSerializer.serialize] function when using [Bson].
@@ -48,6 +49,6 @@ interface BsonOutput : Encoder, CompositeEncoder {
     /**
      * Write a [bson regular expression][org.bson.BsonRegularExpression] value.
      */
-    fun encodeRegularExpression(regex: Regex)
+    fun encodeRegularExpression(pattern: Pattern)
 
 }

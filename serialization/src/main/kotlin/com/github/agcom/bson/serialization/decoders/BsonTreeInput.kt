@@ -5,7 +5,7 @@ import com.github.agcom.bson.serialization.BsonDecodingException
 import com.github.agcom.bson.serialization.utils.PRIMITIVE_TAG
 import com.github.agcom.bson.serialization.utils.fold
 import com.github.agcom.bson.serialization.utils.toBinary
-import com.github.agcom.bson.serialization.utils.toRegex
+import com.github.agcom.bson.serialization.utils.toPattern
 import kotlinx.serialization.*
 import kotlinx.serialization.internal.AbstractPolymorphicSerializer
 import kotlinx.serialization.internal.NamedValueDecoder
@@ -14,6 +14,7 @@ import org.bson.*
 import org.bson.types.Binary
 import org.bson.types.Decimal128
 import org.bson.types.ObjectId
+import java.util.regex.Pattern
 
 @OptIn(InternalSerializationApi::class)
 private sealed class AbstractBsonTreeInput(
@@ -69,7 +70,7 @@ private sealed class AbstractBsonTreeInput(
     override fun decodeDateTime(): Long = decodeTaggedDateTime(popTag())
     override fun decodeJavaScript(): String = decodeTaggedJavaScript(popTag())
     override fun decodeDecimal128(): Decimal128 = decodeTaggedDecimal128(popTag())
-    override fun decodeRegularExpression(): Regex = decodeTaggedRegularExpression(popTag())
+    override fun decodeRegularExpression(): Pattern = decodeTaggedRegularExpression(popTag())
 
     override fun decodeTaggedEnum(tag: String, enumDescription: SerialDescriptor): Int =
         enumDescription.getElementIndexOrThrow(getValue(tag).asString().value)
@@ -90,7 +91,7 @@ private sealed class AbstractBsonTreeInput(
     private fun decodeTaggedDateTime(tag: String): Long = getValue(tag).asDateTime().value
     private fun decodeTaggedJavaScript(tag: String): String = getValue(tag).asJavaScript().code
     private fun decodeTaggedDecimal128(tag: String): Decimal128 = getValue(tag).asDecimal128().value
-    private fun decodeTaggedRegularExpression(tag: String): Regex = getValue(tag).asRegularExpression().toRegex()
+    private fun decodeTaggedRegularExpression(tag: String): Pattern = getValue(tag).asRegularExpression().toPattern()
 
 }
 

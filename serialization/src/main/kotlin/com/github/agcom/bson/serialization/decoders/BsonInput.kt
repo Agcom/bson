@@ -7,6 +7,7 @@ import org.bson.BsonValue
 import org.bson.types.Binary
 import org.bson.types.Decimal128
 import org.bson.types.ObjectId
+import java.util.regex.Pattern
 
 /**
  * The [Decoder] instance which is passed to the [`deserialize`][kotlinx.serialization.KSerializer.deserialize] function when using [Bson].
@@ -51,6 +52,6 @@ interface BsonInput : Decoder, CompositeDecoder {
     /**
      * Read a [bson regular expression][org.bson.BsonRegularExpression] value.
      */
-    fun decodeRegularExpression(): Regex
+    fun decodeRegularExpression(): Pattern
 
 }
