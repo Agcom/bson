@@ -93,7 +93,9 @@ class BsonRegularExpressionTest : FreeSpec({
         val bsonValue = BsonRegularExpression("hello", "cdgimstux")
         val expected = Regex(bsonValue.pattern, RegexOption.values().toSet())
 
-        bsonValue.toRegex() shouldBe expected
+        val test = bsonValue.toRegex()
+        test.pattern shouldBe expected.pattern
+        test.options shouldBe expected.options
     }
 
     "pattern to bson" {

@@ -95,28 +95,22 @@ class BsonTest : BsonInstanceTest by BsonInstanceTestDefault(), FreeSpec() {
                         bson.toBson(Decimal128Serializer, decimal) shouldBe BsonDecimal128(decimal)
                     }
 
-                    "regular expresion" - {
+                    "pattern" {
+                        val flags =
+                            Pattern.CANON_EQ or Pattern.UNIX_LINES or 256 /* Global flag */ or Pattern.CASE_INSENSITIVE or Pattern.MULTILINE or Pattern.DOTALL or Pattern.LITERAL or Pattern.UNICODE_CASE or Pattern.COMMENTS
+                        val pattern = Pattern.compile("hello", flags)
+                        bson.toBson(PatternSerializer, pattern) shouldBe BsonRegularExpression(
+                            pattern.pattern(),
+                            "cdgimstux"
+                        )
+                    }
 
-                        "without options" {
-                            val regex = Regex("acme.*corp")
-                            bson.toBson(RegexSerializer, regex) shouldBe BsonRegularExpression(regex.pattern)
-                        }
-
-                        "with options" {
-                            val regex =
-                                Regex(
-                                    "acme.*corp", setOf(
-                                        RegexOption.IGNORE_CASE,
-                                        RegexOption.MULTILINE,
-                                        RegexOption.LITERAL,
-                                        RegexOption.UNIX_LINES,
-                                        RegexOption.COMMENTS,
-                                        RegexOption.DOT_MATCHES_ALL,
-                                        RegexOption.CANON_EQ
-                                    )
-                                )
-                            bson.toBson(RegexSerializer, regex) shouldBe BsonRegularExpression(regex.pattern, "imdxs")
-                        }
+                    "regex" {
+                        val regex = Regex("hello", RegexOption.values().toSet())
+                        bson.toBson(RegexSerializer, regex) shouldBe BsonRegularExpression(
+                            regex.pattern,
+                            "cdimstux"
+                        )
                     }
 
                     "enum kind" {
@@ -292,26 +286,23 @@ class BsonTest : BsonInstanceTest by BsonInstanceTestDefault(), FreeSpec() {
                         bson.fromBson(Decimal128Serializer, BsonDecimal128(decimal)) shouldBe decimal
                     }
 
-                    "regular expresion" - {
+                    "pattern" {
+                        val flags =
+                            Pattern.CANON_EQ or Pattern.UNIX_LINES or 256 /* Global flag */ or Pattern.CASE_INSENSITIVE or Pattern.MULTILINE or Pattern.DOTALL or Pattern.LITERAL or Pattern.UNICODE_CASE or Pattern.COMMENTS
+                        val pattern = Pattern.compile("hello", flags)
 
-                        "without options" {
-                            val regex = Regex("acme.*corp")
-                            bson.fromBson(RegexSerializer, BsonRegularExpression(regex.pattern)) shouldBe regex
-                        }
+                        val test =
+                            bson.fromBson(PatternSerializer, BsonRegularExpression(pattern.pattern(), "cdgimstux"))
+                        test.pattern() shouldBe pattern.pattern()
+                        test.flags() shouldBe pattern.flags()
+                    }
 
-                        "with options" {
-                            val regex =
-                                Regex(
-                                    "acme.*corp", setOf(
-                                        RegexOption.IGNORE_CASE,
-                                        RegexOption.MULTILINE,
-                                        RegexOption.UNIX_LINES,
-                                        RegexOption.COMMENTS,
-                                        RegexOption.DOT_MATCHES_ALL
-                                    )
-                                )
-                            bson.fromBson(RegexSerializer, BsonRegularExpression(regex.pattern, "imdxs")) shouldBe regex
-                        }
+                    "regex" {
+                        val regex = Regex("hello", RegexOption.values().toSet())
+
+                        val test = bson.fromBson(RegexSerializer, BsonRegularExpression(regex.pattern, "cdimstux"))
+                        test.pattern shouldBe regex.pattern
+                        test.options shouldBe regex.options
                     }
 
                     "enum kind" {
