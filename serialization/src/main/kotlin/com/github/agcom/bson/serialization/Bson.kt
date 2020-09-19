@@ -10,11 +10,7 @@ import kotlinx.serialization.modules.*
 import org.bson.*
 import org.bson.io.BasicOutputBuffer
 import org.bson.io.ByteBufferBsonInput
-import org.bson.types.Binary
-import org.bson.types.Decimal128
-import org.bson.types.ObjectId
 import java.nio.ByteBuffer
-import java.util.regex.Pattern
 
 /**
  * Main entry point to work with BSON serialization.
@@ -136,32 +132,28 @@ class Bson(
 }
 
 private val defaultBsonModule: SerialModule = SerializersModule {
-    include(
-        serializersModuleOf(
-            mapOf(
-                BsonValue::class to BsonValueSerializer,
-                BsonDocument::class to BsonDocumentSerializer,
-                BsonArray::class to BsonArraySerializer,
-                BsonBinary::class to BsonPrimitiveSerializer,
-                BsonBoolean::class to BsonPrimitiveSerializer,
-                BsonDateTime::class to BsonPrimitiveSerializer,
-                BsonDecimal128::class to BsonPrimitiveSerializer,
-                BsonDouble::class to BsonPrimitiveSerializer,
-                BsonInt32::class to BsonPrimitiveSerializer,
-                BsonInt64::class to BsonPrimitiveSerializer,
-                BsonJavaScript::class to BsonPrimitiveSerializer,
-                BsonNull::class to BsonPrimitiveSerializer,
-                BsonNumber::class to BsonPrimitiveSerializer,
-                BsonObjectId::class to BsonPrimitiveSerializer,
-                BsonRegularExpression::class to BsonPrimitiveSerializer,
-                BsonString::class to BsonPrimitiveSerializer,
-                Binary::class to BinarySerializer,
-                ObjectId::class to ObjectIdSerializer,
-                Decimal128::class to Decimal128Serializer,
-                Regex::class to RegexSerializer,
-                Pattern::class to PatternSerializer
-            )
-        )
-    )
+    contextual(BsonValueSerializer)
+    contextual(BsonDocumentSerializer)
+    contextual(BsonArraySerializer)
+    contextual(BsonBinarySerializer)
+    contextual(BsonBooleanSerializer)
+    contextual(BsonDateTimeSerializer)
+    contextual(BsonDecimal128Serializer)
+    contextual(BsonDoubleSerializer)
+    contextual(BsonInt32Serializer)
+    contextual(BsonInt64Serializer)
+    contextual(BsonJavaScriptSerializer)
+    contextual(BsonNullSerializer)
+    contextual(BsonNumberSerializer)
+    contextual(BsonObjectIdSerializer)
+    contextual(BsonRegularExpressionSerializer)
+    contextual(BsonStringSerializer)
+
+    contextual(BinarySerializer)
+    contextual(ObjectIdSerializer)
+    contextual(Decimal128Serializer)
+    contextual(RegexSerializer)
+    contextual(PatternSerializer)
+
     include(bsonTemporalModule)
 }
