@@ -714,55 +714,55 @@ class BsonTest : BsonInstanceTest by BsonInstanceTestDefault(), FreeSpec() {
             "bson primitives" - {
 
                 "bson binary" {
-                    bson.context.getContextual(BsonBinary::class) shouldBe BsonPrimitiveSerializer
+                    bson.context.getContextual(BsonBinary::class) shouldBe BsonBinarySerializer
                 }
 
                 "bson boolean" {
-                    bson.context.getContextual(BsonBoolean::class) shouldBe BsonPrimitiveSerializer
+                    bson.context.getContextual(BsonBoolean::class) shouldBe BsonBooleanSerializer
                 }
 
                 "bson date time" {
-                    bson.context.getContextual(BsonDateTime::class) shouldBe BsonPrimitiveSerializer
+                    bson.context.getContextual(BsonDateTime::class) shouldBe BsonDateTimeSerializer
                 }
 
                 "bson decimal 128" {
-                    bson.context.getContextual(BsonDecimal128::class) shouldBe BsonPrimitiveSerializer
+                    bson.context.getContextual(BsonDecimal128::class) shouldBe BsonDecimal128Serializer
                 }
 
                 "bson double" {
-                    bson.context.getContextual(BsonDouble::class) shouldBe BsonPrimitiveSerializer
+                    bson.context.getContextual(BsonDouble::class) shouldBe BsonDoubleSerializer
                 }
 
                 "bson int 32" {
-                    bson.context.getContextual(BsonInt32::class) shouldBe BsonPrimitiveSerializer
+                    bson.context.getContextual(BsonInt32::class) shouldBe BsonInt32Serializer
                 }
 
                 "bson int 64" {
-                    bson.context.getContextual(BsonInt64::class) shouldBe BsonPrimitiveSerializer
+                    bson.context.getContextual(BsonInt64::class) shouldBe BsonInt64Serializer
                 }
 
                 "bson java script" {
-                    bson.context.getContextual(BsonJavaScript::class) shouldBe BsonPrimitiveSerializer
+                    bson.context.getContextual(BsonJavaScript::class) shouldBe BsonJavaScriptSerializer
                 }
 
                 "bson null" {
-                    bson.context.getContextual(BsonNull::class) shouldBe BsonPrimitiveSerializer
+                    bson.context.getContextual(BsonNull::class) shouldBe BsonNullSerializer
                 }
 
                 "bson number" {
-                    bson.context.getContextual(BsonNumber::class) shouldBe BsonPrimitiveSerializer
+                    bson.context.getContextual(BsonNumber::class) shouldBe BsonNumberSerializer
                 }
 
                 "bson object id" {
-                    bson.context.getContextual(BsonObjectId::class) shouldBe BsonPrimitiveSerializer
+                    bson.context.getContextual(BsonObjectId::class) shouldBe BsonObjectIdSerializer
                 }
 
                 "bson regular expression" {
-                    bson.context.getContextual(BsonRegularExpression::class) shouldBe BsonPrimitiveSerializer
+                    bson.context.getContextual(BsonRegularExpression::class) shouldBe BsonRegularExpressionSerializer
                 }
 
                 "bson string" {
-                    bson.context.getContextual(BsonString::class) shouldBe BsonPrimitiveSerializer
+                    bson.context.getContextual(BsonString::class) shouldBe BsonStringSerializer
                 }
 
             }
