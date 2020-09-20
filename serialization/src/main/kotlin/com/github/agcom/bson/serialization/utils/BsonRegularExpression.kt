@@ -6,12 +6,14 @@ import java.util.regex.Pattern
 /**
  * Constructor like builder for [BsonRegularExpression] using Java [Pattern].
  */
-operator fun BsonRegularExpression.invoke(pattern: Pattern): BsonRegularExpression = pattern.toBsonRegularExpression()
+@Suppress("FunctionName")
+fun BsonRegularExpression(pattern: Pattern): BsonRegularExpression = pattern.toBsonRegularExpression()
 
 /**
  * Constructor like builder for [BsonRegularExpression] using Kotlin [Regex].
  */
-operator fun BsonRegularExpression.invoke(regex: Regex): BsonRegularExpression = regex.toBsonRegularExpression()
+@Suppress("FunctionName")
+fun BsonRegularExpression(regex: Regex): BsonRegularExpression = regex.toBsonRegularExpression()
 
 /**
  * Convert a Java [Pattern] into it's bson type class [BsonRegularExpression].
