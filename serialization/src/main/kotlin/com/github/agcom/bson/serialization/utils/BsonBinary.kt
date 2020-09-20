@@ -6,7 +6,8 @@ import org.bson.types.Binary
 /**
  * Constructor like builder for [BsonBinary] using it's helper class [Binary].
  */
-operator fun BsonBinary.invoke(binary: Binary): BsonBinary = binary.toBsonBinary()
+@Suppress("FunctionName")
+fun BsonBinary(binary: Binary): BsonBinary = binary.toBsonBinary()
 
 /**
  * Convert a [BsonBinary] into it's helper class [Binary].
