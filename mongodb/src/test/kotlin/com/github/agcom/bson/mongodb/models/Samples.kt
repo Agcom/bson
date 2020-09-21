@@ -42,3 +42,6 @@ object EmptyMessage : Message {
         return javaClass.hashCode()
     }
 }
+
+@Serializable
+object DualBase : Message, Filter()
