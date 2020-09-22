@@ -3,10 +3,14 @@ package com.github.agcom.bson.serialization.serializers
 import com.github.agcom.bson.serialization.decoders.BsonInput
 import com.github.agcom.bson.serialization.encoders.BsonOutput
 import kotlinx.serialization.*
-import org.bson.*
+import org.bson.BsonBinarySubType
+import org.bson.UuidRepresentation
+import org.bson.internal.UuidHelper
 import org.bson.types.Binary
+import org.bson.types.Code
 import org.bson.types.Decimal128
 import org.bson.types.ObjectId
+import java.util.*
 import java.util.regex.Pattern
 
 /**
@@ -20,8 +24,7 @@ import java.util.regex.Pattern
 @Serializer(Binary::class)
 object BinarySerializer : KSerializer<Binary> {
 
-    override val descriptor: SerialDescriptor =
-        PrimitiveDescriptor(BsonBinary::class.qualifiedName!!, PrimitiveKind.STRING)
+    override val descriptor: SerialDescriptor = BsonBinarySerializer.descriptor
 
     override fun serialize(encoder: Encoder, value: Binary) {
         encoder.verify(); encoder as BsonOutput
@@ -46,8 +49,7 @@ object BinarySerializer : KSerializer<Binary> {
 @Serializer(ObjectId::class)
 object ObjectIdSerializer : KSerializer<ObjectId> {
 
-    override val descriptor: SerialDescriptor =
-        PrimitiveDescriptor(BsonObjectId::class.qualifiedName!!, PrimitiveKind.STRING)
+    override val descriptor: SerialDescriptor = BsonObjectIdSerializer.descriptor
 
     override fun serialize(encoder: Encoder, value: ObjectId) {
         encoder.verify(); encoder as BsonOutput
@@ -72,8 +74,7 @@ object ObjectIdSerializer : KSerializer<ObjectId> {
 @Serializer(Long::class)
 object DateTimeSerializer : KSerializer<Long> {
 
-    override val descriptor: SerialDescriptor =
-        PrimitiveDescriptor(BsonDateTime::class.qualifiedName!!, PrimitiveKind.LONG)
+    override val descriptor: SerialDescriptor = BsonDateTimeSerializer.descriptor
 
     override fun serialize(encoder: Encoder, value: Long) {
         encoder.verify(); encoder as BsonOutput
@@ -98,8 +99,7 @@ object DateTimeSerializer : KSerializer<Long> {
 @Serializer(String::class)
 object JavaScriptSerializer : KSerializer<String> {
 
-    override val descriptor: SerialDescriptor =
-        PrimitiveDescriptor(BsonJavaScript::class.qualifiedName!!, PrimitiveKind.STRING)
+    override val descriptor: SerialDescriptor = BsonJavaScriptSerializer.descriptor
 
     override fun serialize(encoder: Encoder, value: String) {
         encoder.verify(); encoder as BsonOutput
@@ -124,8 +124,7 @@ object JavaScriptSerializer : KSerializer<String> {
 @Serializer(Decimal128::class)
 object Decimal128Serializer : KSerializer<Decimal128> {
 
-    override val descriptor: SerialDescriptor =
-        PrimitiveDescriptor(BsonDecimal128::class.qualifiedName!!, PrimitiveKind.STRING)
+    override val descriptor: SerialDescriptor = BsonDecimal128Serializer.descriptor
 
     override fun serialize(encoder: Encoder, value: Decimal128) {
         encoder.verify(); encoder as BsonOutput
@@ -150,7 +149,7 @@ object Decimal128Serializer : KSerializer<Decimal128> {
 @Serializer(Pattern::class)
 object PatternSerializer : KSerializer<Pattern> {
 
-    override val descriptor: SerialDescriptor = RegexSerializer.descriptor
+    override val descriptor: SerialDescriptor = BsonRegularExpressionSerializer.descriptor
 
     override fun serialize(encoder: Encoder, value: Pattern) {
         encoder.verify(); encoder as BsonOutput
@@ -166,6 +165,7 @@ object PatternSerializer : KSerializer<Pattern> {
 
 /**
  * [Regex] serializer.
+ *
  * Ports to [PatternSerializer]. Uses [toPattern] extension function when serializing and [toRegex] when deserializing.
  *
  * Corresponds to [BsonRegularExpression][org.bson.BsonRegularExpression] type.
@@ -176,15 +176,136 @@ object PatternSerializer : KSerializer<Pattern> {
 @Serializer(Regex::class)
 object RegexSerializer : KSerializer<Regex> {
 
-    override val descriptor: SerialDescriptor =
-        PrimitiveDescriptor(BsonRegularExpression::class.qualifiedName!!, PrimitiveKind.STRING)
+    override val descriptor: SerialDescriptor = PatternSerializer.descriptor
 
     override fun serialize(encoder: Encoder, value: Regex) {
+        encoder.verify()
         encoder.encode(PatternSerializer, value.toPattern())
     }
 
     override fun deserialize(decoder: Decoder): Regex {
+        decoder.verify()
         return decoder.decode(PatternSerializer).toRegex()
+    }
+
+}
+
+/**
+ * [Code] serializer.
+ *
+ * Ports to [JavaScriptSerializer] using [Code.code].
+ *
+ * Corresponds to [BsonJavaScript][org.bson.BsonJavaScript] type.
+ *
+ * Can only be used with [Bson][com.github.agcom.bson.serialization.Bson] format.
+ * Uses [BsonOutput.encodeJavaScript] / [BsonInput.decodeJavaScript]
+ */
+object CodeSerializer : KSerializer<Code> {
+
+    override val descriptor: SerialDescriptor = JavaScriptSerializer.descriptor
+
+    override fun deserialize(decoder: Decoder): Code {
+        decoder.verify()
+        return Code(decoder.decode(JavaScriptSerializer))
+    }
+
+    override fun serialize(encoder: Encoder, value: Code) {
+        encoder.verify()
+        encoder.encode(JavaScriptSerializer, value.code)
+    }
+
+}
+
+/**
+ * [ByteArray] serializer.
+ *
+ * Ports to [BinarySerializer] with [BsonBinarySubType.BINARY] as bson binary type.
+ *
+ * Corresponds to [BsonBinary][org.bson.BsonBinary] type.
+ *
+ * Can only be used with [Bson][com.github.agcom.bson.serialization.Bson] format.
+ * Uses [BsonOutput.encodeJavaScript] / [BsonInput.decodeJavaScript]
+ */
+object ByteArraySerializer : KSerializer<ByteArray> {
+
+    override val descriptor: SerialDescriptor = BinarySerializer.descriptor
+
+    override fun serialize(encoder: Encoder, value: ByteArray) {
+        encoder.verify()
+        encoder.encode(BinarySerializer, Binary(value))
+    }
+
+    override fun deserialize(decoder: Decoder): ByteArray {
+        decoder.verify()
+        val binary = decoder.decode(BinarySerializer)
+        if (binary.type != BsonBinarySubType.BINARY.value)
+            throw SerializationException("Expected bson binary type to be ${BsonBinarySubType.BINARY}, " +
+                    "but was ${BsonBinarySubType.values()
+                        .firstOrNull { it.value == binary.type } ?: binary.type.toString(16)}")
+        return binary.data
+    }
+
+}
+
+/**
+ * [UUID] serializer.
+ *
+ * Ports to [BinarySerializer] with [BsonBinarySubType.UUID_LEGACY] or [BsonBinarySubType.UUID_STANDARD] as bson binary type.
+ *
+ * @see UuidRepresentation
+ *
+ * Corresponds to [BsonBinary][org.bson.BsonBinary] type.
+ *
+ * Can only be used with [Bson][com.github.agcom.bson.serialization.Bson] format.
+ * Uses [BsonOutput.encodeJavaScript] / [BsonInput.decodeJavaScript]
+ */
+class UUIDSerializer(private val uuidRepresentation: UuidRepresentation = UuidRepresentation.STANDARD) :
+    KSerializer<UUID> {
+
+    override val descriptor: SerialDescriptor = BsonBinarySerializer.descriptor
+
+    override fun serialize(encoder: Encoder, value: UUID) {
+        encoder.verify()
+        val binary = Binary(
+            when (uuidRepresentation) {
+                UuidRepresentation.STANDARD -> BsonBinarySubType.UUID_STANDARD
+                else -> BsonBinarySubType.UUID_LEGACY
+            },
+            UuidHelper.encodeUuidToBinary(value, uuidRepresentation)
+        )
+        encoder.encode(BinarySerializer, binary)
+    }
+
+    override fun deserialize(decoder: Decoder): UUID {
+        decoder.verify()
+        val binary = decoder.decode(BinarySerializer)
+        return UuidHelper.decodeBinaryToUuid(binary.data, binary.type, uuidRepresentation)
+    }
+
+}
+
+/**
+ * [Date] serializer.
+ *
+ * Ports to [DateTimeSerializer] using [Date.getTime] function.
+ *
+ * Corresponds to [BsonDateTime][org.bson.BsonDateTime] type.
+ *
+ * Can only be used with [Bson][com.github.agcom.bson.serialization.Bson] format.
+ * Uses [BsonOutput.encodeJavaScript] / [BsonInput.decodeJavaScript]
+ */
+object DateSerializer : KSerializer<Date> {
+
+    override val descriptor: SerialDescriptor = DateTimeSerializer.descriptor
+
+    override fun serialize(encoder: Encoder, value: Date) {
+        encoder.verify()
+        encoder.encode(DateTimeSerializer, value.time)
+    }
+
+    override fun deserialize(decoder: Decoder): Date {
+        decoder.verify()
+        return Date(decoder.decode(DateTimeSerializer))
     }
 
 }
