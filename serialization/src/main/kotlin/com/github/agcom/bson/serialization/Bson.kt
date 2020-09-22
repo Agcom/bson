@@ -154,6 +154,10 @@ private val defaultBsonModule: SerialModule = SerializersModule {
     contextual(Decimal128Serializer)
     contextual(RegexSerializer)
     contextual(PatternSerializer)
+    contextual(CodeSerializer)
+    contextual(ByteArraySerializer)
+    contextual(UUIDSerializer())
+    contextual(DateSerializer)
 
     include(bsonTemporalModule)
 }
