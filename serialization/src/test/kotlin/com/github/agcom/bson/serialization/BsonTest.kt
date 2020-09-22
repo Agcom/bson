@@ -9,10 +9,12 @@ import io.kotest.core.spec.style.FreeSpec
 import io.kotest.data.forAll
 import io.kotest.data.row
 import io.kotest.matchers.shouldBe
+import io.kotest.matchers.types.shouldBeInstanceOf
 import kotlinx.serialization.builtins.*
 import org.bson.*
 import org.bson.io.BasicOutputBuffer
 import org.bson.types.Binary
+import org.bson.types.Code
 import org.bson.types.Decimal128
 import org.bson.types.ObjectId
 import java.time.*
@@ -825,6 +827,22 @@ class BsonTest : BsonInstanceTest by BsonInstanceTestDefault(), FreeSpec() {
                     bson.context.getContextual(TemporalAccessor::class) shouldBe TemporalSerializer
                 }
 
+            }
+
+            "code" {
+                bson.context.getContextual(Code::class) shouldBe CodeSerializer
+            }
+
+            "byte array" {
+                bson.context.getContextual(ByteArray::class) shouldBe ByteArraySerializer
+            }
+
+            "uuid" {
+                bson.context.getContextual(UUID::class).shouldBeInstanceOf<UUIDSerializer>()
+            }
+
+            "date" {
+                bson.context.getContextual(Date::class) shouldBe DateSerializer
             }
 
         }
