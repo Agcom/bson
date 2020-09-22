@@ -36,7 +36,6 @@ class BsonRegularExpressionTest : FreeSpec({
                 "all flags" {
                     val flags =
                         Pattern.CANON_EQ or Pattern.UNIX_LINES or 256 /* Global flag */ or Pattern.CASE_INSENSITIVE or Pattern.MULTILINE or Pattern.DOTALL or Pattern.LITERAL or Pattern.UNICODE_CASE or Pattern.COMMENTS
-                    val pattern = Pattern.compile("hello", flags)
                     PatternUtils.flagsAsEmbedded(flags) shouldBe "cdgimstux"
                 }
 

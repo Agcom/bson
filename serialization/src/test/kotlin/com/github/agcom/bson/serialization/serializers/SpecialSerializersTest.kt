@@ -4,11 +4,14 @@ import com.github.agcom.bson.serialization.BsonInstanceTest
 import com.github.agcom.bson.serialization.BsonInstanceTestDefault
 import com.github.agcom.bson.serialization.models.testBsonValuePrimitives
 import com.github.agcom.bson.serialization.utils.toBinary
+import com.github.agcom.bson.serialization.utils.toPattern
 import com.github.agcom.bson.serialization.utils.toRegex
 import io.kotest.core.spec.style.FreeSpec
 import io.kotest.matchers.shouldBe
 import kotlinx.serialization.KSerializer
 import org.bson.*
+import org.bson.types.Code
+import java.util.*
 
 class SpecialSerializersTest : BsonInstanceTest by BsonInstanceTestDefault(), FreeSpec() {
 
@@ -59,13 +62,38 @@ class SpecialSerializersTest : BsonInstanceTest by BsonInstanceTestDefault(), Fr
 
         "pattern" {
             val expectedBsonValue = testBsonValuePrimitives.filterIsInstance<BsonRegularExpression>().last()
-            val expectedPattern = expectedBsonValue.toRegex().toPattern()
+            val expectedPattern = expectedBsonValue.toPattern()
 
             val bsonValue = bson.toBson(PatternSerializer, expectedPattern)
             bsonValue shouldBe expectedBsonValue
             val pattern = bson.fromBson(PatternSerializer, expectedBsonValue)
             pattern.pattern() shouldBe expectedPattern.pattern()
             pattern.flags() shouldBe expectedPattern.flags()
+        }
+
+        "code" {
+            val bsonValue = testBsonValuePrimitives.filterIsInstance<BsonJavaScript>().first()
+            val code = Code(bsonValue.code)
+            CodeSerializer.shouldBeOk(code, bsonValue)
+        }
+
+        "byte array" {
+            val bsonValue = testBsonValuePrimitives.filterIsInstance<BsonBinary>().first()
+            bsonValue.type shouldBe BsonBinarySubType.BINARY.value
+            val bytes = bsonValue.data
+            ByteArraySerializer.shouldBeOk(bytes, bsonValue)
+        }
+
+        "uuid" {
+            val uuid = UUID.randomUUID()
+            val bsonValue = BsonBinary(uuid)
+            UUIDSerializer().shouldBeOk(uuid, bsonValue)
+        }
+
+        "date" {
+            val date = Date()
+            val bsonValue = BsonDateTime(date.time)
+            DateSerializer.shouldBeOk(date, bsonValue)
         }
 
     }
