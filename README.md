@@ -2,13 +2,13 @@
 
 [Bson](http://bsonspec.org/) serialization format implementation for [Kotlinx serialization](https://github.com/Kotlin/kotlinx.serialization), based on [The BSON library (org.mongodb.bson)](https://mvnrepository.com/artifact/org.mongodb/bson).
 
-> JVM only (#36)
+> JVM only.
 
-Also, provides useful tools to use with [MongoDB Java driver](https://mongodb.github.io/mongo-java-driver/), e.g. `SerializationCodecRegistry`.
+Also, provides useful tools to integrate with [MongoDB Java driver](https://mongodb.github.io/mongo-java-driver/). For example, the out of box `SerializationCodecRegistry`.
 
 ## Setup
 
-Currently, only supports **Kotlin 1.3.72** and **Kotlinx serialization runtime 0.20.0** (#35).
+Currently, only supports **Kotlinx serialization runtime 0.20.0**.
 
 ### Gradle
 
@@ -25,7 +25,7 @@ Currently, only supports **Kotlin 1.3.72** and **Kotlinx serialization runtime 0
   }
   ```
 
-- `*.gradle.kts`: Same as `*.gradle`, with small tweaks.
+- `*.gradle.kts`: Same as `*.gradle`, with some small tweaks.
 
 ## Usage
 
@@ -39,7 +39,7 @@ import org.bson.*
 @Serializable
 data class Project(val name: String, val language: String)
 
-val bson = Bson(BsonConfiguration.DEFAULT)
+val bson = Bson()
 
 fun main() {
     val data = Project("com.github.agcom.bson", "Kotlin")
@@ -59,11 +59,11 @@ fun main() {
 
 The following functions can be found in the `com.github.agcom.bson.serialization.Bson` class.
 
-> Doesn't support deprecated bson types (#13).
+> Doesn't support deprecated bson types.
 
-- `toBson` and `fromBson`: The above example :point_up:
+- `toBson` and `fromBson`: The above example :point_up:.
 
-- `dump` and `load`,
+- `dump` and `load`:
 
   ```kotlin
   import kotlinx.serialization.*
@@ -73,7 +73,7 @@ The following functions can be found in the `com.github.agcom.bson.serialization
   @Serializable
   data class Project(val name: String, val language: String)
   
-  val bson = Bson(BsonConfiguration.DEFAULT)
+  val bson = Bson()
   
   fun main() {
       val data = Project("com.github.agcom.bson", "Kotlin")
@@ -96,15 +96,15 @@ Various **bson types adapter serializers** can be found under `com.github.agcom.
 
 Those are all registered as default contextual serializers, so you can use `@ContextualSerializer` safely.
 
-> E.g. `BsonValueSerializer`, `TemporalSerializer` and `RegexSerializer`.
+> For example, `BsonValueSerializer`, `TemporalSerializer` and `RegexSerializer`.
 
 ### MongoDB driver extensions
 
-Provides extensions to use the serialization library with [MongoDB Java driver](https://mongodb.github.io/mongo-java-driver/).
+Provides extensions to integrate with [MongoDB Java driver](https://mongodb.github.io/mongo-java-driver/).
 
 - Serialization codec
 
-	An adapter between a *serializer* and a `Codec` instance.
+	An adapter between `KSerializer` and `Codec`.
 
 	```kotlin
 	import kotlinx.serialization.*
@@ -115,17 +115,17 @@ Provides extensions to use the serialization library with [MongoDB Java driver](
 	@Serializable
 	data class Project(val name: String, val language: String)
 	
-	val bson = Bson(BsonConfiguration.DEFAULT)
+	val bson = Bson()
 	
 	fun main() {
-	    val codec: Codec<Project> = SerializationCodec(bson, Project.serializer()) // Look here
+	    val codec: Codec<Project> serializer= SerializationCodec(bson, Project.serializer()) // Look here
 	    ...
 	}
 	```
 
 - Serialization codec registry
 
-  An adapter between a serialization `Bson` instance and `CodecRegistry`.
+  An adapter between `Bson` and `CodecRegistry`.
 
   ```kotlin
   import kotlinx.serialization.*
@@ -137,7 +137,7 @@ Provides extensions to use the serialization library with [MongoDB Java driver](
   @Serializable
   data class Project(val name: String, val language: String)
   
-  val bson = Bson(BsonConfiguration.DEFAULT)
+  val bson = Bson()
   
   fun main() {
       // Composing two registries
@@ -151,4 +151,3 @@ Provides extensions to use the serialization library with [MongoDB Java driver](
   
   > It's **recommended** to compose the serialization registry after the **default registry**. This reduces hip-hops (better performance) when working with simple bson types.
   >
-
