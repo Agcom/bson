@@ -26,8 +26,5 @@ subprojects {
         testRuntimeOnly "io.kotest:kotest-runner-console-jvm:$kotest_version" // For the Kotest Intellij plugin
     }
 
-    compileKotlin.kotlinOptions { jvmTarget = '11' }
-    compileTestKotlin.kotlinOptions { jvmTarget = '11' }
-
     test { useJUnitPlatform() }
 }
