@@ -20,8 +20,8 @@ Currently, only supports **Kotlinx serialization runtime 0.20.0**.
   }
   
   dependencies {
-      implementation 'com.github.agcom:bson-serialization:1.0.1' // The bson serialization library
-      implementation 'com.github.agcom:bson-mongodb:1.0.1' // MongoDB driver extensions
+      implementation 'com.github.agcom.bson:bson-serialization:1.0.1' // The bson serialization library
+      implementation 'com.github.agcom.bson:bson-mongodb:1.0.1' // MongoDB driver extensions
   }
   ```
 
@@ -51,7 +51,7 @@ fun main() {
     // Deserializing
     println(
         bson.fromBson(Project.serializer(), bsonValue)
-    ) // Project(name=com.github.agcom, language=Kotlin)
+    ) // Project(name=com.github.agcom.bson, language=Kotlin)
 }
 ```
 
@@ -84,7 +84,7 @@ The following functions can be found in the `com.github.agcom.bson.serialization
       // Load
       println(
           bson.load(Project.serializer(), bytes)
-      ) // Project(name=com.github.agcom, language=Kotlin)
+      ) // Project(name=com.github.agcom.bson, language=Kotlin)
   }
   ```
 
