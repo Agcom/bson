@@ -186,11 +186,14 @@ internal fun <T> Bson.readBson(
     element: BsonValue,
     deserializer: DeserializationStrategy<T>
 ): T {
-    val input = element.fold(
-        primitive = { BsonPrimitiveInput(this, it) },
-        document = { BsonTreeInput(this, it) },
-        array = { BsonTreeListInput(this, it) }
-    )
-
-    return input.decode(deserializer)
+    try {
+        val input = element.fold(
+            primitive = { BsonPrimitiveInput(this, it) },
+            document = { BsonTreeInput(this, it) },
+            array = { BsonTreeListInput(this, it) }
+        )
+        return input.decode(deserializer)
+    } catch (ex: BSONException) {
+        throw BsonDecodingException(ex.message ?: "", ex)
+    }
 }

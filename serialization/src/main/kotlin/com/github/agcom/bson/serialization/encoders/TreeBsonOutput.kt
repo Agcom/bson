@@ -216,8 +216,12 @@ private class BsonTreeListOutput(bson: Bson, nodeConsumer: (BsonValue) -> Unit) 
 }
 
 internal fun <T> Bson.writeBson(value: T, serializer: SerializationStrategy<T>): BsonValue {
-    var result: BsonValue? = null
-    val encoder = BsonTreeOutput(this) { result = it }
-    encoder.encode(serializer, value)
-    return result ?: throw BsonEncodingException("No value captured. Does your serializer calls endStructure?")
+    try {
+        var result: BsonValue? = null
+        val encoder = BsonTreeOutput(this) { result = it }
+        encoder.encode(serializer, value)
+        return result ?: throw BsonEncodingException("No value captured. Does your serializer calls endStructure?")
+    } catch (ex: BSONException) {
+        throw BsonEncodingException(ex.message ?: "", ex)
+    }
 }

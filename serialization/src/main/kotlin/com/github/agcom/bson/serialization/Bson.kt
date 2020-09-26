@@ -42,7 +42,13 @@ class Bson(
      * You can use [loadBsonArray] if you want to directly read an array, or use convertor function [toBsonArray] after reading a document.
      */
     fun loadBsonDocument(bytes: ByteArray): BsonDocument {
-        return ByteBufferBsonInput(ByteBufNIO(ByteBuffer.wrap(bytes))).use { it.readBsonDocument() }
+        return ByteBufferBsonInput(ByteBufNIO(ByteBuffer.wrap(bytes))).use {
+            try {
+                it.readBsonDocument()
+            } catch (ex: BSONException) {
+                throw BsonDecodingException(ex.message ?: "", ex)
+            }
+        }
     }
 
     /**
@@ -56,7 +62,14 @@ class Bson(
      * Write a [BsonDocument] into a [ByteArray].
      */
     fun dumpBson(bsonDocument: BsonDocument): ByteArray {
-        return BasicOutputBuffer().use { it.writeBsonDocument(bsonDocument); it.toByteArray() }
+        return BasicOutputBuffer().use {
+            try {
+                it.writeBsonDocument(bsonDocument);
+            } catch (ex: BSONException) {
+                throw BsonEncodingException(ex.message ?: "", ex)
+            }
+            it.toByteArray()
+        }
     }
 
     /**
@@ -87,16 +100,15 @@ class Bson(
     @OptIn(InternalSerializationApi::class)
     override fun <T> load(deserializer: DeserializationStrategy<T>, bytes: ByteArray): T {
         val doc = loadBsonDocument(bytes)
-        val array by lazy { doc.toBsonArray() }
+        val array by lazy(mode = LazyThreadSafetyMode.NONE) { doc.toBsonArray() }
 
         fun trialAndError(): T {
-            // Trial and error
             return try {
                 fromBson(deserializer, doc)
-            } catch (docEx: BsonException) {
+            } catch (docEx: BsonException) { // Document failed
                 try {
                     fromBson(deserializer, array ?: throw BsonDecodingException("Not a bson array"))
-                } catch (arrayEx: BsonException) {
+                } catch (arrayEx: BsonException) { // Array failed
                     docEx.addSuppressed(arrayEx)
                     throw docEx
                 }

@@ -7,14 +7,14 @@ import kotlinx.serialization.SerializationException
  *
  * Don't confuse it with [org.bson.BSONException], although it also may be thrown (issue #12).
  */
-sealed class BsonException(final override val message: String) : SerializationException(message)
+sealed class BsonException(message: String, cause: Throwable? = null) : SerializationException(message, cause)
 
 /**
  * A problem in the serialization process.
  */
-class BsonEncodingException(message: String) : BsonException(message)
+class BsonEncodingException(message: String, cause: Throwable? = null) : BsonException(message, cause)
 
 /**
  * A problem in the deserialization process.
  */
-class BsonDecodingException(message: String) : BsonException(message)
+class BsonDecodingException(message: String, cause: Throwable? = null) : BsonException(message, cause)
