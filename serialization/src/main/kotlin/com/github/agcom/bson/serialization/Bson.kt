@@ -127,20 +127,6 @@ class Bson(
         }
     }
 
-    /**
-     * This function was declared to semi-bypass the issue with inferring bytes bson type.
-     *
-     * @param type The expected bson type of the [bytes]. E.g. [BsonType.DOCUMENT].
-     */
-    @Deprecated(
-        "Ports to the main load function; Loading primitives are no longer supported",
-        ReplaceWith("load(deserializer, bytes)")
-    )
-    @Suppress("UNUSED_PARAMETER")
-    fun <T> load(deserializer: DeserializationStrategy<T>, bytes: ByteArray, type: BsonType): T {
-        return load(deserializer, bytes)
-    }
-
 }
 
 private val defaultBsonModule: SerialModule = SerializersModule {
