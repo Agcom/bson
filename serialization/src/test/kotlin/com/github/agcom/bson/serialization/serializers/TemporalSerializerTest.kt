@@ -39,11 +39,11 @@ class TemporalSerializerTest : FreeSpec(), BsonInstanceTest by BsonInstanceTestD
         }
 
         "local date" {
-            LocalDateSerializer shouldBeOk LocalDate.ofInstant(testInstant, ZoneId.systemDefault())
+            LocalDateSerializer shouldBeOk LocalDateTime.ofInstant(testInstant, ZoneId.systemDefault()).toLocalDate()
         }
 
         "local time" {
-            LocalTimeSerializer shouldBeOk LocalTime.ofInstant(testInstant, ZoneId.systemDefault())
+            LocalTimeSerializer shouldBeOk LocalDateTime.ofInstant(testInstant, ZoneId.systemDefault()).toLocalTime()
         }
 
         "offset date time" {
