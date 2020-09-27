@@ -59,7 +59,7 @@ fun main() {
 
 The following functions can be found in the `com.github.agcom.bson.serialization.Bson` class.
 
-> Doesn't support deprecated bson types.
+> Doesn't support some of deprecated bson types.
 
 - `toBson` and `fromBson`: The above example :point_up:.
 

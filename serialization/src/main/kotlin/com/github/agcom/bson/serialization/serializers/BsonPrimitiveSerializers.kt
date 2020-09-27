@@ -21,9 +21,9 @@ import org.bson.BsonType.*
  * - [BsonInt64]
  * - [BsonDecimal128]
  * - [BsonRegularExpression]
- *
- * Note: Doesn't support deprecated or internal types:
  * - [BsonDbPointer]
+ *
+ * Note: Doesn't support some of deprecated or internal types:
  * - [BsonJavaScriptWithScope]
  * - [BsonMaxKey]
  * - [BsonMinKey]
@@ -60,6 +60,7 @@ object BsonPrimitiveSerializer : KSerializer<BsonValue> {
                     INT64 -> encoder.encode(BsonInt64Serializer, it.asInt64())
                     DECIMAL128 -> encoder.encode(BsonDecimal128Serializer, it.asDecimal128())
                     REGULAR_EXPRESSION -> encoder.encode(BsonRegularExpressionSerializer, it.asRegularExpression())
+                    DB_POINTER -> encoder.encode(BsonDbPointerSerializer, it.asDBPointer())
                     else -> throw RuntimeException("Should not reach here")
                 }
             }
@@ -340,4 +341,26 @@ object BsonNumberSerializer : KSerializer<BsonNumber> {
         decoder.verify(); decoder as BsonInput
         return decoder.decodeBson().asNumber()
     }
+}
+
+/**
+ * External serializer for [BsonDbPointer].
+ *
+ * Can only be used with [Bson][com.github.agcom.bson.serialization.Bson] format.
+ */
+object BsonDbPointerSerializer : KSerializer<BsonDbPointer> {
+
+    override val descriptor: SerialDescriptor =
+        PrimitiveDescriptor(BsonDbPointer::class.qualifiedName!!, PrimitiveKind.STRING)
+
+    override fun serialize(encoder: Encoder, value: BsonDbPointer) {
+        encoder.verify(); encoder as BsonOutput
+        encoder.encodeDbPointer(value)
+    }
+
+    override fun deserialize(decoder: Decoder): BsonDbPointer {
+        decoder.verify(); decoder as BsonInput
+        return decoder.decodeDbPointer()
+    }
+
 }

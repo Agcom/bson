@@ -3,6 +3,7 @@ package com.github.agcom.bson.serialization.encoders
 import com.github.agcom.bson.serialization.Bson
 import kotlinx.serialization.CompositeEncoder
 import kotlinx.serialization.Encoder
+import org.bson.BsonDbPointer
 import org.bson.BsonValue
 import org.bson.types.Binary
 import org.bson.types.Decimal128
@@ -50,5 +51,10 @@ interface BsonOutput : Encoder, CompositeEncoder {
      * Write a [bson regular expression][org.bson.BsonRegularExpression] value.
      */
     fun encodeRegularExpression(pattern: Pattern)
+
+    /**
+     * Write a [bson db pointer][org.bson.BsonDbPointer] value.
+     */
+    fun encodeDbPointer(pointer: BsonDbPointer)
 
 }

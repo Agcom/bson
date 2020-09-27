@@ -57,6 +57,7 @@ private sealed class AbstractBsonTreeOutput(
     private fun encodeTaggedDecimal128(tag: String, value: Decimal128) = putElement(tag, BsonDecimal128(value))
     private fun encodeTaggedRegularExpression(tag: String, value: Pattern) =
         putElement(tag, value.toBsonRegularExpression())
+    private fun encodeTaggedDbPointer(tag: String, value: BsonDbPointer) = putElement(tag, value)
 
     private fun encodeTaggedBson(tag: String, value: BsonValue) = putElement(tag, value)
 
@@ -66,6 +67,7 @@ private sealed class AbstractBsonTreeOutput(
     override fun encodeJavaScript(code: String) = encodeTaggedJavaScript(popTag(), code)
     override fun encodeDecimal128(decimal: Decimal128) = encodeTaggedDecimal128(popTag(), decimal)
     override fun encodeRegularExpression(pattern: Pattern) = encodeTaggedRegularExpression(popTag(), pattern)
+    override fun encodeDbPointer(pointer: BsonDbPointer) = encodeTaggedDbPointer(popTag(), pointer)
 
     private fun checkClassDiscriminatorConflict(serializer: SerializationStrategy<*>) {
         if (bson.configuration.classDiscriminator in serializer.descriptor.elementNames())

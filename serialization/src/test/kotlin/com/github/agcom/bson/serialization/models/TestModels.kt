@@ -48,7 +48,8 @@ val testBsonValuePrimitives: List<BsonValue>
         BsonObjectId(ObjectId()),
         BsonRegularExpression("hello"),
         BsonRegularExpression("hello", "cdgimstux"),
-        BsonString("hello")
+        BsonString("hello"),
+        BsonDbPointer("hello.world", ObjectId())
     )
 
 fun testBsonDocument(): BsonDocument = BsonDocument().also { doc ->

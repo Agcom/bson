@@ -767,6 +767,10 @@ class BsonTest : BsonInstanceTest by BsonInstanceTestDefault(), FreeSpec() {
                     bson.context.getContextual(BsonString::class) shouldBe BsonStringSerializer
                 }
 
+                "bson db pointer" {
+                    bson.context.getContextual(BsonDbPointer::class) shouldBe BsonDbPointerSerializer
+                }
+
             }
 
             "binary" {
