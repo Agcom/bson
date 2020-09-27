@@ -4,6 +4,7 @@ import com.github.agcom.bson.serialization.Bson
 import kotlinx.serialization.CompositeDecoder
 import kotlinx.serialization.Decoder
 import org.bson.BsonDbPointer
+import org.bson.BsonJavaScriptWithScope
 import org.bson.BsonValue
 import org.bson.types.Binary
 import org.bson.types.Decimal128
@@ -59,5 +60,10 @@ interface BsonInput : Decoder, CompositeDecoder {
      * Read a [bson db pointer][org.bson.BsonDbPointer] value.
      */
     fun decodeDbPointer(): BsonDbPointer
+
+    /**
+     * Read a [bson java script with scope][org.bson.BsonJavaScriptWithScope] value.
+     */
+    fun decodeJavaScriptWithScope(): BsonJavaScriptWithScope
 
 }

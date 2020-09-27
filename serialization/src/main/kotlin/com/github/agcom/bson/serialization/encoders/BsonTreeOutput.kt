@@ -58,6 +58,7 @@ private sealed class AbstractBsonTreeOutput(
     private fun encodeTaggedRegularExpression(tag: String, value: Pattern) =
         putElement(tag, value.toBsonRegularExpression())
     private fun encodeTaggedDbPointer(tag: String, value: BsonDbPointer) = putElement(tag, value)
+    private fun encodeTaggerJavaScriptWithScope(tag: String, value: BsonJavaScriptWithScope) = putElement(tag, value)
 
     private fun encodeTaggedBson(tag: String, value: BsonValue) = putElement(tag, value)
 
@@ -68,6 +69,7 @@ private sealed class AbstractBsonTreeOutput(
     override fun encodeDecimal128(decimal: Decimal128) = encodeTaggedDecimal128(popTag(), decimal)
     override fun encodeRegularExpression(pattern: Pattern) = encodeTaggedRegularExpression(popTag(), pattern)
     override fun encodeDbPointer(pointer: BsonDbPointer) = encodeTaggedDbPointer(popTag(), pointer)
+    override fun encodeJavaScriptWithScope(jsWithScope: BsonJavaScriptWithScope) = encodeTaggerJavaScriptWithScope(popTag(), jsWithScope)
 
     private fun checkClassDiscriminatorConflict(serializer: SerializationStrategy<*>) {
         if (bson.configuration.classDiscriminator in serializer.descriptor.elementNames())

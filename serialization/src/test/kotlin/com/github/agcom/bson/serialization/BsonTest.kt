@@ -771,6 +771,10 @@ class BsonTest : BsonInstanceTest by BsonInstanceTestDefault(), FreeSpec() {
                     bson.context.getContextual(BsonDbPointer::class) shouldBe BsonDbPointerSerializer
                 }
 
+                "bson java script with scope" {
+                    bson.context.getContextual(BsonJavaScriptWithScope::class) shouldBe BsonJavaScriptWithScopeSerializer
+                }
+
             }
 
             "binary" {

@@ -147,6 +147,7 @@ private val defaultBsonModule: SerialModule = SerializersModule {
     contextual(BsonRegularExpressionSerializer)
     contextual(BsonStringSerializer)
     contextual(BsonDbPointerSerializer)
+    contextual(BsonJavaScriptWithScopeSerializer)
 
     contextual(BinarySerializer)
     contextual(ObjectIdSerializer)

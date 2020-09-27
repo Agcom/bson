@@ -61,6 +61,10 @@ object BsonPrimitiveSerializer : KSerializer<BsonValue> {
                     DECIMAL128 -> encoder.encode(BsonDecimal128Serializer, it.asDecimal128())
                     REGULAR_EXPRESSION -> encoder.encode(BsonRegularExpressionSerializer, it.asRegularExpression())
                     DB_POINTER -> encoder.encode(BsonDbPointerSerializer, it.asDBPointer())
+                    JAVASCRIPT_WITH_SCOPE -> encoder.encode(
+                        BsonJavaScriptWithScopeSerializer,
+                        it.asJavaScriptWithScope()
+                    )
                     else -> throw RuntimeException("Should not reach here")
                 }
             }
@@ -363,4 +367,25 @@ object BsonDbPointerSerializer : KSerializer<BsonDbPointer> {
         return decoder.decodeDbPointer()
     }
 
+}
+
+/**
+ * External serializer for [BsonJavaScriptWithScope].
+ *
+ * Can only be used with [Bson][com.github.agcom.bson.serialization.Bson] format.
+ */
+object BsonJavaScriptWithScopeSerializer : KSerializer<BsonJavaScriptWithScope> {
+
+    override val descriptor: SerialDescriptor =
+        PrimitiveDescriptor(BsonJavaScriptWithScope::class.qualifiedName!!, PrimitiveKind.STRING)
+
+    override fun serialize(encoder: Encoder, value: BsonJavaScriptWithScope) {
+        encoder.verify(); encoder as BsonOutput
+        encoder.encodeJavaScriptWithScope(value)
+    }
+
+    override fun deserialize(decoder: Decoder): BsonJavaScriptWithScope {
+        decoder.verify(); decoder as BsonInput
+        return decoder.decodeJavaScriptWithScope()
+    }
 }

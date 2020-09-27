@@ -72,6 +72,7 @@ private sealed class AbstractBsonTreeInput(
     override fun decodeDecimal128(): Decimal128 = decodeTaggedDecimal128(popTag())
     override fun decodeRegularExpression(): Pattern = decodeTaggedRegularExpression(popTag())
     override fun decodeDbPointer(): BsonDbPointer = decodeTaggedDbPointer(popTag())
+    override fun decodeJavaScriptWithScope(): BsonJavaScriptWithScope = decodeTaggerJavaScriptWithScope(popTag())
 
     override fun decodeTaggedEnum(tag: String, enumDescription: SerialDescriptor): Int =
         enumDescription.getElementIndexOrThrow(getValue(tag).asString().value)
@@ -94,6 +95,7 @@ private sealed class AbstractBsonTreeInput(
     private fun decodeTaggedDecimal128(tag: String): Decimal128 = getValue(tag).asDecimal128().value
     private fun decodeTaggedRegularExpression(tag: String): Pattern = getValue(tag).asRegularExpression().toPattern()
     private fun decodeTaggedDbPointer(tag: String): BsonDbPointer = getValue(tag).asDBPointer()
+    private fun decodeTaggerJavaScriptWithScope(tag: String): BsonJavaScriptWithScope = getValue(tag).asJavaScriptWithScope()
 
 }
 
