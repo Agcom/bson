@@ -171,7 +171,6 @@ object PatternSerializer : KSerializer<Pattern> {
  * Corresponds to [BsonRegularExpression][org.bson.BsonRegularExpression] type.
  *
  * Can only be used with [Bson][com.github.agcom.bson.serialization.Bson] format.
- * Uses [BsonOutput.encodeRegularExpression] / [BsonInput.decodeRegularExpression]
  */
 @Serializer(Regex::class)
 object RegexSerializer : KSerializer<Regex> {
@@ -198,7 +197,6 @@ object RegexSerializer : KSerializer<Regex> {
  * Corresponds to [BsonJavaScript][org.bson.BsonJavaScript] type.
  *
  * Can only be used with [Bson][com.github.agcom.bson.serialization.Bson] format.
- * Uses [BsonOutput.encodeJavaScript] / [BsonInput.decodeJavaScript]
  */
 object CodeSerializer : KSerializer<Code> {
 
@@ -224,7 +222,6 @@ object CodeSerializer : KSerializer<Code> {
  * Corresponds to [BsonBinary][org.bson.BsonBinary] type.
  *
  * Can only be used with [Bson][com.github.agcom.bson.serialization.Bson] format.
- * Uses [BsonOutput.encodeJavaScript] / [BsonInput.decodeJavaScript]
  */
 object ByteArraySerializer : KSerializer<ByteArray> {
 
@@ -257,7 +254,6 @@ object ByteArraySerializer : KSerializer<ByteArray> {
  * Corresponds to [BsonBinary][org.bson.BsonBinary] type.
  *
  * Can only be used with [Bson][com.github.agcom.bson.serialization.Bson] format.
- * Uses [BsonOutput.encodeJavaScript] / [BsonInput.decodeJavaScript]
  */
 class UUIDSerializer(private val uuidRepresentation: UuidRepresentation = UuidRepresentation.STANDARD) :
     KSerializer<UUID> {
@@ -292,7 +288,6 @@ class UUIDSerializer(private val uuidRepresentation: UuidRepresentation = UuidRe
  * Corresponds to [BsonDateTime][org.bson.BsonDateTime] type.
  *
  * Can only be used with [Bson][com.github.agcom.bson.serialization.Bson] format.
- * Uses [BsonOutput.encodeJavaScript] / [BsonInput.decodeJavaScript]
  */
 object DateSerializer : KSerializer<Date> {
 
