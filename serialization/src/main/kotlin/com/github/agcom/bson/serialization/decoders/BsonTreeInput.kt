@@ -13,6 +13,7 @@ import kotlinx.serialization.modules.SerialModule
 import org.bson.*
 import org.bson.types.Binary
 import org.bson.types.Decimal128
+import org.bson.types.MaxKey
 import org.bson.types.ObjectId
 import java.util.regex.Pattern
 
@@ -73,6 +74,7 @@ private sealed class AbstractBsonTreeInput(
     override fun decodeRegularExpression(): Pattern = decodeTaggedRegularExpression(popTag())
     override fun decodeDbPointer(): BsonDbPointer = decodeTaggedDbPointer(popTag())
     override fun decodeJavaScriptWithScope(): BsonJavaScriptWithScope = decodeTaggerJavaScriptWithScope(popTag())
+    override fun decodeMaxKey(): MaxKey = decodeTaggerMaxKey(popTag())
 
     override fun decodeTaggedEnum(tag: String, enumDescription: SerialDescriptor): Int =
         enumDescription.getElementIndexOrThrow(getValue(tag).asString().value)
@@ -95,7 +97,13 @@ private sealed class AbstractBsonTreeInput(
     private fun decodeTaggedDecimal128(tag: String): Decimal128 = getValue(tag).asDecimal128().value
     private fun decodeTaggedRegularExpression(tag: String): Pattern = getValue(tag).asRegularExpression().toPattern()
     private fun decodeTaggedDbPointer(tag: String): BsonDbPointer = getValue(tag).asDBPointer()
-    private fun decodeTaggerJavaScriptWithScope(tag: String): BsonJavaScriptWithScope = getValue(tag).asJavaScriptWithScope()
+    private fun decodeTaggerJavaScriptWithScope(tag: String): BsonJavaScriptWithScope =
+        getValue(tag).asJavaScriptWithScope()
+    private fun decodeTaggerMaxKey(tag: String): MaxKey = getValue(tag).let {
+        it as? BsonMaxKey
+            ?: throw BsonInvalidOperationException("Value expected to be of type ${BsonType.MAX_KEY} is of unexpected type ${it.bsonType}")
+        MaxKey()
+    }
 
 }
 

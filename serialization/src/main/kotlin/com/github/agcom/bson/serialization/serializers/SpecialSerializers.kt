@@ -4,12 +4,10 @@ import com.github.agcom.bson.serialization.decoders.BsonInput
 import com.github.agcom.bson.serialization.encoders.BsonOutput
 import kotlinx.serialization.*
 import org.bson.BsonBinarySubType
+import org.bson.BsonMaxKey
 import org.bson.UuidRepresentation
 import org.bson.internal.UuidHelper
-import org.bson.types.Binary
-import org.bson.types.Code
-import org.bson.types.Decimal128
-import org.bson.types.ObjectId
+import org.bson.types.*
 import java.util.*
 import java.util.regex.Pattern
 
@@ -306,6 +304,31 @@ object DateSerializer : KSerializer<Date> {
     override fun deserialize(decoder: Decoder): Date {
         decoder.verify()
         return Date(decoder.decode(DateTimeSerializer))
+    }
+
+}
+
+/**
+ * [MaxKey] serializer.
+ *
+ * Corresponds to [BsonMaxKey][org.bson.BsonMaxKey] type.
+ *
+ * Can only be used with [Bson][com.github.agcom.bson.serialization.Bson] format.
+ */
+object MaxKeySerializer : KSerializer<MaxKey> {
+
+    override val descriptor: SerialDescriptor
+        get() = BsonMaxKeySerializer.descriptor
+
+    override fun serialize(encoder: Encoder, value: MaxKey) {
+        encoder.verify()
+        encoder.encode(BsonMaxKeySerializer, BsonMaxKey())
+    }
+
+    override fun deserialize(decoder: Decoder): MaxKey {
+        decoder.verify()
+        decoder.decode(BsonMaxKeySerializer)
+        return MaxKey()
     }
 
 }

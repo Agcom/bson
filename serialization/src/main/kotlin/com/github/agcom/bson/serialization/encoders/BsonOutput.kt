@@ -8,6 +8,7 @@ import org.bson.BsonJavaScriptWithScope
 import org.bson.BsonValue
 import org.bson.types.Binary
 import org.bson.types.Decimal128
+import org.bson.types.MaxKey
 import org.bson.types.ObjectId
 import java.util.regex.Pattern
 
@@ -62,5 +63,10 @@ interface BsonOutput : Encoder, CompositeEncoder {
      * Write a [bson java script with scope][org.bson.BsonJavaScriptWithScope] value.
      */
     fun encodeJavaScriptWithScope(jsWithScope: BsonJavaScriptWithScope)
+
+    /**
+     * Write a [bson max key][org.bson.BsonMaxKey] value.
+     */
+    fun encodeMaxKey(maxKey: MaxKey = MaxKey())
 
 }

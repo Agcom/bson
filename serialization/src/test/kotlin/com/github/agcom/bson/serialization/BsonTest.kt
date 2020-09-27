@@ -13,10 +13,7 @@ import io.kotest.matchers.types.shouldBeInstanceOf
 import kotlinx.serialization.builtins.*
 import org.bson.*
 import org.bson.io.BasicOutputBuffer
-import org.bson.types.Binary
-import org.bson.types.Code
-import org.bson.types.Decimal128
-import org.bson.types.ObjectId
+import org.bson.types.*
 import java.time.*
 import java.time.temporal.Temporal
 import java.time.temporal.TemporalAccessor
@@ -118,6 +115,11 @@ class BsonTest : BsonInstanceTest by BsonInstanceTestDefault(), FreeSpec() {
                     "enum kind" {
                         val enum = HttpError.NOT_FOUND
                         bson.toBson(HttpError.serializer(), enum) shouldBe BsonString(enum.name)
+                    }
+
+                    "max key" {
+                        val maxKey = MaxKey()
+                        bson.toBson(MaxKeySerializer, maxKey) shouldBe BsonMaxKey()
                     }
 
                 }
@@ -310,6 +312,11 @@ class BsonTest : BsonInstanceTest by BsonInstanceTestDefault(), FreeSpec() {
                     "enum kind" {
                         val enum = HttpError.NOT_FOUND
                         bson.fromBson(HttpError.serializer(), BsonString(enum.name)) shouldBe enum
+                    }
+
+                    "max key" {
+                        val maxKey = MaxKey()
+                        bson.fromBson(MaxKeySerializer, BsonMaxKey()) shouldBe maxKey
                     }
 
                 }
@@ -775,6 +782,10 @@ class BsonTest : BsonInstanceTest by BsonInstanceTestDefault(), FreeSpec() {
                     bson.context.getContextual(BsonJavaScriptWithScope::class) shouldBe BsonJavaScriptWithScopeSerializer
                 }
 
+                "bson max key" {
+                    bson.context.getContextual(BsonMaxKey::class) shouldBe BsonMaxKeySerializer
+                }
+
             }
 
             "binary" {
@@ -795,6 +806,10 @@ class BsonTest : BsonInstanceTest by BsonInstanceTestDefault(), FreeSpec() {
 
             "pattern" {
                 bson.context.getContextual(Pattern::class) shouldBe PatternSerializer
+            }
+
+            "max key" {
+                bson.context.getContextual(MaxKey::class) shouldBe MaxKeySerializer
             }
 
             "temporals" - {

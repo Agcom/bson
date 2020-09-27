@@ -14,6 +14,7 @@ import org.bson.*
 import org.bson.BsonType.*
 import org.bson.types.Binary
 import org.bson.types.Decimal128
+import org.bson.types.MaxKey
 import org.bson.types.ObjectId
 import java.util.regex.Pattern
 
@@ -59,6 +60,8 @@ private sealed class AbstractBsonTreeOutput(
         putElement(tag, value.toBsonRegularExpression())
     private fun encodeTaggedDbPointer(tag: String, value: BsonDbPointer) = putElement(tag, value)
     private fun encodeTaggerJavaScriptWithScope(tag: String, value: BsonJavaScriptWithScope) = putElement(tag, value)
+    @Suppress("UNUSED_PARAMETER")
+    private fun encodeTaggedMaxKey(tag: String, value: MaxKey) = putElement(tag, BsonMaxKey())
 
     private fun encodeTaggedBson(tag: String, value: BsonValue) = putElement(tag, value)
 
@@ -70,6 +73,7 @@ private sealed class AbstractBsonTreeOutput(
     override fun encodeRegularExpression(pattern: Pattern) = encodeTaggedRegularExpression(popTag(), pattern)
     override fun encodeDbPointer(pointer: BsonDbPointer) = encodeTaggedDbPointer(popTag(), pointer)
     override fun encodeJavaScriptWithScope(jsWithScope: BsonJavaScriptWithScope) = encodeTaggerJavaScriptWithScope(popTag(), jsWithScope)
+    override fun encodeMaxKey(maxKey: MaxKey) = encodeTaggedMaxKey(popTag(), maxKey)
 
     private fun checkClassDiscriminatorConflict(serializer: SerializationStrategy<*>) {
         if (bson.configuration.classDiscriminator in serializer.descriptor.elementNames())

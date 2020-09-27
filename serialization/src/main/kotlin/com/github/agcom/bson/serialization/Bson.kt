@@ -148,6 +148,7 @@ private val defaultBsonModule: SerialModule = SerializersModule {
     contextual(BsonStringSerializer)
     contextual(BsonDbPointerSerializer)
     contextual(BsonJavaScriptWithScopeSerializer)
+    contextual(BsonMaxKeySerializer)
 
     contextual(BinarySerializer)
     contextual(ObjectIdSerializer)
@@ -158,6 +159,7 @@ private val defaultBsonModule: SerialModule = SerializersModule {
     contextual(ByteArraySerializer)
     contextual(UUIDSerializer())
     contextual(DateSerializer)
+    contextual(MaxKeySerializer)
 
     include(bsonTemporalModule)
 }
