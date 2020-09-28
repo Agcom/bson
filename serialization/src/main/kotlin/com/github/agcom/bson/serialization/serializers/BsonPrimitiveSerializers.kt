@@ -6,6 +6,8 @@ import com.github.agcom.bson.serialization.utils.*
 import kotlinx.serialization.*
 import org.bson.*
 import org.bson.BsonType.*
+import org.bson.types.MaxKey
+import org.bson.types.MinKey
 
 /**
  * External serializer for bson primitive types (anything other than [BsonDocument] and [BsonArray]):
@@ -21,15 +23,13 @@ import org.bson.BsonType.*
  * - [BsonInt64]
  * - [BsonDecimal128]
  * - [BsonRegularExpression]
- *
- * Note: Doesn't support deprecated or internal types:
  * - [BsonDbPointer]
- * - [BsonJavaScriptWithScope]
  * - [BsonMaxKey]
  * - [BsonMinKey]
  * - [BsonSymbol]
- * - [BsonTimestamp]
  * - [BsonUndefined]
+ * - [BsonJavaScriptWithScope]
+ * - [BsonTimestamp]
  *
  * Can only be used with [Bson][com.github.agcom.bson.serialization.Bson] format.
  */
@@ -60,6 +60,27 @@ object BsonPrimitiveSerializer : KSerializer<BsonValue> {
                     INT64 -> encoder.encode(BsonInt64Serializer, it.asInt64())
                     DECIMAL128 -> encoder.encode(BsonDecimal128Serializer, it.asDecimal128())
                     REGULAR_EXPRESSION -> encoder.encode(BsonRegularExpressionSerializer, it.asRegularExpression())
+                    DB_POINTER -> encoder.encode(BsonDbPointerSerializer, it.asDBPointer())
+                    JAVASCRIPT_WITH_SCOPE -> encoder.encode(
+                        BsonJavaScriptWithScopeSerializer,
+                        it.asJavaScriptWithScope()
+                    )
+                    MAX_KEY -> encoder.encode(
+                        BsonMaxKeySerializer,
+                        it as? BsonMaxKey
+                            ?: throw BsonInvalidOperationException("Value expected to be of type $MAX_KEY is of unexpected type ${it.bsonType}")
+                    )
+                    MIN_KEY -> encoder.encode(
+                        BsonMinKeySerializer,
+                        it as? BsonMinKey
+                            ?: throw BsonInvalidOperationException("Value expected to be of type $MIN_KEY is of unexpected type ${it.bsonType}")
+                    )
+                    SYMBOL -> encoder.encode(BsonSymbolSerializer, it.asSymbol())
+                    UNDEFINED -> encoder.encode(
+                        BsonUndefinedSerializer, it as? BsonUndefined
+                            ?: throw BsonInvalidOperationException("Value expected to be of type ${UNDEFINED} is of unexpected type ${it.bsonType}")
+                    )
+                    TIMESTAMP -> encoder.encode(BsonTimestampSerializer, it.asTimestamp())
                     else -> throw RuntimeException("Should not reach here")
                 }
             }
@@ -340,4 +361,159 @@ object BsonNumberSerializer : KSerializer<BsonNumber> {
         decoder.verify(); decoder as BsonInput
         return decoder.decodeBson().asNumber()
     }
+}
+
+/**
+ * External serializer for [BsonDbPointer].
+ *
+ * Can only be used with [Bson][com.github.agcom.bson.serialization.Bson] format.
+ */
+object BsonDbPointerSerializer : KSerializer<BsonDbPointer> {
+
+    override val descriptor: SerialDescriptor =
+        PrimitiveDescriptor(BsonDbPointer::class.qualifiedName!!, PrimitiveKind.STRING)
+
+    override fun serialize(encoder: Encoder, value: BsonDbPointer) {
+        encoder.verify(); encoder as BsonOutput
+        encoder.encodeDbPointer(value)
+    }
+
+    override fun deserialize(decoder: Decoder): BsonDbPointer {
+        decoder.verify(); decoder as BsonInput
+        return decoder.decodeDbPointer()
+    }
+
+}
+
+/**
+ * External serializer for [BsonJavaScriptWithScope].
+ *
+ * Can only be used with [Bson][com.github.agcom.bson.serialization.Bson] format.
+ */
+object BsonJavaScriptWithScopeSerializer : KSerializer<BsonJavaScriptWithScope> {
+
+    override val descriptor: SerialDescriptor =
+        PrimitiveDescriptor(BsonJavaScriptWithScope::class.qualifiedName!!, PrimitiveKind.STRING)
+
+    override fun serialize(encoder: Encoder, value: BsonJavaScriptWithScope) {
+        encoder.verify(); encoder as BsonOutput
+        encoder.encodeJavaScriptWithScope(value)
+    }
+
+    override fun deserialize(decoder: Decoder): BsonJavaScriptWithScope {
+        decoder.verify(); decoder as BsonInput
+        return decoder.decodeJavaScriptWithScope()
+    }
+}
+
+/**
+ * External serializer for [BsonMaxKey].
+ *
+ * Can only be used with [Bson][com.github.agcom.bson.serialization.Bson] format.
+ */
+object BsonMaxKeySerializer : KSerializer<BsonMaxKey> {
+
+    override val descriptor: SerialDescriptor =
+        PrimitiveDescriptor(BsonMaxKey::class.qualifiedName!!, PrimitiveKind.BYTE)
+
+    override fun serialize(encoder: Encoder, value: BsonMaxKey) {
+        encoder.verify(); encoder as BsonOutput
+        encoder.encodeMaxKey(MaxKey())
+    }
+
+    override fun deserialize(decoder: Decoder): BsonMaxKey {
+        decoder.verify(); decoder as BsonInput
+        decoder.decodeMaxKey()
+        return BsonMaxKey()
+    }
+
+}
+
+/**
+ * External serializer for [BsonMinKey].
+ *
+ * Can only be used with [Bson][com.github.agcom.bson.serialization.Bson] format.
+ */
+object BsonMinKeySerializer : KSerializer<BsonMinKey> {
+
+    override val descriptor: SerialDescriptor =
+        PrimitiveDescriptor(BsonMinKey::class.qualifiedName!!, PrimitiveKind.BYTE)
+
+    override fun serialize(encoder: Encoder, value: BsonMinKey) {
+        encoder.verify(); encoder as BsonOutput
+        encoder.encodeMinKey(MinKey())
+    }
+
+    override fun deserialize(decoder: Decoder): BsonMinKey {
+        decoder.verify(); decoder as BsonInput
+        decoder.decodeMinKey()
+        return BsonMinKey()
+    }
+
+}
+
+/**
+ * External serializer for [BsonSymbol].
+ *
+ * Can only be used with [Bson][com.github.agcom.bson.serialization.Bson] format.
+ */
+object BsonSymbolSerializer : KSerializer<BsonSymbol> {
+
+    override val descriptor: SerialDescriptor =
+        PrimitiveDescriptor(BsonSymbol::class.qualifiedName!!, PrimitiveKind.STRING)
+
+    override fun serialize(encoder: Encoder, value: BsonSymbol) {
+        encoder.verify(); encoder as BsonOutput
+        encoder.encodeSymbol(value.symbol)
+    }
+
+    override fun deserialize(decoder: Decoder): BsonSymbol {
+        decoder.verify(); decoder as BsonInput
+        return BsonSymbol(decoder.decodeSymbol())
+    }
+
+}
+
+/**
+ * External serializer for [BsonUndefined].
+ *
+ * Can only be used with [Bson][com.github.agcom.bson.serialization.Bson] format.
+ */
+object BsonUndefinedSerializer : KSerializer<BsonUndefined> {
+
+    override val descriptor: SerialDescriptor =
+        PrimitiveDescriptor(BsonUndefined::class.qualifiedName!!, PrimitiveKind.BYTE)
+
+    override fun serialize(encoder: Encoder, value: BsonUndefined) {
+        encoder.verify(); encoder as BsonOutput
+        encoder.encodeUndefined(value)
+    }
+
+    override fun deserialize(decoder: Decoder): BsonUndefined {
+        decoder.verify(); decoder as BsonInput
+        return decoder.decodeUndefined()
+    }
+
+}
+
+/**
+ * External serializer for [BsonTimestamp].
+ *
+ * Can only be used with [Bson][com.github.agcom.bson.serialization.Bson] format.
+ */
+object BsonTimestampSerializer : KSerializer<BsonTimestamp> {
+
+    override val descriptor: SerialDescriptor =
+        PrimitiveDescriptor(BsonTimestamp::class.qualifiedName!!, PrimitiveKind.LONG)
+
+    override fun serialize(encoder: Encoder, value: BsonTimestamp) {
+        encoder.verify(); encoder as BsonOutput
+        encoder.encodeTimestamp(value)
+    }
+
+    override fun deserialize(decoder: Decoder): BsonTimestamp {
+        decoder.verify(); decoder as BsonInput
+        return decoder.decodeTimestamp()
+    }
+
 }

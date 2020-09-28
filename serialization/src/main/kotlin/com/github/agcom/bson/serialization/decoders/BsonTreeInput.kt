@@ -11,9 +11,7 @@ import kotlinx.serialization.internal.AbstractPolymorphicSerializer
 import kotlinx.serialization.internal.NamedValueDecoder
 import kotlinx.serialization.modules.SerialModule
 import org.bson.*
-import org.bson.types.Binary
-import org.bson.types.Decimal128
-import org.bson.types.ObjectId
+import org.bson.types.*
 import java.util.regex.Pattern
 
 @OptIn(InternalSerializationApi::class)
@@ -71,6 +69,13 @@ private sealed class AbstractBsonTreeInput(
     override fun decodeJavaScript(): String = decodeTaggedJavaScript(popTag())
     override fun decodeDecimal128(): Decimal128 = decodeTaggedDecimal128(popTag())
     override fun decodeRegularExpression(): Pattern = decodeTaggedRegularExpression(popTag())
+    override fun decodeDbPointer(): BsonDbPointer = decodeTaggedDbPointer(popTag())
+    override fun decodeJavaScriptWithScope(): BsonJavaScriptWithScope = decodeTaggedJavaScriptWithScope(popTag())
+    override fun decodeMaxKey(): MaxKey = decodeTaggedMaxKey(popTag())
+    override fun decodeMinKey(): MinKey = decodeTaggedMinKey(popTag())
+    override fun decodeSymbol(): String = decodeTaggedSymbol(popTag())
+    override fun decodeUndefined(): BsonUndefined = decodeTaggedUndefined(popTag())
+    override fun decodeTimestamp(): BsonTimestamp = decodeTaggedTimestamp(popTag())
 
     override fun decodeTaggedEnum(tag: String, enumDescription: SerialDescriptor): Int =
         enumDescription.getElementIndexOrThrow(getValue(tag).asString().value)
@@ -92,6 +97,29 @@ private sealed class AbstractBsonTreeInput(
     private fun decodeTaggedJavaScript(tag: String): String = getValue(tag).asJavaScript().code
     private fun decodeTaggedDecimal128(tag: String): Decimal128 = getValue(tag).asDecimal128().value
     private fun decodeTaggedRegularExpression(tag: String): Pattern = getValue(tag).asRegularExpression().toPattern()
+    private fun decodeTaggedDbPointer(tag: String): BsonDbPointer = getValue(tag).asDBPointer()
+    private fun decodeTaggedJavaScriptWithScope(tag: String): BsonJavaScriptWithScope =
+        getValue(tag).asJavaScriptWithScope()
+
+    private fun decodeTaggedMaxKey(tag: String): MaxKey = getValue(tag).let {
+        it as? BsonMaxKey
+            ?: throw BsonInvalidOperationException("Value expected to be of type ${BsonType.MAX_KEY} is of unexpected type ${it.bsonType}")
+        MaxKey()
+    }
+
+    private fun decodeTaggedMinKey(tag: String): MinKey = getValue(tag).let {
+        it as? BsonMinKey
+            ?: throw BsonInvalidOperationException("Value expected to be of type ${BsonType.MIN_KEY} is of unexpected type ${it.bsonType}")
+        MinKey()
+    }
+
+    private fun decodeTaggedSymbol(tag: String): String = getValue(tag).asSymbol().symbol
+    private fun decodeTaggedUndefined(tag: String): BsonUndefined = getValue(tag).let {
+        it as? BsonUndefined
+            ?: throw BsonInvalidOperationException("Value expected to be of type ${BsonType.UNDEFINED} is of unexpected type ${it.bsonType}")
+    }
+
+    private fun decodeTaggedTimestamp(tag: String): BsonTimestamp = getValue(tag).asTimestamp()
 
 }
 

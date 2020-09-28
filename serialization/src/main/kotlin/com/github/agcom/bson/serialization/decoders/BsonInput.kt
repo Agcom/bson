@@ -3,10 +3,8 @@ package com.github.agcom.bson.serialization.decoders
 import com.github.agcom.bson.serialization.Bson
 import kotlinx.serialization.CompositeDecoder
 import kotlinx.serialization.Decoder
-import org.bson.BsonValue
-import org.bson.types.Binary
-import org.bson.types.Decimal128
-import org.bson.types.ObjectId
+import org.bson.*
+import org.bson.types.*
 import java.util.regex.Pattern
 
 /**
@@ -53,5 +51,40 @@ interface BsonInput : Decoder, CompositeDecoder {
      * Read a [bson regular expression][org.bson.BsonRegularExpression] value.
      */
     fun decodeRegularExpression(): Pattern
+
+    /**
+     * Read a [bson db pointer][org.bson.BsonDbPointer] value.
+     */
+    fun decodeDbPointer(): BsonDbPointer
+
+    /**
+     * Read a [bson java script with scope][org.bson.BsonJavaScriptWithScope] value.
+     */
+    fun decodeJavaScriptWithScope(): BsonJavaScriptWithScope
+
+    /**
+     * Read a [bson max key][org.bson.BsonMaxKey] value.
+     */
+    fun decodeMaxKey(): MaxKey
+
+    /**
+     * Read a [bson min key][org.bson.BsonMinKey] value.
+     */
+    fun decodeMinKey(): MinKey
+
+    /**
+     * Read a [bson symbol][org.bson.BsonSymbol] value.
+     */
+    fun decodeSymbol(): String
+
+    /**
+     * Read a [bson undefined][org.bson.BsonUndefined] value.
+     */
+    fun decodeUndefined(): BsonUndefined
+
+    /**
+     * Read a [bson timestamp][org.bson.BsonTimestamp] value.
+     */
+    fun decodeTimestamp(): BsonTimestamp
 
 }

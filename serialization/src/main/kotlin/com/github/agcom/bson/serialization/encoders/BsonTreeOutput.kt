@@ -12,9 +12,7 @@ import kotlinx.serialization.internal.NamedValueEncoder
 import kotlinx.serialization.modules.SerialModule
 import org.bson.*
 import org.bson.BsonType.*
-import org.bson.types.Binary
-import org.bson.types.Decimal128
-import org.bson.types.ObjectId
+import org.bson.types.*
 import java.util.regex.Pattern
 
 @OptIn(InternalSerializationApi::class)
@@ -58,6 +56,18 @@ private sealed class AbstractBsonTreeOutput(
     private fun encodeTaggedRegularExpression(tag: String, value: Pattern) =
         putElement(tag, value.toBsonRegularExpression())
 
+    private fun encodeTaggedDbPointer(tag: String, value: BsonDbPointer) = putElement(tag, value)
+    private fun encodeTaggerJavaScriptWithScope(tag: String, value: BsonJavaScriptWithScope) = putElement(tag, value)
+
+    @Suppress("UNUSED_PARAMETER")
+    private fun encodeTaggedMaxKey(tag: String, value: MaxKey) = putElement(tag, BsonMaxKey())
+
+    @Suppress("UNUSED_PARAMETER")
+    private fun encodeTaggedMinKey(tag: String, value: MinKey) = putElement(tag, BsonMinKey())
+    private fun encodeTaggedSymbol(tag: String, value: String) = putElement(tag, BsonSymbol(value))
+    private fun encodeTaggedUndefined(tag: String, value: BsonUndefined) = putElement(tag, value)
+    private fun encodeTaggedTimestamp(tag: String, value: BsonTimestamp) = putElement(tag, value)
+
     private fun encodeTaggedBson(tag: String, value: BsonValue) = putElement(tag, value)
 
     override fun encodeBinary(binary: Binary) = encodeTaggedBinary(popTag(), binary)
@@ -66,6 +76,15 @@ private sealed class AbstractBsonTreeOutput(
     override fun encodeJavaScript(code: String) = encodeTaggedJavaScript(popTag(), code)
     override fun encodeDecimal128(decimal: Decimal128) = encodeTaggedDecimal128(popTag(), decimal)
     override fun encodeRegularExpression(pattern: Pattern) = encodeTaggedRegularExpression(popTag(), pattern)
+    override fun encodeDbPointer(pointer: BsonDbPointer) = encodeTaggedDbPointer(popTag(), pointer)
+    override fun encodeJavaScriptWithScope(jsWithScope: BsonJavaScriptWithScope) =
+        encodeTaggerJavaScriptWithScope(popTag(), jsWithScope)
+
+    override fun encodeMaxKey(maxKey: MaxKey) = encodeTaggedMaxKey(popTag(), maxKey)
+    override fun encodeMinKey(minKey: MinKey) = encodeTaggedMinKey(popTag(), minKey)
+    override fun encodeSymbol(symbol: String) = encodeTaggedSymbol(popTag(), symbol)
+    override fun encodeUndefined(undefined: BsonUndefined) = encodeTaggedUndefined(popTag(), undefined)
+    override fun encodeTimestamp(timestamp: BsonTimestamp) = encodeTaggedTimestamp(popTag(), timestamp)
 
     private fun checkClassDiscriminatorConflict(serializer: SerializationStrategy<*>) {
         if (bson.configuration.classDiscriminator in serializer.descriptor.elementNames())

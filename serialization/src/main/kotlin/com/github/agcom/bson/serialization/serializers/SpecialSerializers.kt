@@ -6,10 +6,7 @@ import kotlinx.serialization.*
 import org.bson.BsonBinarySubType
 import org.bson.UuidRepresentation
 import org.bson.internal.UuidHelper
-import org.bson.types.Binary
-import org.bson.types.Code
-import org.bson.types.Decimal128
-import org.bson.types.ObjectId
+import org.bson.types.*
 import java.util.*
 import java.util.regex.Pattern
 
@@ -301,6 +298,78 @@ object DateSerializer : KSerializer<Date> {
     override fun deserialize(decoder: Decoder): Date {
         decoder.verify()
         return Date(decoder.decode(DateTimeSerializer))
+    }
+
+}
+
+/**
+ * [MaxKey] serializer.
+ *
+ * Corresponds to [BsonMaxKey][org.bson.BsonMaxKey] type.
+ *
+ * Can only be used with [Bson][com.github.agcom.bson.serialization.Bson] format.
+ */
+object MaxKeySerializer : KSerializer<MaxKey> {
+
+    override val descriptor: SerialDescriptor
+        get() = BsonMaxKeySerializer.descriptor
+
+    override fun serialize(encoder: Encoder, value: MaxKey) {
+        encoder.verify(); encoder as BsonOutput
+        encoder.encodeMaxKey(value)
+    }
+
+    override fun deserialize(decoder: Decoder): MaxKey {
+        decoder.verify(); decoder as BsonInput
+        return decoder.decodeMaxKey()
+    }
+
+}
+
+/**
+ * [MinKey] serializer.
+ *
+ * Corresponds to [BsonMinKey][org.bson.BsonMinKey] type.
+ *
+ * Can only be used with [Bson][com.github.agcom.bson.serialization.Bson] format.
+ */
+object MinKeySerializer : KSerializer<MinKey> {
+
+    override val descriptor: SerialDescriptor
+        get() = BsonMinKeySerializer.descriptor
+
+    override fun serialize(encoder: Encoder, value: MinKey) {
+        encoder.verify(); encoder as BsonOutput
+        encoder.encodeMinKey(value)
+    }
+
+    override fun deserialize(decoder: Decoder): MinKey {
+        decoder.verify(); decoder as BsonInput
+        return decoder.decodeMinKey()
+    }
+
+}
+
+/**
+ * Symbol string serializer.
+ *
+ * Corresponds to [BsonSymbol][org.bson.BsonSymbol] type.
+ *
+ * Can only be used with [Bson][com.github.agcom.bson.serialization.Bson] format.
+ */
+object SymbolSerializer : KSerializer<String> {
+
+    override val descriptor: SerialDescriptor
+        get() = BsonSymbolSerializer.descriptor
+
+    override fun serialize(encoder: Encoder, value: String) {
+        encoder.verify(); encoder as BsonOutput
+        encoder.encodeSymbol(value);
+    }
+
+    override fun deserialize(decoder: Decoder): String {
+        decoder.verify(); decoder as BsonInput
+        return decoder.decodeSymbol()
     }
 
 }

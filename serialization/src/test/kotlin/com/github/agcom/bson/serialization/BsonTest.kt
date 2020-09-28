@@ -13,10 +13,7 @@ import io.kotest.matchers.types.shouldBeInstanceOf
 import kotlinx.serialization.builtins.*
 import org.bson.*
 import org.bson.io.BasicOutputBuffer
-import org.bson.types.Binary
-import org.bson.types.Code
-import org.bson.types.Decimal128
-import org.bson.types.ObjectId
+import org.bson.types.*
 import java.time.*
 import java.time.temporal.Temporal
 import java.time.temporal.TemporalAccessor
@@ -118,6 +115,21 @@ class BsonTest : BsonInstanceTest by BsonInstanceTestDefault(), FreeSpec() {
                     "enum kind" {
                         val enum = HttpError.NOT_FOUND
                         bson.toBson(HttpError.serializer(), enum) shouldBe BsonString(enum.name)
+                    }
+
+                    "max key" {
+                        val maxKey = MaxKey()
+                        bson.toBson(MaxKeySerializer, maxKey) shouldBe BsonMaxKey()
+                    }
+
+                    "min key" {
+                        val minKey = MinKey()
+                        bson.toBson(MinKeySerializer, minKey) shouldBe BsonMinKey()
+                    }
+
+                    "symbol" {
+                        val symbol = "hello"
+                        bson.toBson(SymbolSerializer, symbol) shouldBe BsonSymbol("hello")
                     }
 
                 }
@@ -310,6 +322,21 @@ class BsonTest : BsonInstanceTest by BsonInstanceTestDefault(), FreeSpec() {
                     "enum kind" {
                         val enum = HttpError.NOT_FOUND
                         bson.fromBson(HttpError.serializer(), BsonString(enum.name)) shouldBe enum
+                    }
+
+                    "max key" {
+                        val maxKey = MaxKey()
+                        bson.fromBson(MaxKeySerializer, BsonMaxKey()) shouldBe maxKey
+                    }
+
+                    "min key" {
+                        val minKey = MinKey()
+                        bson.fromBson(MinKeySerializer, BsonMinKey()) shouldBe minKey
+                    }
+
+                    "symbol" {
+                        val symbol = "hello"
+                        bson.fromBson(SymbolSerializer, BsonSymbol("hello")) shouldBe symbol
                     }
 
                 }
@@ -767,6 +794,34 @@ class BsonTest : BsonInstanceTest by BsonInstanceTestDefault(), FreeSpec() {
                     bson.context.getContextual(BsonString::class) shouldBe BsonStringSerializer
                 }
 
+                "bson db pointer" {
+                    bson.context.getContextual(BsonDbPointer::class) shouldBe BsonDbPointerSerializer
+                }
+
+                "bson java script with scope" {
+                    bson.context.getContextual(BsonJavaScriptWithScope::class) shouldBe BsonJavaScriptWithScopeSerializer
+                }
+
+                "bson max key" {
+                    bson.context.getContextual(BsonMaxKey::class) shouldBe BsonMaxKeySerializer
+                }
+
+                "bson min key" {
+                    bson.context.getContextual(BsonMinKey::class) shouldBe BsonMinKeySerializer
+                }
+
+                "bson symbol" {
+                    bson.context.getContextual(BsonSymbol::class) shouldBe BsonSymbolSerializer
+                }
+
+                "bson undefined" {
+                    bson.context.getContextual(BsonUndefined::class) shouldBe BsonUndefinedSerializer
+                }
+
+                "bson timestamp" {
+                    bson.context.getContextual(BsonTimestamp::class) shouldBe BsonTimestampSerializer
+                }
+
             }
 
             "binary" {
@@ -787,6 +842,10 @@ class BsonTest : BsonInstanceTest by BsonInstanceTestDefault(), FreeSpec() {
 
             "pattern" {
                 bson.context.getContextual(Pattern::class) shouldBe PatternSerializer
+            }
+
+            "max key" {
+                bson.context.getContextual(MaxKey::class) shouldBe MaxKeySerializer
             }
 
             "temporals" - {
@@ -843,6 +902,10 @@ class BsonTest : BsonInstanceTest by BsonInstanceTestDefault(), FreeSpec() {
 
             "date" {
                 bson.context.getContextual(Date::class) shouldBe DateSerializer
+            }
+
+            "min key" {
+                bson.context.getContextual(MinKey::class) shouldBe MinKeySerializer
             }
 
         }
