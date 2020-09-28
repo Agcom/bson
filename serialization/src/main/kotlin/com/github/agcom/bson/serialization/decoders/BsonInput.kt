@@ -5,6 +5,7 @@ import kotlinx.serialization.CompositeDecoder
 import kotlinx.serialization.Decoder
 import org.bson.BsonDbPointer
 import org.bson.BsonJavaScriptWithScope
+import org.bson.BsonUndefined
 import org.bson.BsonValue
 import org.bson.types.*
 import java.util.regex.Pattern
@@ -78,5 +79,10 @@ interface BsonInput : Decoder, CompositeDecoder {
      * Read a [bson symbol][org.bson.BsonSymbol] value.
      */
     fun decodeSymbol(): String
+
+    /**
+     * Read a [bson undefined][org.bson.BsonUndefined] value.
+     */
+    fun decodeUndefined(): BsonUndefined
 
 }

@@ -5,6 +5,7 @@ import kotlinx.serialization.CompositeEncoder
 import kotlinx.serialization.Encoder
 import org.bson.BsonDbPointer
 import org.bson.BsonJavaScriptWithScope
+import org.bson.BsonUndefined
 import org.bson.BsonValue
 import org.bson.types.*
 import java.util.regex.Pattern
@@ -75,5 +76,10 @@ interface BsonOutput : Encoder, CompositeEncoder {
      * Write a [bson symbol][org.bson.BsonSymbol] value.
      */
     fun encodeSymbol(symbol: String)
+
+    /**
+     * Write a [bson undefined][org.bson.BsonUndefined] value.
+     */
+    fun encodeUndefined(undefined: BsonUndefined = BsonUndefined())
 
 }

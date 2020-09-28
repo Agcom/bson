@@ -53,7 +53,8 @@ val testBsonValuePrimitives: List<BsonValue>
         BsonJavaScriptWithScope("main() { console.log(hello) }", BsonDocument("hello", BsonString("bson"))),
         BsonMaxKey(),
         BsonMinKey(),
-        BsonSymbol("hello")
+        BsonSymbol("hello"),
+        BsonUndefined()
     )
 
 fun testBsonDocument(): BsonDocument = BsonDocument().also { doc ->

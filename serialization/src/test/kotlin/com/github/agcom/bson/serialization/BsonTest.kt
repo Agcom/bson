@@ -814,6 +814,10 @@ class BsonTest : BsonInstanceTest by BsonInstanceTestDefault(), FreeSpec() {
                     bson.context.getContextual(BsonSymbol::class) shouldBe BsonSymbolSerializer
                 }
 
+                "bson undefined" {
+                    bson.context.getContextual(BsonUndefined::class) shouldBe BsonUndefinedSerializer
+                }
+
             }
 
             "binary" {

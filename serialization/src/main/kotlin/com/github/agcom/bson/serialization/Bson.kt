@@ -151,6 +151,7 @@ private val defaultBsonModule: SerialModule = SerializersModule {
     contextual(BsonMaxKeySerializer)
     contextual(BsonMinKeySerializer)
     contextual(BsonSymbolSerializer)
+    contextual(BsonUndefinedSerializer)
 
     contextual(BinarySerializer)
     contextual(ObjectIdSerializer)

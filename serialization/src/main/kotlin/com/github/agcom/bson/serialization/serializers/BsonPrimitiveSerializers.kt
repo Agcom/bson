@@ -27,11 +27,11 @@ import org.bson.types.MinKey
  * - [BsonMaxKey]
  * - [BsonMinKey]
  * - [BsonSymbol]
+ * - [BsonUndefined]
  *
  * Note: Doesn't support some of deprecated or internal types:
  * - [BsonJavaScriptWithScope]
  * - [BsonTimestamp]
- * - [BsonUndefined]
  *
  * Can only be used with [Bson][com.github.agcom.bson.serialization.Bson] format.
  */
@@ -78,6 +78,10 @@ object BsonPrimitiveSerializer : KSerializer<BsonValue> {
                             ?: throw BsonInvalidOperationException("Value expected to be of type $MIN_KEY is of unexpected type ${it.bsonType}")
                     )
                     SYMBOL -> encoder.encode(BsonSymbolSerializer, it.asSymbol())
+                    UNDEFINED -> encoder.encode(
+                        BsonUndefinedSerializer, it as? BsonUndefined
+                            ?: throw BsonInvalidOperationException("Value expected to be of type ${UNDEFINED} is of unexpected type ${it.bsonType}")
+                    )
                     else -> throw RuntimeException("Should not reach here")
                 }
             }
@@ -467,6 +471,28 @@ object BsonSymbolSerializer : KSerializer<BsonSymbol> {
     override fun deserialize(decoder: Decoder): BsonSymbol {
         decoder.verify(); decoder as BsonInput
         return BsonSymbol(decoder.decodeSymbol())
+    }
+
+}
+
+/**
+ * External serializer for [BsonUndefined].
+ *
+ * Can only be used with [Bson][com.github.agcom.bson.serialization.Bson] format.
+ */
+object BsonUndefinedSerializer : KSerializer<BsonUndefined> {
+
+    override val descriptor: SerialDescriptor =
+        PrimitiveDescriptor(BsonUndefined::class.qualifiedName!!, PrimitiveKind.BYTE)
+
+    override fun serialize(encoder: Encoder, value: BsonUndefined) {
+        encoder.verify(); encoder as BsonOutput
+        encoder.encodeUndefined(value)
+    }
+
+    override fun deserialize(decoder: Decoder): BsonUndefined {
+        decoder.verify(); decoder as BsonInput
+        return decoder.decodeUndefined()
     }
 
 }
