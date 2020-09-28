@@ -6,10 +6,7 @@ import kotlinx.serialization.Encoder
 import org.bson.BsonDbPointer
 import org.bson.BsonJavaScriptWithScope
 import org.bson.BsonValue
-import org.bson.types.Binary
-import org.bson.types.Decimal128
-import org.bson.types.MaxKey
-import org.bson.types.ObjectId
+import org.bson.types.*
 import java.util.regex.Pattern
 
 /**
@@ -68,5 +65,10 @@ interface BsonOutput : Encoder, CompositeEncoder {
      * Write a [bson max key][org.bson.BsonMaxKey] value.
      */
     fun encodeMaxKey(maxKey: MaxKey = MaxKey())
+
+    /**
+     * Write a [bson min key][org.bson.BsonMinKey] value.
+     */
+    fun encodeMinKey(minKey: MinKey = MinKey())
 
 }

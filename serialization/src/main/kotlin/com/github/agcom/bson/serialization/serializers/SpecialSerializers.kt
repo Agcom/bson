@@ -5,6 +5,7 @@ import com.github.agcom.bson.serialization.encoders.BsonOutput
 import kotlinx.serialization.*
 import org.bson.BsonBinarySubType
 import org.bson.BsonMaxKey
+import org.bson.BsonMinKey
 import org.bson.UuidRepresentation
 import org.bson.internal.UuidHelper
 import org.bson.types.*
@@ -329,6 +330,31 @@ object MaxKeySerializer : KSerializer<MaxKey> {
         decoder.verify()
         decoder.decode(BsonMaxKeySerializer)
         return MaxKey()
+    }
+
+}
+
+/**
+ * [MinKey] serializer.
+ *
+ * Corresponds to [BsonMinKey][org.bson.BsonMinKey] type.
+ *
+ * Can only be used with [Bson][com.github.agcom.bson.serialization.Bson] format.
+ */
+object MinKeySerializer : KSerializer<MinKey> {
+
+    override val descriptor: SerialDescriptor
+        get() = BsonMinKeySerializer.descriptor
+
+    override fun serialize(encoder: Encoder, value: MinKey) {
+        encoder.verify()
+        encoder.encode(BsonMinKeySerializer, BsonMinKey())
+    }
+
+    override fun deserialize(decoder: Decoder): MinKey {
+        decoder.verify()
+        decoder.decode(BsonMinKeySerializer)
+        return MinKey()
     }
 
 }

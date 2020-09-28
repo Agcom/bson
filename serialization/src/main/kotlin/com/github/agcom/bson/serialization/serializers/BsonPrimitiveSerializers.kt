@@ -7,6 +7,7 @@ import kotlinx.serialization.*
 import org.bson.*
 import org.bson.BsonType.*
 import org.bson.types.MaxKey
+import org.bson.types.MinKey
 
 /**
  * External serializer for bson primitive types (anything other than [BsonDocument] and [BsonArray]):
@@ -23,11 +24,11 @@ import org.bson.types.MaxKey
  * - [BsonDecimal128]
  * - [BsonRegularExpression]
  * - [BsonDbPointer]
+ * - [BsonMaxKey]
+ * - [BsonMinKey]
  *
  * Note: Doesn't support some of deprecated or internal types:
  * - [BsonJavaScriptWithScope]
- * - [BsonMaxKey]
- * - [BsonMinKey]
  * - [BsonSymbol]
  * - [BsonTimestamp]
  * - [BsonUndefined]
@@ -66,7 +67,16 @@ object BsonPrimitiveSerializer : KSerializer<BsonValue> {
                         BsonJavaScriptWithScopeSerializer,
                         it.asJavaScriptWithScope()
                     )
-                    MAX_KEY -> encoder.encode(BsonMaxKeySerializer, it as? BsonMaxKey ?: throw BsonInvalidOperationException("Value expected to be of type ${BsonType.MAX_KEY} is of unexpected type ${it.bsonType}"))
+                    MAX_KEY -> encoder.encode(
+                        BsonMaxKeySerializer,
+                        it as? BsonMaxKey
+                            ?: throw BsonInvalidOperationException("Value expected to be of type $MAX_KEY is of unexpected type ${it.bsonType}")
+                    )
+                    MIN_KEY -> encoder.encode(
+                        BsonMinKeySerializer,
+                        it as? BsonMinKey
+                            ?: throw BsonInvalidOperationException("Value expected to be of type $MIN_KEY is of unexpected type ${it.bsonType}")
+                    )
                     else -> throw RuntimeException("Should not reach here")
                 }
             }
@@ -399,7 +409,8 @@ object BsonJavaScriptWithScopeSerializer : KSerializer<BsonJavaScriptWithScope> 
  */
 object BsonMaxKeySerializer : KSerializer<BsonMaxKey> {
 
-    override val descriptor: SerialDescriptor = PrimitiveDescriptor(BsonMaxKey::class.qualifiedName!!, PrimitiveKind.BYTE)
+    override val descriptor: SerialDescriptor =
+        PrimitiveDescriptor(BsonMaxKey::class.qualifiedName!!, PrimitiveKind.BYTE)
 
     override fun serialize(encoder: Encoder, value: BsonMaxKey) {
         encoder.verify(); encoder as BsonOutput
@@ -410,6 +421,29 @@ object BsonMaxKeySerializer : KSerializer<BsonMaxKey> {
         decoder.verify(); decoder as BsonInput
         decoder.decodeMaxKey()
         return BsonMaxKey()
+    }
+
+}
+
+/**
+ * External serializer for [BsonMinKey].
+ *
+ * Can only be used with [Bson][com.github.agcom.bson.serialization.Bson] format.
+ */
+object BsonMinKeySerializer : KSerializer<BsonMinKey> {
+
+    override val descriptor: SerialDescriptor =
+        PrimitiveDescriptor(BsonMinKey::class.qualifiedName!!, PrimitiveKind.BYTE)
+
+    override fun serialize(encoder: Encoder, value: BsonMinKey) {
+        encoder.verify(); encoder as BsonOutput
+        encoder.encodeMinKey(MinKey())
+    }
+
+    override fun deserialize(decoder: Decoder): BsonMinKey {
+        decoder.verify(); decoder as BsonInput
+        decoder.decodeMinKey()
+        return BsonMinKey()
     }
 
 }

@@ -122,6 +122,11 @@ class BsonTest : BsonInstanceTest by BsonInstanceTestDefault(), FreeSpec() {
                         bson.toBson(MaxKeySerializer, maxKey) shouldBe BsonMaxKey()
                     }
 
+                    "min key" {
+                        val minKey = MinKey()
+                        bson.toBson(MinKeySerializer, minKey) shouldBe BsonMinKey()
+                    }
+
                 }
 
             }
@@ -317,6 +322,11 @@ class BsonTest : BsonInstanceTest by BsonInstanceTestDefault(), FreeSpec() {
                     "max key" {
                         val maxKey = MaxKey()
                         bson.fromBson(MaxKeySerializer, BsonMaxKey()) shouldBe maxKey
+                    }
+
+                    "min key" {
+                        val minKey = MinKey()
+                        bson.fromBson(MinKeySerializer, BsonMinKey()) shouldBe minKey
                     }
 
                 }
@@ -786,6 +796,10 @@ class BsonTest : BsonInstanceTest by BsonInstanceTestDefault(), FreeSpec() {
                     bson.context.getContextual(BsonMaxKey::class) shouldBe BsonMaxKeySerializer
                 }
 
+                "bson min key" {
+                    bson.context.getContextual(BsonMinKey::class) shouldBe BsonMinKeySerializer
+                }
+
             }
 
             "binary" {
@@ -866,6 +880,10 @@ class BsonTest : BsonInstanceTest by BsonInstanceTestDefault(), FreeSpec() {
 
             "date" {
                 bson.context.getContextual(Date::class) shouldBe DateSerializer
+            }
+
+            "min key" {
+                bson.context.getContextual(MinKey::class) shouldBe MinKeySerializer
             }
 
         }

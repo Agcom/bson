@@ -11,10 +11,7 @@ import kotlinx.serialization.internal.AbstractPolymorphicSerializer
 import kotlinx.serialization.internal.NamedValueDecoder
 import kotlinx.serialization.modules.SerialModule
 import org.bson.*
-import org.bson.types.Binary
-import org.bson.types.Decimal128
-import org.bson.types.MaxKey
-import org.bson.types.ObjectId
+import org.bson.types.*
 import java.util.regex.Pattern
 
 @OptIn(InternalSerializationApi::class)
@@ -75,6 +72,7 @@ private sealed class AbstractBsonTreeInput(
     override fun decodeDbPointer(): BsonDbPointer = decodeTaggedDbPointer(popTag())
     override fun decodeJavaScriptWithScope(): BsonJavaScriptWithScope = decodeTaggerJavaScriptWithScope(popTag())
     override fun decodeMaxKey(): MaxKey = decodeTaggerMaxKey(popTag())
+    override fun decodeMinKey(): MinKey = decodeTaggerMinKey(popTag())
 
     override fun decodeTaggedEnum(tag: String, enumDescription: SerialDescriptor): Int =
         enumDescription.getElementIndexOrThrow(getValue(tag).asString().value)
@@ -103,6 +101,11 @@ private sealed class AbstractBsonTreeInput(
         it as? BsonMaxKey
             ?: throw BsonInvalidOperationException("Value expected to be of type ${BsonType.MAX_KEY} is of unexpected type ${it.bsonType}")
         MaxKey()
+    }
+    private fun decodeTaggerMinKey(tag: String): MinKey = getValue(tag).let {
+        it as? BsonMinKey
+            ?: throw BsonInvalidOperationException("Value expected to be of type ${BsonType.MIN_KEY} is of unexpected type ${it.bsonType}")
+        MinKey()
     }
 
 }
