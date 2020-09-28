@@ -12,7 +12,7 @@ Currently, only supports **Kotlinx serialization runtime 0.20.0**.
 
 ### Gradle
 
-- `*.gradle`
+- `*.gradle`:
 
   ```groovy
   repositories {
@@ -58,8 +58,6 @@ fun main() {
 ### Serialization functions
 
 The following functions can be found in the `com.github.agcom.bson.serialization.Bson` class.
-
-> Doesn't support deprecated bson types.
 
 - `toBson` and `fromBson`: The above example :point_up:.
 

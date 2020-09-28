@@ -3,10 +3,8 @@ package com.github.agcom.bson.serialization.encoders
 import com.github.agcom.bson.serialization.Bson
 import kotlinx.serialization.CompositeEncoder
 import kotlinx.serialization.Encoder
-import org.bson.BsonValue
-import org.bson.types.Binary
-import org.bson.types.Decimal128
-import org.bson.types.ObjectId
+import org.bson.*
+import org.bson.types.*
 import java.util.regex.Pattern
 
 /**
@@ -50,5 +48,40 @@ interface BsonOutput : Encoder, CompositeEncoder {
      * Write a [bson regular expression][org.bson.BsonRegularExpression] value.
      */
     fun encodeRegularExpression(pattern: Pattern)
+
+    /**
+     * Write a [bson db pointer][org.bson.BsonDbPointer] value.
+     */
+    fun encodeDbPointer(pointer: BsonDbPointer)
+
+    /**
+     * Write a [bson java script with scope][org.bson.BsonJavaScriptWithScope] value.
+     */
+    fun encodeJavaScriptWithScope(jsWithScope: BsonJavaScriptWithScope)
+
+    /**
+     * Write a [bson max key][org.bson.BsonMaxKey] value.
+     */
+    fun encodeMaxKey(maxKey: MaxKey = MaxKey())
+
+    /**
+     * Write a [bson min key][org.bson.BsonMinKey] value.
+     */
+    fun encodeMinKey(minKey: MinKey = MinKey())
+
+    /**
+     * Write a [bson symbol][org.bson.BsonSymbol] value.
+     */
+    fun encodeSymbol(symbol: String)
+
+    /**
+     * Write a [bson undefined][org.bson.BsonUndefined] value.
+     */
+    fun encodeUndefined(undefined: BsonUndefined = BsonUndefined())
+
+    /**
+     * Write a [bson timestamp][org.bson.BsonTimestamp] value.
+     */
+    fun encodeTimestamp(timestamp: BsonTimestamp)
 
 }
