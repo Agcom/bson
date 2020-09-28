@@ -127,6 +127,11 @@ class BsonTest : BsonInstanceTest by BsonInstanceTestDefault(), FreeSpec() {
                         bson.toBson(MinKeySerializer, minKey) shouldBe BsonMinKey()
                     }
 
+                    "symbol" {
+                        val symbol = "hello"
+                        bson.toBson(SymbolSerializer, symbol) shouldBe BsonSymbol("hello")
+                    }
+
                 }
 
             }
@@ -327,6 +332,11 @@ class BsonTest : BsonInstanceTest by BsonInstanceTestDefault(), FreeSpec() {
                     "min key" {
                         val minKey = MinKey()
                         bson.fromBson(MinKeySerializer, BsonMinKey()) shouldBe minKey
+                    }
+
+                    "symbol" {
+                        val symbol = "hello"
+                        bson.fromBson(SymbolSerializer, BsonSymbol("hello")) shouldBe symbol
                     }
 
                 }
@@ -798,6 +808,10 @@ class BsonTest : BsonInstanceTest by BsonInstanceTestDefault(), FreeSpec() {
 
                 "bson min key" {
                     bson.context.getContextual(BsonMinKey::class) shouldBe BsonMinKeySerializer
+                }
+
+                "bson symbol" {
+                    bson.context.getContextual(BsonSymbol::class) shouldBe BsonSymbolSerializer
                 }
 
             }

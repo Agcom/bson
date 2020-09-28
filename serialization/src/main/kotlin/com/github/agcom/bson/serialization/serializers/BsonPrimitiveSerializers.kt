@@ -26,10 +26,10 @@ import org.bson.types.MinKey
  * - [BsonDbPointer]
  * - [BsonMaxKey]
  * - [BsonMinKey]
+ * - [BsonSymbol]
  *
  * Note: Doesn't support some of deprecated or internal types:
  * - [BsonJavaScriptWithScope]
- * - [BsonSymbol]
  * - [BsonTimestamp]
  * - [BsonUndefined]
  *
@@ -77,6 +77,7 @@ object BsonPrimitiveSerializer : KSerializer<BsonValue> {
                         it as? BsonMinKey
                             ?: throw BsonInvalidOperationException("Value expected to be of type $MIN_KEY is of unexpected type ${it.bsonType}")
                     )
+                    SYMBOL -> encoder.encode(BsonSymbolSerializer, it.asSymbol())
                     else -> throw RuntimeException("Should not reach here")
                 }
             }
@@ -444,6 +445,28 @@ object BsonMinKeySerializer : KSerializer<BsonMinKey> {
         decoder.verify(); decoder as BsonInput
         decoder.decodeMinKey()
         return BsonMinKey()
+    }
+
+}
+
+/**
+ * External serializer for [BsonSymbol].
+ *
+ * Can only be used with [Bson][com.github.agcom.bson.serialization.Bson] format.
+ */
+object BsonSymbolSerializer : KSerializer<BsonSymbol> {
+
+    override val descriptor: SerialDescriptor =
+        PrimitiveDescriptor(BsonSymbol::class.qualifiedName!!, PrimitiveKind.STRING)
+
+    override fun serialize(encoder: Encoder, value: BsonSymbol) {
+        encoder.verify(); encoder as BsonOutput
+        encoder.encodeSymbol(value.symbol)
+    }
+
+    override fun deserialize(decoder: Decoder): BsonSymbol {
+        decoder.verify(); decoder as BsonInput
+        return BsonSymbol(decoder.decodeSymbol())
     }
 
 }

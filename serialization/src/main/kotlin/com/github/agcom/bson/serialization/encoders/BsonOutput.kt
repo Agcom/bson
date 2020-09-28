@@ -71,4 +71,9 @@ interface BsonOutput : Encoder, CompositeEncoder {
      */
     fun encodeMinKey(minKey: MinKey = MinKey())
 
+    /**
+     * Write a [bson symbol][org.bson.BsonSymbol] value.
+     */
+    fun encodeSymbol(symbol: String)
+
 }

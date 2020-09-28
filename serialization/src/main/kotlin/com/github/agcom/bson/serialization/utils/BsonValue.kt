@@ -48,7 +48,7 @@ internal inline fun <R> BsonValue.fold(
     return when (bsonType) {
         ARRAY -> array(asArray()) // Array should be checked first as any array is a document but any document is not an array; Although the user might meant a document.
         DOCUMENT -> document(asDocument())
-        DOUBLE, STRING, BINARY, OBJECT_ID, BOOLEAN, DATE_TIME, REGULAR_EXPRESSION, JAVASCRIPT, INT32, INT64, DECIMAL128, NULL, DB_POINTER, JAVASCRIPT_WITH_SCOPE, MAX_KEY, MIN_KEY ->
+        DOUBLE, STRING, BINARY, OBJECT_ID, BOOLEAN, DATE_TIME, REGULAR_EXPRESSION, JAVASCRIPT, INT32, INT64, DECIMAL128, NULL, DB_POINTER, JAVASCRIPT_WITH_SCOPE, MAX_KEY, MIN_KEY, SYMBOL ->
             primitive(this)
         else -> unexpected(this)
     }

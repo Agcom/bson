@@ -4,8 +4,6 @@ import com.github.agcom.bson.serialization.decoders.BsonInput
 import com.github.agcom.bson.serialization.encoders.BsonOutput
 import kotlinx.serialization.*
 import org.bson.BsonBinarySubType
-import org.bson.BsonMaxKey
-import org.bson.BsonMinKey
 import org.bson.UuidRepresentation
 import org.bson.internal.UuidHelper
 import org.bson.types.*
@@ -322,14 +320,13 @@ object MaxKeySerializer : KSerializer<MaxKey> {
         get() = BsonMaxKeySerializer.descriptor
 
     override fun serialize(encoder: Encoder, value: MaxKey) {
-        encoder.verify()
-        encoder.encode(BsonMaxKeySerializer, BsonMaxKey())
+        encoder.verify(); encoder as BsonOutput
+        encoder.encodeMaxKey(value)
     }
 
     override fun deserialize(decoder: Decoder): MaxKey {
-        decoder.verify()
-        decoder.decode(BsonMaxKeySerializer)
-        return MaxKey()
+        decoder.verify(); decoder as BsonInput
+        return decoder.decodeMaxKey()
     }
 
 }
@@ -347,14 +344,37 @@ object MinKeySerializer : KSerializer<MinKey> {
         get() = BsonMinKeySerializer.descriptor
 
     override fun serialize(encoder: Encoder, value: MinKey) {
-        encoder.verify()
-        encoder.encode(BsonMinKeySerializer, BsonMinKey())
+        encoder.verify(); encoder as BsonOutput
+        encoder.encodeMinKey(value)
     }
 
     override fun deserialize(decoder: Decoder): MinKey {
-        decoder.verify()
-        decoder.decode(BsonMinKeySerializer)
-        return MinKey()
+        decoder.verify(); decoder as BsonInput
+        return decoder.decodeMinKey()
+    }
+
+}
+
+/**
+ * Symbol string serializer.
+ *
+ * Corresponds to [BsonSymbol][org.bson.BsonSymbol] type.
+ *
+ * Can only be used with [Bson][com.github.agcom.bson.serialization.Bson] format.
+ */
+object SymbolSerializer : KSerializer<String> {
+
+    override val descriptor: SerialDescriptor
+        get() = BsonSymbolSerializer.descriptor
+
+    override fun serialize(encoder: Encoder, value: String) {
+        encoder.verify(); encoder as BsonOutput
+        encoder.encodeSymbol(value);
+    }
+
+    override fun deserialize(decoder: Decoder): String {
+        decoder.verify(); decoder as BsonInput
+        return decoder.decodeSymbol()
     }
 
 }

@@ -61,8 +61,10 @@ private sealed class AbstractBsonTreeOutput(
 
     @Suppress("UNUSED_PARAMETER")
     private fun encodeTaggedMaxKey(tag: String, value: MaxKey) = putElement(tag, BsonMaxKey())
+
     @Suppress("UNUSED_PARAMETER")
     private fun encodeTaggedMinKey(tag: String, value: MinKey) = putElement(tag, BsonMinKey())
+    private fun encodeTaggedSymbol(tag: String, value: String) = putElement(tag, BsonSymbol(value))
 
     private fun encodeTaggedBson(tag: String, value: BsonValue) = putElement(tag, value)
 
@@ -78,6 +80,7 @@ private sealed class AbstractBsonTreeOutput(
 
     override fun encodeMaxKey(maxKey: MaxKey) = encodeTaggedMaxKey(popTag(), maxKey)
     override fun encodeMinKey(minKey: MinKey) = encodeTaggedMinKey(popTag(), minKey)
+    override fun encodeSymbol(symbol: String) = encodeTaggedSymbol(popTag(), symbol)
 
     private fun checkClassDiscriminatorConflict(serializer: SerializationStrategy<*>) {
         if (bson.configuration.classDiscriminator in serializer.descriptor.elementNames())

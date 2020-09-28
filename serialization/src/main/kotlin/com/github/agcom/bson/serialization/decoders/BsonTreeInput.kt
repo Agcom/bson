@@ -70,9 +70,10 @@ private sealed class AbstractBsonTreeInput(
     override fun decodeDecimal128(): Decimal128 = decodeTaggedDecimal128(popTag())
     override fun decodeRegularExpression(): Pattern = decodeTaggedRegularExpression(popTag())
     override fun decodeDbPointer(): BsonDbPointer = decodeTaggedDbPointer(popTag())
-    override fun decodeJavaScriptWithScope(): BsonJavaScriptWithScope = decodeTaggerJavaScriptWithScope(popTag())
-    override fun decodeMaxKey(): MaxKey = decodeTaggerMaxKey(popTag())
-    override fun decodeMinKey(): MinKey = decodeTaggerMinKey(popTag())
+    override fun decodeJavaScriptWithScope(): BsonJavaScriptWithScope = decodeTaggedJavaScriptWithScope(popTag())
+    override fun decodeMaxKey(): MaxKey = decodeTaggedMaxKey(popTag())
+    override fun decodeMinKey(): MinKey = decodeTaggedMinKey(popTag())
+    override fun decodeSymbol(): String = decodeTaggedSymbol(popTag())
 
     override fun decodeTaggedEnum(tag: String, enumDescription: SerialDescriptor): Int =
         enumDescription.getElementIndexOrThrow(getValue(tag).asString().value)
@@ -95,18 +96,22 @@ private sealed class AbstractBsonTreeInput(
     private fun decodeTaggedDecimal128(tag: String): Decimal128 = getValue(tag).asDecimal128().value
     private fun decodeTaggedRegularExpression(tag: String): Pattern = getValue(tag).asRegularExpression().toPattern()
     private fun decodeTaggedDbPointer(tag: String): BsonDbPointer = getValue(tag).asDBPointer()
-    private fun decodeTaggerJavaScriptWithScope(tag: String): BsonJavaScriptWithScope =
+    private fun decodeTaggedJavaScriptWithScope(tag: String): BsonJavaScriptWithScope =
         getValue(tag).asJavaScriptWithScope()
-    private fun decodeTaggerMaxKey(tag: String): MaxKey = getValue(tag).let {
+
+    private fun decodeTaggedMaxKey(tag: String): MaxKey = getValue(tag).let {
         it as? BsonMaxKey
             ?: throw BsonInvalidOperationException("Value expected to be of type ${BsonType.MAX_KEY} is of unexpected type ${it.bsonType}")
         MaxKey()
     }
-    private fun decodeTaggerMinKey(tag: String): MinKey = getValue(tag).let {
+
+    private fun decodeTaggedMinKey(tag: String): MinKey = getValue(tag).let {
         it as? BsonMinKey
             ?: throw BsonInvalidOperationException("Value expected to be of type ${BsonType.MIN_KEY} is of unexpected type ${it.bsonType}")
         MinKey()
     }
+
+    private fun decodeTaggedSymbol(tag: String): String = getValue(tag).asSymbol().symbol
 
 }
 

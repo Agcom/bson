@@ -74,4 +74,9 @@ interface BsonInput : Decoder, CompositeDecoder {
      */
     fun decodeMinKey(): MinKey
 
+    /**
+     * Read a [bson symbol][org.bson.BsonSymbol] value.
+     */
+    fun decodeSymbol(): String
+
 }
