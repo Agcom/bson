@@ -75,6 +75,7 @@ private sealed class AbstractBsonTreeInput(
     override fun decodeMinKey(): MinKey = decodeTaggedMinKey(popTag())
     override fun decodeSymbol(): String = decodeTaggedSymbol(popTag())
     override fun decodeUndefined(): BsonUndefined = decodeTaggedUndefined(popTag())
+    override fun decodeTimestamp(): BsonTimestamp = decodeTaggedTimestamp(popTag())
 
     override fun decodeTaggedEnum(tag: String, enumDescription: SerialDescriptor): Int =
         enumDescription.getElementIndexOrThrow(getValue(tag).asString().value)
@@ -117,6 +118,8 @@ private sealed class AbstractBsonTreeInput(
         it as? BsonUndefined
             ?: throw BsonInvalidOperationException("Value expected to be of type ${BsonType.UNDEFINED} is of unexpected type ${it.bsonType}")
     }
+
+    private fun decodeTaggedTimestamp(tag: String): BsonTimestamp = getValue(tag).asTimestamp()
 
 }
 

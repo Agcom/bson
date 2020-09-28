@@ -54,7 +54,8 @@ val testBsonValuePrimitives: List<BsonValue>
         BsonMaxKey(),
         BsonMinKey(),
         BsonSymbol("hello"),
-        BsonUndefined()
+        BsonUndefined(),
+        BsonTimestamp(100, 10)
     )
 
 fun testBsonDocument(): BsonDocument = BsonDocument().also { doc ->

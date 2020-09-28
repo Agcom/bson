@@ -66,6 +66,7 @@ private sealed class AbstractBsonTreeOutput(
     private fun encodeTaggedMinKey(tag: String, value: MinKey) = putElement(tag, BsonMinKey())
     private fun encodeTaggedSymbol(tag: String, value: String) = putElement(tag, BsonSymbol(value))
     private fun encodeTaggedUndefined(tag: String, value: BsonUndefined) = putElement(tag, value)
+    private fun encodeTaggedTimestamp(tag: String, value: BsonTimestamp) = putElement(tag, value)
 
     private fun encodeTaggedBson(tag: String, value: BsonValue) = putElement(tag, value)
 
@@ -83,6 +84,7 @@ private sealed class AbstractBsonTreeOutput(
     override fun encodeMinKey(minKey: MinKey) = encodeTaggedMinKey(popTag(), minKey)
     override fun encodeSymbol(symbol: String) = encodeTaggedSymbol(popTag(), symbol)
     override fun encodeUndefined(undefined: BsonUndefined) = encodeTaggedUndefined(popTag(), undefined)
+    override fun encodeTimestamp(timestamp: BsonTimestamp) = encodeTaggedTimestamp(popTag(), timestamp)
 
     private fun checkClassDiscriminatorConflict(serializer: SerializationStrategy<*>) {
         if (bson.configuration.classDiscriminator in serializer.descriptor.elementNames())

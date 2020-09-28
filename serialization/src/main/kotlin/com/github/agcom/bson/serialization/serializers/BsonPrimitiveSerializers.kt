@@ -28,8 +28,6 @@ import org.bson.types.MinKey
  * - [BsonMinKey]
  * - [BsonSymbol]
  * - [BsonUndefined]
- *
- * Note: Doesn't support some of deprecated or internal types:
  * - [BsonJavaScriptWithScope]
  * - [BsonTimestamp]
  *
@@ -82,6 +80,7 @@ object BsonPrimitiveSerializer : KSerializer<BsonValue> {
                         BsonUndefinedSerializer, it as? BsonUndefined
                             ?: throw BsonInvalidOperationException("Value expected to be of type ${UNDEFINED} is of unexpected type ${it.bsonType}")
                     )
+                    TIMESTAMP -> encoder.encode(BsonTimestampSerializer, it.asTimestamp())
                     else -> throw RuntimeException("Should not reach here")
                 }
             }
@@ -493,6 +492,28 @@ object BsonUndefinedSerializer : KSerializer<BsonUndefined> {
     override fun deserialize(decoder: Decoder): BsonUndefined {
         decoder.verify(); decoder as BsonInput
         return decoder.decodeUndefined()
+    }
+
+}
+
+/**
+ * External serializer for [BsonTimestamp].
+ *
+ * Can only be used with [Bson][com.github.agcom.bson.serialization.Bson] format.
+ */
+object BsonTimestampSerializer : KSerializer<BsonTimestamp> {
+
+    override val descriptor: SerialDescriptor =
+        PrimitiveDescriptor(BsonTimestamp::class.qualifiedName!!, PrimitiveKind.LONG)
+
+    override fun serialize(encoder: Encoder, value: BsonTimestamp) {
+        encoder.verify(); encoder as BsonOutput
+        encoder.encodeTimestamp(value)
+    }
+
+    override fun deserialize(decoder: Decoder): BsonTimestamp {
+        decoder.verify(); decoder as BsonInput
+        return decoder.decodeTimestamp()
     }
 
 }

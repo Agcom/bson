@@ -818,6 +818,10 @@ class BsonTest : BsonInstanceTest by BsonInstanceTestDefault(), FreeSpec() {
                     bson.context.getContextual(BsonUndefined::class) shouldBe BsonUndefinedSerializer
                 }
 
+                "bson timestamp" {
+                    bson.context.getContextual(BsonTimestamp::class) shouldBe BsonTimestampSerializer
+                }
+
             }
 
             "binary" {

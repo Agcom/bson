@@ -3,10 +3,7 @@ package com.github.agcom.bson.serialization.decoders
 import com.github.agcom.bson.serialization.Bson
 import kotlinx.serialization.CompositeDecoder
 import kotlinx.serialization.Decoder
-import org.bson.BsonDbPointer
-import org.bson.BsonJavaScriptWithScope
-import org.bson.BsonUndefined
-import org.bson.BsonValue
+import org.bson.*
 import org.bson.types.*
 import java.util.regex.Pattern
 
@@ -84,5 +81,10 @@ interface BsonInput : Decoder, CompositeDecoder {
      * Read a [bson undefined][org.bson.BsonUndefined] value.
      */
     fun decodeUndefined(): BsonUndefined
+
+    /**
+     * Read a [bson timestamp][org.bson.BsonTimestamp] value.
+     */
+    fun decodeTimestamp(): BsonTimestamp
 
 }
