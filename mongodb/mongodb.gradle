@@ -28,7 +28,7 @@ bintray {
         name = 'mongodb'
         version {
             name = project.version.toString()
-            desc = 'Patch to deal with org.bson.BSONException'
+            desc = 'Patch to deal with internal and deprecated bson types'
             released = new Date()
             vcsTag = "v${project.version.toString()}"
         }

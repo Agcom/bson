@@ -20,8 +20,8 @@ Currently, only supports **Kotlinx serialization runtime 0.20.0**.
   }
   
   dependencies {
-      implementation 'com.github.agcom.bson:bson-serialization:0.4.0' // The bson serialization library
-      implementation 'com.github.agcom.bson:bson-mongodb:0.4.0' // MongoDB driver extensions
+      implementation 'com.github.agcom.bson:bson-serialization:0.5.0' // The bson serialization library
+      implementation 'com.github.agcom.bson:bson-mongodb:0.5.0' // MongoDB driver extensions
   }
   ```
 
