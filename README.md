@@ -1,3 +1,5 @@
+> :warning: Archived in favor of [agcom/kbson](https://github.com/agcom/kbson) :warning:
+
 # Bson serialization
 
 [Bson](http://bsonspec.org/) serialization format implementation for [Kotlinx serialization](https://github.com/Kotlin/kotlinx.serialization), based on [The BSON library (org.mongodb.bson)](https://mvnrepository.com/artifact/org.mongodb/bson).
