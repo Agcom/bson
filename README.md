@@ -1,4 +1,4 @@
-> :warning: Archived in favor of [agcom/kbson](https://github.com/agcom/kbson) :warning:
+> :warning: Archived in favor of a future project (agcom/kbson) :warning:
 
 # Bson serialization
 
